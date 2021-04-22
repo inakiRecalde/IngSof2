@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #Probando para ver si se modifica en el repositorio
 #Probando po555555555555555555555555
-#aaaaaaaahhhhhhh
 #para probar pull 
 
 #Probando para ver si funciona push
