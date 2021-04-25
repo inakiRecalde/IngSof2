@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from PaginaDePruebaApp.models import *
 
 # Register your models here.
@@ -9,6 +8,7 @@ from PaginaDePruebaApp.models import *
 class UsuarioAdmin(admin.ModelAdmin):
     list_display = ("nombre", "email","dni")  #campos de la tabla
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
+    #readonly_fields=('created','updated') 
 
     #list_filter("") muestra filtros tener en cuaenta para los viajes para filtrar por fechas
 admin.site.register(Usuario, UsuarioAdmin)
