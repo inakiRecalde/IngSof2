@@ -43,16 +43,16 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav mx-auto">
-          <li class="nav-item active px-lg-4">
+          <li class="nav-item {% if request.path == 'Inicio' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url 'Inicio' %}">Inicio</a>
           </li>
-          <li class="nav-item px-lg-4">
+          <li class="nav-item {% if request.path == 'Comentarios' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url 'Comentarios' %}">Comentarios</a>
           </li>
-          <li class="nav-item px-lg-4">
+          <li class="nav-item {% if request.path == 'Contacto' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url 'Contacto' %}">Contacto</a>
           </li>
-          <li class="nav-item px-lg-4">
+          <li class="nav-item {% if request.path == 'Perfil' %}active{% endif %} px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="{% url 'Perfil' %}">Iniciar sesion</a>
           </li>
 
@@ -65,6 +65,7 @@
   {% block content %}
 
   {% endblock %}
+
   <!-- Footer -->
   <footer  id="fot"class="footer text-faded text-center py-5">
     <div class="container">
@@ -98,8 +99,8 @@
  </footer>
     <!-- Bootstrap -->
 
-    <script src="{% static 'PaginaDePruebaApp/vendor/jquery/jquery.min.js' %"></script>
-    <script src="{% static 'PaginaDePruebaApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %"></script>
+    <script src="{% static 'PaginaDePruebaApp/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'PaginaDePruebaApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
     <script type="text/javascript">
        $(function() {
