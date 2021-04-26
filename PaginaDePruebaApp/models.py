@@ -1,15 +1,19 @@
 from django.db import models
-from django.contrib.auth.admin import User
+from django.contrib.auth.models import AbstractUser
+
+
 
 # Create your models here.
+class User(AbstractUser):
+    telefono= models.IntegerField(null= True, blank = True)
 
-class Usuario(models.Model):
+
+class Cliente(models.Model):
     nombre=models.CharField(max_length=30)
     apellido=models.CharField(max_length=30)
     email= models.EmailField()
     dni= models.IntegerField()
     contraseña = models.CharField(max_length=50)
-    user=models.CharField(max_length=30)
     suspendido=models.BooleanField(default=False)
     #historialViajes
     #created=models.DateTimeField(auto_now_add=True)
@@ -18,27 +22,19 @@ class Usuario(models.Model):
     def __str__(self):
         return (self.nombre)
 
-class UsuarioGold(Usuario):
+class Tarjeta():
+    nro=models.IntegerField()
+    fechaVto=models.DateTimeField()
+    codigo=models.IntegerField(max_length=3) 
+
+class ClienteGold(Cliente):
      ahorro=models.FloatField()
-     created=models.DateTimeField(auto_now_add=True)
-     updated=models.DateTimeField(auto_now_add=True)
+    ## created=models.DateTimeField(auto_now_add=True)
+    ## updated=models.DateTimeField(auto_now_add=True)
      #faltaria una lista de tarjetas
 
      def __init__(self):
          Usuario.__init__(self)
-
-class Chofer(models.Model):
-    nombre=models.CharField(max_length=30)
-    apellido=models.CharField(max_length=30)
-    email= models.EmailField()
-    telefono= models.IntegerField()
-    contraseña = models.CharField(max_length=50)
-    created=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now_add=True)
-    #viajes
-
-    def __str__(self):
-        return (self.nombre)
 
 
 class Combi(models.Model):
@@ -46,17 +42,17 @@ class Combi(models.Model):
     modelo=models.CharField(max_length=30)
     cantAsientos= models.IntegerField()
     patente = models.CharField(max_length=20)
-    chofer = models.OneToOneField(Chofer, on_delete= models.CASCADE, ## cascade mantiene la integridad referencial ante bajas
+    chofer = models.OneToOneField(User, on_delete= models.CASCADE, ## cascade mantiene la integridad referencial ante bajas
                                                 null= False, blank = False) ## obliga a que se asigne un chofer
-    created=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now_add=True)
+   ## created=models.DateTimeField(auto_now_add=True)
+  ##  updated=models.DateTimeField(auto_now_add=True)
 
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30)
     descripcion=models.CharField(max_length=50) #esto sería opcional
     precio=models.IntegerField()
-    created=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now_add=True)
+  ##  created=models.DateTimeField(auto_now_add=True)
+  ##  updated=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return 'el insumo %s tiene un precio de $ %s  ' %(self.nombre, self.precio) ## asi se muestra en la tabla
@@ -65,15 +61,11 @@ class Comentario():
     texto=models.CharField(max_length=200)
     puntuacion=models.IntegerField(max_length=1) #no se cómo restringir que el número sea entre 0 y 5
     #autor (un usuario )
-    created=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now_add=True)
+  ##  created=models.DateTimeField(auto_now_add=True)
+  ##  updated=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return 'Comentario: %s, puntuacion: %d' %(self.texto, self.puntuacion)
 
-class Tarjeta():
-    nro=models.IntegerField()
-    fechaVto=models.DateTimeField()
-    codigo=models.IntegerField(max_length=3) 
 
 class Compra():
     fecha=models.DateTimeField(auto_now_add=True)

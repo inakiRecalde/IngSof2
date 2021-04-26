@@ -313,3 +313,15 @@ ul.errorlist{
   font-style: italic;
   color: red;
 }
+
+.registro {
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+.login {
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
