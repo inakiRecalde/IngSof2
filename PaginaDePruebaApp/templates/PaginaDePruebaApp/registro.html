@@ -7,7 +7,7 @@
 <div class="registro">
     <form action="" method="post">
         {% csrf_token %}
-        {{form.as_p}}
+        <table> {{form.as_table}} </table>
         <button class="btn" type="submit">Registrarse</button>
 
     </form>

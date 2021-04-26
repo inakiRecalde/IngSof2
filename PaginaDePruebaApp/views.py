@@ -32,7 +32,7 @@ def Login_request(request):
         form = AuthenticationForm( request, data= request.POST)
         if form.is_valid:
             usuario = form.cleaned_data.get('username')
-            constrasena = form.cleaned_data.get('password')
+            contrasena = form.cleaned_data.get('password')
             user =authenticate(username = usuario, password= contrasena)
             if user is not None:
                 user = form.save()

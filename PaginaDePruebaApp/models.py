@@ -34,11 +34,11 @@ class ClienteGold(Cliente):
      #faltaria una lista de tarjetas
 
      def __init__(self):
-         Usuario.__init__(self)
+         Cliente.__init__(self)
 
 
 class Combi(models.Model):
-    marca=models.CharField(max_length=30)
+    #marca=models.CharField(max_length=30)
     modelo=models.CharField(max_length=30)
     cantAsientos= models.IntegerField()
     patente = models.CharField(max_length=20)
