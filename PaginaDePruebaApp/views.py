@@ -26,22 +26,6 @@ def Logout_request(request):
     messages.info(request, "Su sesion cerro correctamente")
     return redirect(Inicio)
 
-def Login_request(request):
-
-    if request.method == "POST":
-        form = AuthenticationForm( request, data= request.POST)
-        if form.is_valid:
-            usuario = form.cleaned_data.get('username')
-            contrasena = form.cleaned_data.get('password')
-            user =authenticate(username = usuario, password= contrasena)
-            if user is not None:
-                user = form.save()
-                login(request,user)
-                return redirect(Inicio)
-            else:
-                messages.error(request," Usuario o contrasena erroneas")
-    form = AuthenticationForm()
-    return render(request,"PaginaDePruebaApp/login.html", {"form": form})
 
 def Registro(request):
 

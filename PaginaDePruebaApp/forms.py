@@ -6,9 +6,9 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
     password1 = forms.CharField(label='password',widget= forms.PasswordInput)
     password2 = forms.CharField(label='Confirmar password',widget= forms.PasswordInput)
-
+    dni = forms.IntegerField(label='dni')
     class Meta:
         model = get_user_model()
-        fields= ['username','email','password1','password2']
+        fields= ['username','email','password1','password2','dni']
         help_text = {k:"" for k in fields }
 
