@@ -123,4 +123,4 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'PaginaDePruebaApp.User'
 
-LOGIN_REDIRECT_URL= 'inicio'
+LOGIN_REDIRECT_URL= 'Inicio'

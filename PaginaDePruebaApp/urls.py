@@ -1,5 +1,6 @@
 from django.urls import path
 from PaginaDePruebaApp import views
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('Inicio', views.Inicio,name = "Inicio"),
@@ -8,5 +9,5 @@ urlpatterns = [
     path('Contacto', views.Contacto,name = "Contacto"),
     path('Registro', views.Registro,name = "Registro"),
     path('logout', views.Logout_request,name = "logout"),
-    path('loogin', views.Login_request,name = "login"),
+    path('login', LoginView.as_view(template_name ='PaginaDePruebaApp/login.html'),name = "login"),
 ]
