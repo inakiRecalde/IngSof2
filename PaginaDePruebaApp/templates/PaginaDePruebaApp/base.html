@@ -114,18 +114,13 @@
     <script src="{% static 'PaginaDePruebaApp/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 
-    <script type="text/javascript">
-        $(function () {
-            $('#datetimepicker1').datetimepicker();
-        });
-    </script>
 
-    {% if messages % }
-    {% for message in messages % }
-    <script type="text/javascript">
-                M.toast({
-                    html: '{{mesage}}'})
-    </script>
+    <!-- {% if messages % }
+     {% for message in messages % }
+     <script type="text/javascript">
+                 M.toast({
+                     html: '{{mesage}}'})
+     </script> -->
 </body>
 
 
