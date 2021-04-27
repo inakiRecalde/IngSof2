@@ -124,3 +124,12 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'PaginaDePruebaApp.User'
 
 LOGIN_REDIRECT_URL= 'Inicio'
+
+#Parametros para el envio de mail
+
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.googlemail.com"
+EMAIL_USE_TLS=True
+EMAIL_PORT=587
+#EMAIL_HOST_USER="Gmail desde donde se envía"
+#EMAIL_HOST_PASSWORD="Contraseña del Gmail"

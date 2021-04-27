@@ -2,9 +2,33 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
+from datetime import date
 from .forms import UserRegisterForm
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.conf import settings
 
 # Create your views here.
+def envio_Mail(destinatario):
+    context = {'destinatario': destinatario}
+    template = get_template('PaginaDePruebaApp/correo.html')
+    content = template.render(content)
+    email = EmailMultiAlternatives(
+        'Confirmacion de cuenta',
+        'COMBI-19',
+        settings.EMAIL_HOST_USER,
+        [destinatario]
+    )
+    email.attach_alternative(content, 'text/html')
+    email.send()
+
+def esMayor(nacimiento):
+    fecha_actual=date.today()
+    resultado=fecha_actual.year - nacimiento.year
+    if reultado > 17:
+        return True
+    return False
+
 def Inicio (request):
 
     return render(request,"PaginaDePruebaApp/inicio.html")
