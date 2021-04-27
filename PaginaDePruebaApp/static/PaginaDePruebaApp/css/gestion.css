@@ -167,7 +167,7 @@ p {
     float: left;
   }
   .intro .intro-text {
-    left: 600;
+    left: 60%;
     width: 60%;
     margin-top: 3rem;
     background-color: rgba(24, 64, 8);
@@ -320,6 +320,7 @@ ul.errorlist{
     background-color: white;
 }
 .login {
+    padding: 20px;
     align-items: center;
     justify-content: center;
     background-color: white;
