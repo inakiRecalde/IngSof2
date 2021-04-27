@@ -62,5 +62,7 @@ def Registro(request):
         else:
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
-    form = UserRegisterForm()
-    return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+            return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+    else:
+        form = UserRegisterForm()
+        return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
