@@ -131,5 +131,5 @@ EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST="smtp.googlemail.com"
 EMAIL_USE_TLS=True
 EMAIL_PORT=587
-#EMAIL_HOST_USER="Gmail desde donde se envía"
-#EMAIL_HOST_PASSWORD="Contraseña del Gmail"
+EMAIL_HOST_USER="combi.19.empresa@gmail.com"
+EMAIL_HOST_PASSWORD="combi-19"
