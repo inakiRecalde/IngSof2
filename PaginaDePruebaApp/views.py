@@ -12,7 +12,7 @@ from django.conf import settings
 def envio_Mail(destinatario):
     context = {'destinatario': destinatario}
     template = get_template('PaginaDePruebaApp/correo.html')
-    content = template.render(content)
+    content = template.render(context)
     email = EmailMultiAlternatives(
         'Confirmacion de cuenta',
         'COMBI-19',
@@ -25,7 +25,7 @@ def envio_Mail(destinatario):
 def esMayor(nacimiento):
     fecha_actual=date.today()
     resultado=fecha_actual.year - nacimiento.year
-    if reultado > 17:
+    if resultado > 17:
         return True
     return False
 
