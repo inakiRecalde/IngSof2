@@ -12,7 +12,7 @@ from django.conf import settings
 def envio_Mail(destinatario):
     context = {'destinatario': destinatario}
     template = get_template('PaginaDePruebaApp/correo.html')
-    content = template.render(content)
+    content = template.render(context)
     email = EmailMultiAlternatives(
         'Confirmacion de cuenta',
         'COMBI-19',
@@ -25,9 +25,15 @@ def envio_Mail(destinatario):
 def esMayor(nacimiento):
     fecha_actual=date.today()
     resultado=fecha_actual.year - nacimiento.year
-    if reultado > 17:
+    if resultado > 17:
         return True
     return False
+
+def clavesValidas(clave1,clave2):
+    if (clave1 == clave2) and (clave1.len()>5):
+        return True
+    return False    
+
 
 def Inicio (request):
 
@@ -56,10 +62,13 @@ def Registro(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
+            diccionario=form.cleaned_data
             usuario = form.save()
             login(request,usuario)
             return redirect(Inicio)
         else:
+            diccionario=form.cleaned_data
+            print(form.error_messages)
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
