@@ -29,6 +29,12 @@ def esMayor(nacimiento):
         return True
     return False
 
+def clavesValidas(clave1,clave2):
+    if (clave1 == clave2) and (clave1.len()>5):
+        return True
+    return False    
+
+
 def Inicio (request):
 
     return render(request,"PaginaDePruebaApp/inicio.html")
@@ -56,10 +62,13 @@ def Registro(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
+            diccionario=form.cleaned_data
             usuario = form.save()
             login(request,usuario)
             return redirect(Inicio)
         else:
+            diccionario=form.cleaned_data
+            print(form.error_messages)
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
     form = UserRegisterForm()
