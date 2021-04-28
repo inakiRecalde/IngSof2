@@ -70,11 +70,9 @@ def Registro(request):
                     #envio_Mail(diccionario["email"])
                     return redirect(Inicio)
                 else: 
-                    messages.add_message(request, messages.WARNING, 'Debe ser mayor de edad para registrarse')
                     print("El usario no es mayor de edad") #Deberiamos devolver un mensaje de error
                     return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
             else: 
-                messages.add_message(request, messages.WARNING, 'Ya existe el mail ingresado')
                 print("Ya existe el mail ingresado") #Mostrar mensaje de error
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
