@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
+from PaginaDePruebaApp.models import Cliente,User
 from datetime import date
 from .forms import UserRegisterForm
 from django.core.mail import EmailMultiAlternatives
@@ -29,11 +30,11 @@ def esMayor(nacimiento):
         return True
     return False
 
-def clavesValidas(clave1,clave2):
-    if (clave1 == clave2) and (clave1.len()>5):
-        return True
-    return False    
-
+def mail_disponible(mail):
+    usuarios=User.objects.filter(email=mail)
+    if usuarios:
+        return False
+    return True    
 
 def Inicio (request):
 
@@ -58,14 +59,22 @@ def Logout_request(request):
 
 
 def Registro(request):
-
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             diccionario=form.cleaned_data
-            usuario = form.save()
-            login(request,usuario)
-            return redirect(Inicio)
+            if mail_disponible(diccionario["email"]):
+                if esMayor(diccionario["fechaDeNacimiento"]):
+                    usuario = form.save()
+                    login(request,usuario)
+                    #envio_Mail(diccionario["email"])
+                    return redirect(Inicio)
+                else: 
+                    print("El usario no es mayor de edad") #Deberiamos devolver un mensaje de error
+                    return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+            else: 
+                print("Ya existe el mail ingresado") #Mostrar mensaje de error
+                return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
             print(form.error_messages)
