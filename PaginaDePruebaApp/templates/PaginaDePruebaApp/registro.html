@@ -8,6 +8,17 @@
     <form class="registro" action="" method="post">
         {% csrf_token %}
         <table> {{form.as_table}} </table>
+        {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                    {% if message.level == 30 %}
+                        {{ message }}
+                    {% endif %}
+                </li>
+             {% endfor %}
+            </ul>
+        {% endif %}
         <button class="btn" type="submit">Registrarse</button>
 
     </form>
