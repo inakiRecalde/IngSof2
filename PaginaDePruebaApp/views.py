@@ -31,8 +31,7 @@ def esMayor(nacimiento):
     return False
 
 def mail_disponible(mail):
-    #No logro que devuelva False cuando el mail ya esta regitrado/ puede que haya algun otro metodo de busqueda en la bd
-    usuarios=Cliente.objects.filter(email__icontains=mail)
+    usuarios=User.objects.filter(email=mail)
     if usuarios:
         return False
     return True    
@@ -77,7 +76,6 @@ def Registro(request):
                 print("Ya existe el mail ingresado") #Mostrar mensaje de error
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
-            diccionario=form.cleaned_data
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
