@@ -76,7 +76,7 @@ def Registro(request):
             else: 
                
                 msg ="Ya existe el mail ingresado."    ## Mensaje si ya existe el correo
-                form.add_error("fechaDeNacimiento", msg)
+                form.add_error("email", msg)
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
