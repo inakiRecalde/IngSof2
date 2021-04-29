@@ -61,9 +61,9 @@ class Combi(models.Model):
     def __str__(self):
         return 'Marca: %s, Asientos: %s, Chofer: %s' %(self.modelo, self.cantAsientos,self.chofer)
 class Insumo(models.Model):
-    nombre=models.CharField(max_length=30)
+    nombre=models.CharField(max_length=30, unique=True)
     descripcion=models.CharField(max_length=50) #esto sería opcional
-    precio=models.IntegerField()
+    precio=models.PositiveIntegerField()
   ##  created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
     
@@ -90,10 +90,10 @@ class Compra(models.Model):
 
 class Lugar(models.Model):
     nombre=models.CharField(max_length=30)
-    codigoPostal=models.IntegerField()
-
+    codigoPostal=models.IntegerField(unique=True)
     def __str__(self):
         return '%s(%d)' %(self.nombre, self.codigoPostal)
+
 class Ruta(models.Model):
     origen = models.ForeignKey(Lugar, on_delete= models.CASCADE,related_name = 'rutaOrigen')
     destino = models.ForeignKey(Lugar, on_delete= models.CASCADE, related_name = 'rutaDestino')
