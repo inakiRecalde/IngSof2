@@ -70,10 +70,13 @@ def Registro(request):
                     #envio_Mail(diccionario["email"])
                     return redirect(Inicio)
                 else: 
-                    print("El usario no es mayor de edad") #Deberiamos devolver un mensaje de error
+                    msg ="El usario no es mayor de edad."   ## Mensaje de eeror si es menor
+                    form.add_error("fechaDeNacimiento", msg)
                     return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
             else: 
-                print("Ya existe el mail ingresado") #Mostrar mensaje de error
+               
+                msg ="Ya existe el mail ingresado."    ## Mensaje si ya existe el correo
+                form.add_error("fechaDeNacimiento", msg)
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
