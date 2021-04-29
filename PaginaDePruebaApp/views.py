@@ -1,10 +1,9 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from PaginaDePruebaApp.models import Cliente,User
 from datetime import date
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, LoginForm
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
@@ -57,6 +56,33 @@ def Logout_request(request):
     messages.info(request, "Su sesion cerro correctamente")
     return redirect(Inicio)
 
+def Login(request):
+    if request.method == "POST":
+        form=LoginForm(request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if User.objects.filter(email=diccionario["email"].lower()).exists():
+                username = User.objects.get(email=diccionario["email"].lower()).username
+                usuario = authenticate(username=username, password=diccionario["contrasenia"])
+                if usuario is not None:
+                    login(request,usuario)  
+                    return redirect(Inicio)  
+                else:
+                    msg ="El mail o la contraseña son inválidos"   
+                    form.add_error("email", msg)
+                    return render(request,"PaginaDePruebaApp/login.html", {"form": form})                
+            else:
+                msg ="El mail o la contraseña son inválidos"   
+                form.add_error("email", msg)
+                return render(request,"PaginaDePruebaApp/login.html", {"form": form})
+        else:
+            diccionario=form.cleaned_data
+            for msg in form.error_messages:
+                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
+            return render(request,"PaginaDePruebaApp/login.html", {"form": form})
+    else:
+        form = LoginForm()
+        return render(request,"PaginaDePruebaApp/login.html", {"form": form})
 
 def Registro(request):
     if request.method == "POST":

@@ -9,5 +9,5 @@ urlpatterns = [
     path('Contacto/', views.Contacto,name = "Contacto"),
     path('Registro/', views.Registro,name = "Registro"),
     path('logout/', views.Logout_request,name = "logout"),
-    path('login/', LoginView.as_view(template_name ='PaginaDePruebaApp/login.html'),name = "login"),
+    path('login/', views.Login,name = "login"),
 ]
