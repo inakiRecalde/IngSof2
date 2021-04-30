@@ -7,6 +7,7 @@ from .forms import UserRegisterForm, LoginForm
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
+from django.contrib import messages
 
 # Create your views here.
 def envio_Mail(destinatario):
@@ -59,11 +60,29 @@ def Logout_request(request):
 def Login(request):
     if request.method == "POST":
         form=LoginForm(request.POST)
-        if form.is_valid():
+        usuario = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
+        if usuario is not None:
+            login(request,usuario)  
+            return redirect(Inicio)  
+        else:
+            messages.error(request,"Mail o contraseña inválidos")
+            return render(request,"PaginaDePruebaApp/login.html", {"form": form})
+        #este comentario gigante es lo que estaba antes, no lo borren plis
+        """if form.is_valid():
             diccionario=form.cleaned_data
+            usuario = authenticate(email=diccionario["email"], password=diccionario["password"])
+            if usuario is not None:
+                login(request,usuario)  
+                return redirect(Inicio)  
+            else:
+                messages.error("please Correct Below Errors")
+                msg ="El mail o la contraseña son inválidos"   
+                form.add_error("email", msg)
+                return render(request,"PaginaDePruebaApp/login.html", {"form": form}) 
             if User.objects.filter(email=diccionario["email"].lower()).exists():
-                username = User.objects.get(email=diccionario["email"].lower()).username
-                usuario = authenticate(username=username, password=diccionario["contrasenia"])
+                mail=User.objects.get(email=diccionario["email"]).lower
+                #username = User.objects.get(email=diccionario["email"].lower()).username
+                usuario = authenticate(email=mail, password=diccionario["password"])
                 if usuario is not None:
                     login(request,usuario)  
                     return redirect(Inicio)  
@@ -72,14 +91,14 @@ def Login(request):
                     form.add_error("email", msg)
                     return render(request,"PaginaDePruebaApp/login.html", {"form": form})                
             else:
-                msg ="El mail o la contraseña son inválidos"   
+                msg ="El mail  son inválidos"   
                 form.add_error("email", msg)
                 return render(request,"PaginaDePruebaApp/login.html", {"form": form})
         else:
             diccionario=form.cleaned_data
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
-            return render(request,"PaginaDePruebaApp/login.html", {"form": form})
+            return render(request,"PaginaDePruebaApp/login.html", {"form": form})"""
     else:
         form = LoginForm()
         return render(request,"PaginaDePruebaApp/login.html", {"form": form})
@@ -99,8 +118,7 @@ def Registro(request):
                     msg ="El usario no es mayor de edad."   ## Mensaje de eeror si es menor
                     form.add_error("fechaDeNacimiento", msg)
                     return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
-            else: 
-               
+            else:                
                 msg ="Ya existe el mail ingresado."    ## Mensaje si ya existe el correo
                 form.add_error("email", msg)
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})

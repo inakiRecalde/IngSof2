@@ -12,7 +12,7 @@ admin.site.register(Tarjeta)
 
 
 class UserAdmin(admin.ModelAdmin):
-    #form=CrearChoferForm
+    model=User
     list_display = ("username", "email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
 
@@ -25,11 +25,19 @@ class ClienteAdmin(admin.ModelAdmin):
 
 admin.site.register(Cliente,ClienteAdmin)
 
+class ChoferAdmin(admin.ModelAdmin):
+    list_display=("user","telefono")
+
+
+#admin.site.register(Chofer,ChoferAdmin)
+
+
 class CombiAdmin(admin.ModelAdmin):
     list_display = ("modelo", "cantAsientos","chofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("modelo","cantAsientos")  ## campos por los que se puede buscar
 
 admin.site.register(Combi, CombiAdmin)
+
 class InsumoAdmin(admin.ModelAdmin):
     list_display = ("nombre", "precio") 
     search_field = ("nombre")
