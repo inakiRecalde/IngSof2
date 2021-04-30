@@ -6,37 +6,28 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class User(AbstractUser):
-
-    telefono= models.IntegerField(null= True, blank = True)  ## SOLO PARA CHOFER
-    dni = models.IntegerField(null= True, blank = True)  ## PARA USER COMUN Y GOLD
-    fechaDeNaciemiento = models.DateField(null= True, blank = True) ## PARA USER COMUN Y GOLD
-    suspendido=models.BooleanField(default=False) ##PARA TODOS ?
-    ahorro=models.FloatField(null= True, blank = True) ## SOLO PARA USER GOLD
+    esCliente=models.BooleanField(default=False)
+    esChofer=models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s, %s, dni: %s' %(self.first_name, self.last_name,self.dni)
+        return '%s, %s ' %(self.first_name, self.last_name)
+
+class Chofer():
+    user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    telefono= models.IntegerField(null= True, blank = True)
+   
 
 class Cliente(models.Model):
-    nombre=models.CharField(max_length=30)
-    apellido=models.CharField(max_length=30)
-    email= models.EmailField()
-    dni= models.IntegerField()
-    contraseña = models.CharField(max_length=50)
+    user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    dni= models.IntegerField(null= True, blank = True)
     suspendido=models.BooleanField(default=False)
+    esGold=models.BooleanField(default=False)
     #historialViajes
     #created=models.DateTimeField(auto_now_add=True)
     #updated=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (self.nombre)
-
-class Tarjeta(models.Model):
-    nro=models.IntegerField()
-    fechaVto=models.DateTimeField()
-    codigo=models.IntegerField() 
-    user = models.ForeignKey(User, on_delete= models.CASCADE)
-
-
+        return self.user.email
 
 class ClienteGold(Cliente):
      ahorro=models.FloatField()
@@ -45,8 +36,13 @@ class ClienteGold(Cliente):
      #faltaria una lista de tarjetas
 
      def __init__(self):
-         Cliente.__init__(self)
+         Cliente.__init__(self)    
 
+class Tarjeta(models.Model):
+    nro=models.IntegerField()
+    fechaVto=models.DateTimeField()
+    codigo=models.IntegerField() 
+    user = models.ForeignKey(User, on_delete= models.CASCADE)
 
 class Combi(models.Model):
     #marca=models.CharField(max_length=30)
