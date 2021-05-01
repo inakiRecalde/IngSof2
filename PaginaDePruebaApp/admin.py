@@ -29,7 +29,7 @@ class ChoferAdmin(admin.ModelAdmin):
     list_display=("user","telefono")
 
 
-#admin.site.register(Chofer,ChoferAdmin)
+admin.site.register(Chofer,ChoferAdmin)
 
 
 class CombiAdmin(admin.ModelAdmin):

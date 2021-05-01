@@ -35,9 +35,9 @@ class User(AbstractUser):
     def __str__(self):
         return '%s, %s ' %(self.first_name, self.last_name)
 
-class Chofer():
+class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    telefono= models.IntegerField(null= True, blank = True)
+    telefono= models.IntegerField( blank= False )
    
 
 class Cliente(models.Model):
