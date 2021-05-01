@@ -15,14 +15,14 @@ class UserAdmin(admin.ModelAdmin):
     model=User
     list_display = ("username", "email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
-
+    filter = ("is_staff")
 
 admin.site.register(User, UserAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("user", "dni", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
-
+    
 admin.site.register(Cliente,ClienteAdmin)
 
 class ChoferAdmin(admin.ModelAdmin):
@@ -45,7 +45,7 @@ class InsumoAdmin(admin.ModelAdmin):
 admin.site.register(Insumo, InsumoAdmin)
 
 class RutaAdmin(admin.ModelAdmin):
-    list_display = ("origen", "destino") 
+    list_display = ("origen", "destino","descripcion") 
     search_fields = ("origen", "destino")
 
 admin.site.register(Ruta, RutaAdmin)
@@ -55,13 +55,14 @@ class LugarAdmin(admin.ModelAdmin):
     search_fields = ("nombre", "codigoPostal")
 
 admin.site.register(Lugar,LugarAdmin)
-class PasajeAdmin(admin.ModelAdmin):
-    list_display = ("fecha", "total") 
-    search_field = ("fecha")
-admin.site.register(Pasaje,PasajeAdmin)
+
+##class PasajeAdmin(admin.ModelAdmin):
+##    list_display = ("fecha", "total") 
+##    search_field = ("fecha")
+##admin.site.register(Pasaje,PasajeAdmin)
 
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ("ruta","combi") 
+    list_display = ("ruta","combi","fechaSalida","fechaLlegada") 
     search_field = ("fechaSalida")
 
 admin.site.register(Viaje,ViajeAdmin)
