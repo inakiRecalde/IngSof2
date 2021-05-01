@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 
-
+## CHEACK para aplicar restrincciones mediante expreciones logicas q devuelvan V o F
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -28,12 +28,11 @@ class User(AbstractUser):
     USERNAME_FIELD='email'
     REQUIRED_FIELDS = []
     objects=CustomUserManager()
-    
     esCliente=models.BooleanField(default=False)
     esChofer=models.BooleanField(default=False)
 
     def __str__(self):
-        return '%s, %s ' %(self.first_name, self.last_name)
+        return "{0}, {1}".format(self.first_name, self.last_name)
 
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -42,7 +41,7 @@ class Chofer(models.Model):
 
 class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    dni= models.IntegerField(null= True, blank = True)
+    dni= models.IntegerField(null= True, blank = False)
     suspendido=models.BooleanField(default=False)
     esGold=models.BooleanField(default=False)
     #historialViajes
@@ -53,7 +52,7 @@ class Cliente(models.Model):
         return self.user.email
 
 class ClienteGold(Cliente):
-     ahorro=models.FloatField()
+     ahorro=models.FloatField(default=0)
     ## created=models.DateTimeField(auto_now_add=True)
     ## updated=models.DateTimeField(auto_now_add=True)
      #faltaria una lista de tarjetas
@@ -78,16 +77,16 @@ class Combi(models.Model):
   ##  updated=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return 'Marca: %s, Asientos: %s, Chofer: %s' %(self.modelo, self.cantAsientos,self.chofer)
+        return "Marca: {0}, Asientos: {1}, Chofer: {2}".format(self.modelo, self.cantAsientos,self.chofer)
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)
     descripcion=models.CharField(max_length=50) #esto sería opcional
-    precio=models.PositiveIntegerField()
+    precio=models.DecimalField(max_digits=10, decimal_places=2)
   ##  created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return '%s' %(self.nombre)
+        return "{0}, Precio: ${1}".format(self.nombre,self.precio)
 
 class Comentario(models.Model):
     texto=models.CharField(max_length=200)
@@ -96,7 +95,7 @@ class Comentario(models.Model):
   ##  created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return 'Comentario: %s, puntuacion: %d' %(self.texto, self.puntuacion)
+        return "Comentario: {0}, puntuacion: {1}".format(self.texto, self.puntuacion)
 
 
 class Compra(models.Model):
@@ -110,15 +109,18 @@ class Lugar(models.Model):
     nombre=models.CharField(max_length=30)
     codigoPostal=models.IntegerField(unique=True, primary_key=True)
     def __str__(self):
-        return '%s(%d)' %(self.nombre, self.codigoPostal)
+        return "{0}({1})".format(self.nombre, self.codigoPostal)
 
 class Ruta(models.Model):
     origen = models.ForeignKey(Lugar, on_delete= models.CASCADE,related_name = 'rutaOrigen')
     destino = models.ForeignKey(Lugar, on_delete= models.CASCADE, related_name = 'rutaDestino')
     distancia=models.PositiveIntegerField() #distancia en km
-
+    descripcion = models.CharField(max_length=50, blank=False)
     def __str__(self):
-        return 'Origen: %s, Destino: %s, km: %s' %(self.origen, self.destino,self.distancia)
+        return "Origen: {0}, Destino: {1}, km: {2}, Des: {3}".format(self.origen, self.destino,self.distancia,self.descripcion)
+
+    class Meta:
+        unique_together=('origen','destino','descripcion')  ## hace que no puede haber otra ruta con estos 3 campos iguales
 
 class Viaje(models.Model):
     insumo = models.ManyToManyField(Insumo)
@@ -127,11 +129,12 @@ class Viaje(models.Model):
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
-    precio=models.FloatField()
+    precio=models.DecimalField(max_digits=10, decimal_places=2)
     enCurso=models.BooleanField()
     finalizado=models.BooleanField()
 
-
+def __str__(self):
+        return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta, self.combi,self.fechaSalida,self.fechaLlegada,self.precio)
 
 class Pasaje(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)
