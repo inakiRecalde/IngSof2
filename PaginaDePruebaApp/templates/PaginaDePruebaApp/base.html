@@ -53,19 +53,34 @@
                         <a class="nav-link text-uppercase text-expanded" href="{% url 'Contacto' %}">Contacto</a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link text-uppercase text-expanded" href="">{{user.email}}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-uppercase text-expanded" href="{% url 'logout' %}">Cerrar sesion</a>
-                    </li>
+                        {% if user.is_superuser %}
+                            <li class="nav-item {% if request.path == 'RegistroChofer' %}active{% endif %} px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="{% url 'RegistroChofer' %}">Registrar chofer</a>
+                            </li>
+                        {% endif %}
+                        {% if user.esChofer %}
+                            <li class="nav-item {% if request.path == 'ViajesChofer' %}active{% endif %} px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="{% url 'ViajesChofer' %}">Mis viajes</a>
+                            </li>
+                        {% endif %}
+                        {% if user.esCliente %}
+                            <li class="nav-item">
+                                <a class="nav-link text-uppercase text-expanded" href="">Historial de viajes</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase text-expanded" href="">{{user.email}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase text-expanded" href="{% url 'logout' %}">Cerrar sesion</a>
+                        </li>
                     {% else %}
-                    <li class="nav-item {% if request.path == 'Registro' %}active{% endif %} px-lg-4">
-                        <a class="nav-link text-uppercase text-expanded" href="{% url 'Registro' %}">Registrarse</a>
-                    </li>
-                    <li class="nav-item {% if request.path == 'Login' %}active{% endif %} px-lg-4">
-                        <a class="nav-link text-uppercase text-expanded" href="{% url 'login' %}">Iniciar sesion</a>
-                    </li>
+                        <li class="nav-item {% if request.path == 'Registro' %}active{% endif %} px-lg-4">
+                            <a class="nav-link text-uppercase text-expanded" href="{% url 'Registro' %}">Registrarse</a>
+                        </li>
+                        <li class="nav-item {% if request.path == 'Login' %}active{% endif %} px-lg-4">
+                            <a class="nav-link text-uppercase text-expanded" href="{% url 'login' %}">Iniciar sesion</a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>

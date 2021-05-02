@@ -36,7 +36,7 @@ class User(AbstractUser):
 
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    telefono= models.IntegerField( blank= False )
+    telefono= models.IntegerField( null= True,blank= False )
    
 
 class Cliente(models.Model):

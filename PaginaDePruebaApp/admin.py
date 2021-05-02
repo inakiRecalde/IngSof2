@@ -2,7 +2,6 @@ from django.contrib import admin
 from PaginaDePruebaApp.models import *
 from PaginaDePruebaApp.models import User 
 from .models import User
-from .forms import CrearChoferForm
 # Register your models here.
 
 ##UserAdmin  adminCombi19 contra: 12345

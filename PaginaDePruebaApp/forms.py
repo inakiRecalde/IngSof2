@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import Cliente, User
+from .models import Cliente, User,Chofer
 from django.contrib.auth import authenticate
 
 class UserRegisterForm(UserCreationForm):
@@ -25,7 +25,6 @@ class UserRegisterForm(UserCreationForm):
         fields= ['first_name','last_name', 'email','password1','password2','dni','fechaDeNacimiento']
         help_text = {k:"" for k in fields }
 
-    #con esto estaba intentando armar los diferentes usuarios pero si sacas el username del formulario se rompe todo
     def save(self):
       user=super().save(commit=False)
       user.esCliente=True
@@ -34,6 +33,36 @@ class UserRegisterForm(UserCreationForm):
       cliente=Cliente.objects.create(user=user)
       cliente.dni=self.cleaned_data.get('dni')
       cliente.save()
+      return user
+
+class ChoferRegisterForm(UserCreationForm):
+    #mensajes de error
+    nombre_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su nombre")', 'oninput': 'this.setCustomValidity("")'}
+    apellido_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su apellido")', 'oninput': 'this.setCustomValidity("")'}
+    tel_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese un numero de telefono")', 'oninput': 'this.setCustomValidity("")'}
+    contra_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese una contraseña")', 'oninput': 'this.setCustomValidity("")'}
+
+    #campos del formulario
+    first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput(attrs=nombre_attr))
+    last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput(attrs=apellido_attr))
+    email = forms.EmailField()
+    password1 = forms.CharField(label='Contraseña',widget= forms.PasswordInput(attrs=contra_attr))
+    password2 = forms.CharField(label='Confirmar contraseña',widget= forms.PasswordInput(attrs=contra_attr))
+    tel = forms.CharField(label='Teléfono',widget=forms.TextInput(attrs=tel_attr))
+
+    class Meta:
+        model = get_user_model()
+        fields= ['first_name','last_name', 'email','password1','password2','tel']
+        help_text = {k:"" for k in fields }
+
+    def save(self):
+      user=super().save(commit=False)
+      user.esChofer=True
+      user.username=self.cleaned_data.get('email')
+      user.save()
+      chofer=Chofer.objects.create(user=user)
+      chofer.telefono=self.cleaned_data.get('tel')
+      chofer.save()
       return user
 
 class LoginForm(forms.ModelForm):
@@ -48,11 +77,6 @@ class LoginForm(forms.ModelForm):
                    'password':forms.TextInput(attrs={'class':'form-control'}),
         }
         help_text = {k:"" for k in fields }
-    """def __init__(self, *args, **kwargs):
-      
-        super(LoginForm(), self).__init__(*args, **kwargs)
-        for field in (self.fields['email'],self.fields['password']):
-            field.widget.attrs.update({'class': 'form-control '})"""
 
     def clean(self):
         if self.is_valid():
@@ -62,11 +86,4 @@ class LoginForm(forms.ModelForm):
                 raise forms.ValidationError('Email o contraseña invalidos')
 
 
-#esto era para configurar desde panel de admin pero no se
-class CrearChoferForm(forms.ModelForm):
-    email=forms.EmailField(label="Email")
-    def clean_name(self):
-        self.clean()
-        # do something that validates your data
-        return self.cleaned_data["email"]
 

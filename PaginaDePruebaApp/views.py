@@ -1,13 +1,12 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente,User
+from PaginaDePruebaApp.models import Cliente,User,Chofer
 from datetime import date
-from .forms import UserRegisterForm, LoginForm
+from .forms import UserRegisterForm, LoginForm, ChoferRegisterForm
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
-from django.contrib import messages
 
 # Create your views here.
 def envio_Mail(destinatario):
@@ -52,6 +51,12 @@ def Contacto (request):
 
     return render(request,"PaginaDePruebaApp/contacto.html")
 
+def Ahorro (request):
+    return render(request,"PaginaDePruebaApp/ahorro.html")
+
+def ViajesChofer (request):
+    return render(request,"PaginaDePruebaApp/viajesChofer.html")
+
 def Logout_request(request):
     logout(request)
     messages.info(request, "Su sesion cerro correctamente")
@@ -65,40 +70,7 @@ def Login(request):
             login(request,usuario)  
             return redirect(Inicio)  
         else:
-            messages.error(request,"Mail o contraseña inválidos")
             return render(request,"PaginaDePruebaApp/login.html", {"form": form})
-        #este comentario gigante es lo que estaba antes, no lo borren plis
-        """if form.is_valid():
-            diccionario=form.cleaned_data
-            usuario = authenticate(email=diccionario["email"], password=diccionario["password"])
-            if usuario is not None:
-                login(request,usuario)  
-                return redirect(Inicio)  
-            else:
-                messages.error("please Correct Below Errors")
-                msg ="El mail o la contraseña son inválidos"   
-                form.add_error("email", msg)
-                return render(request,"PaginaDePruebaApp/login.html", {"form": form}) 
-            if User.objects.filter(email=diccionario["email"].lower()).exists():
-                mail=User.objects.get(email=diccionario["email"]).lower
-                #username = User.objects.get(email=diccionario["email"].lower()).username
-                usuario = authenticate(email=mail, password=diccionario["password"])
-                if usuario is not None:
-                    login(request,usuario)  
-                    return redirect(Inicio)  
-                else:
-                    msg ="El mail o la contraseña son inválidos"   
-                    form.add_error("email", msg)
-                    return render(request,"PaginaDePruebaApp/login.html", {"form": form})                
-            else:
-                msg ="El mail  son inválidos"   
-                form.add_error("email", msg)
-                return render(request,"PaginaDePruebaApp/login.html", {"form": form})
-        else:
-            diccionario=form.cleaned_data
-            for msg in form.error_messages:
-                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
-            return render(request,"PaginaDePruebaApp/login.html", {"form": form})"""
     else:
         form = LoginForm()
         return render(request,"PaginaDePruebaApp/login.html", {"form": form})
@@ -112,7 +84,6 @@ def Registro(request):
                 if esMayor(diccionario["fechaDeNacimiento"]):
                     usuario = form.save()
                     login(request,usuario)
-                    #envio_Mail(diccionario["email"])
                     return redirect(Inicio)
                 else: 
                     msg ="El usario no es mayor de edad."   ## Mensaje de eeror si es menor
@@ -130,4 +101,26 @@ def Registro(request):
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
     else:
         form = UserRegisterForm()
+        return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+
+def RegistroChofer(request):
+    if request.method == "POST":
+        form = ChoferRegisterForm(request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if mail_disponible(diccionario["email"]):
+                usuario = form.save()
+                return redirect(Inicio)
+            else:                
+                msg ="Ya existe el mail ingresado."    ## Mensaje si ya existe el correo
+                form.add_error("email", msg)
+                return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+        else:
+            diccionario=form.cleaned_data
+            print(form.error_messages)
+            for msg in form.error_messages:
+                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
+            return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+    else:
+        form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})

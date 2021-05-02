@@ -8,6 +8,9 @@ urlpatterns = [
     path('Perfil/', views.Perfil,name = "Perfil"),
     path('Contacto/', views.Contacto,name = "Contacto"),
     path('Registro/', views.Registro,name = "Registro"),
+    path('RegistroChofer/', views.RegistroChofer,name = "RegistroChofer"),
+    path('ViajesChofer/', views.ViajesChofer,name = "ViajesChofer"),
+    path('Ahorro/', views.Registro,name = "Ahorro"),
     path('logout/', views.Logout_request,name = "logout"),
     path('login/', views.Login,name = "login"),
 ]
