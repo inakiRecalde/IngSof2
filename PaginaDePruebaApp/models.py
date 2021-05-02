@@ -37,7 +37,8 @@ class User(AbstractUser):
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     telefono= models.IntegerField( null= True,blank= False )
-   
+    def __str__(self):
+        return self.user.email
 
 class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -69,10 +70,9 @@ class Tarjeta(models.Model):
 class Combi(models.Model):
     #marca=models.CharField(max_length=30)
     modelo=models.CharField(max_length=30)
-    cantAsientos= models.IntegerField( default=0)
-    cantAsientosDisponibles= models.IntegerField( default=0)
-    patente = models.CharField(max_length=20)
-    chofer = models.ForeignKey(User, on_delete= models.CASCADE)
+    cantAsientos= models.PositiveIntegerField(default=0)
+    patente = models.CharField(max_length=20, unique=True)
+    chofer = models.OneToOneField(Chofer, on_delete= models.CASCADE)
    ## created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
     
