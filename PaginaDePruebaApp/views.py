@@ -59,7 +59,6 @@ def ViajesChofer (request):
 
 def Logout_request(request):
     logout(request)
-    messages.info(request, "Su sesion cerro correctamente")
     return redirect(Inicio)
 
 def Login(request):
@@ -68,7 +67,23 @@ def Login(request):
         usuario = authenticate(email=request.POST.get('email'), password=request.POST.get('password'))
         if usuario is not None:
             login(request,usuario)  
-            return redirect(Inicio)  
+            try: 
+                persona=Cliente.objects.get(pk=usuario.id)
+            except: 
+                messages.error(request, "message") 
+                return render(request,"PaginaDePruebaApp/inicio.html", {"form": form})
+            if persona is not None:
+                return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
+            else:
+                try: 
+                    persona=Chofer.objects.get(pk=usuario.id)
+                except: 
+                    messages.error(request, "message") 
+                    return render(request,"PaginaDePruebaApp/inicio.html", {"form": form})
+                if persona is not None:
+                    return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
+                else:
+                    return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
         else:
             return render(request,"PaginaDePruebaApp/login.html", {"form": form})
     else:
