@@ -68,16 +68,23 @@ class Tarjeta(models.Model):
     user = models.ForeignKey(User, on_delete= models.CASCADE)
 
 class Combi(models.Model):
-    #marca=models.CharField(max_length=30)
+    TIPO = (
+        ('Comodo', 'Cómodo'),
+        ('SuperComodo', 'Súper Comodo'),
+    )
     modelo=models.CharField(max_length=30)
     cantAsientos= models.PositiveIntegerField(default=0)
     patente = models.CharField(max_length=20, unique=True)
     chofer = models.OneToOneField(Chofer, on_delete= models.CASCADE)
+    tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
    ## created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
+
+    def getModelo(self):
+        return self.modelo
     
     def __str__(self):
-        return "Marca: {0}, Asientos: {1}, Chofer: {2}".format(self.modelo, self.cantAsientos,self.chofer)
+        return "Modelo: {0}, Asientos: {1}, Chofer: {2}".format(self.modelo, self.cantAsientos,self.chofer)
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)
     descripcion=models.CharField(max_length=50) #esto sería opcional
@@ -116,6 +123,10 @@ class Ruta(models.Model):
     destino = models.ForeignKey(Lugar, on_delete= models.CASCADE, related_name = 'rutaDestino')
     distancia=models.PositiveIntegerField() #distancia en km
     descripcion = models.CharField(max_length=50, blank=False)
+
+    def getDescripcion(self):
+        return self.descripcion
+
     def __str__(self):
         return "Origen: {0}, Destino: {1}, km: {2}, Des: {3}".format(self.origen, self.destino,self.distancia,self.descripcion)
 
@@ -123,17 +134,17 @@ class Ruta(models.Model):
         unique_together=('origen','destino','descripcion')  ## hace que no puede haber otra ruta con estos 3 campos iguales
 
 class Viaje(models.Model):
-    insumo = models.ManyToManyField(Insumo)
-    combi = models.ForeignKey(Combi, on_delete= models.CASCADE)
-    ruta = models.ForeignKey(Ruta, on_delete= models.CASCADE)
+    insumo = models.ManyToManyField(Insumo, verbose_name="Lista de insumos", blank=True)
+    combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.CASCADE)
+    ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.CASCADE)
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
     precio=models.DecimalField(max_digits=10, decimal_places=2)
-    enCurso=models.BooleanField()
-    finalizado=models.BooleanField()
+    enCurso=models.BooleanField(default=False)
+    finalizado=models.BooleanField(default=False)
 
-def __str__(self):
+    def __str__(self):
         return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta, self.combi,self.fechaSalida,self.fechaLlegada,self.precio)
 
 class Pasaje(models.Model):
