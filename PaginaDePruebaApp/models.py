@@ -4,11 +4,9 @@ import datetime
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-<<<<<<< HEAD
+
 from PaginaDePruebaApp.validators import *
 
-=======
->>>>>>> 7cacf91468435af53eeecb37fba0033473e2b863
 ## CHEACK para aplicar restrincciones mediante expreciones logicas q devuelvan V o F
 class CustomUserManager(BaseUserManager):
     """
@@ -154,17 +152,13 @@ class Ruta(models.Model):
     destino = models.ForeignKey(Lugar, on_delete= models.CASCADE, related_name = 'rutaDestino')
     distancia=models.PositiveIntegerField() #distancia en km
     descripcion = models.CharField(max_length=50, blank=False)
-
-<<<<<<< HEAD
-=======
     def getDescripcion(self):
         return self.descripcion
 
     def clean(self):
         if self.origen == self.destino:
             raise ValidationError('Mismo lugar de origen y destino')
-            
->>>>>>> 7cacf91468435af53eeecb37fba0033473e2b863
+ 
     def __str__(self):
         return "Origen: {0}, Destino: {1}, km: {2}, Des: {3}".format(self.origen, self.destino,self.distancia,self.descripcion)
 
