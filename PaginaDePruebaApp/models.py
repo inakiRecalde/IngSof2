@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
-
+from django.core.exceptions import ValidationError
 ## CHEACK para aplicar restrincciones mediante expreciones logicas q devuelvan V o F
 class CustomUserManager(BaseUserManager):
     """
@@ -127,6 +127,10 @@ class Ruta(models.Model):
     def getDescripcion(self):
         return self.descripcion
 
+    def clean(self):
+        if self.origen == self.destino:
+            raise ValidationError('Mismo lugar de origen y destino')
+            
     def __str__(self):
         return "Origen: {0}, Destino: {1}, km: {2}, Des: {3}".format(self.origen, self.destino,self.distancia,self.descripcion)
 
