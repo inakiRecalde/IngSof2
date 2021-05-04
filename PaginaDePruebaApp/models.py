@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import datetime
+from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -172,19 +173,29 @@ class Viaje(models.Model):
     insumo = models.ManyToManyField(Insumo, verbose_name="Lista de insumos", blank=True)
     combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.CASCADE)
     ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.CASCADE)
-    fechaSalida=models.DateTimeField(validators=[validateFechaSalida])
-    fechaLlegada=models.DateTimeField(validators=[validateFechaSalida])
+    fechaSalida=models.DateTimeField()
+    fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
     precio=models.DecimalField(max_digits=10, decimal_places=2,validators=[validatePrecio])
     enCurso=models.BooleanField(default=False)
     finalizado=models.BooleanField(default=False)
+
+    def clean(self):
+        if self.fechaSalida == self.fechaLlegada:
+            raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
+        if self.fechaSalida < timezone.now():
+            raise ValidationError('Fecha de salida inválida')
+        if self.fechaLlegada < timezone.now():
+            raise ValidationError('Fecha de llegada inválida')
+        if self.fechaLlegada < self.fechaSalida:
+            raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
 
     class Meta:
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
 
     def __str__(self):
-        return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta, self.combi,self.fechaSalida,self.fechaLlegada,self.precio)
+        return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
 
 class Pasaje(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)

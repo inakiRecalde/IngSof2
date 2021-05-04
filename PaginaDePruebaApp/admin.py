@@ -6,6 +6,8 @@ from .models import User
 
 ##UserAdmin  adminCombi19 contra: 12345
 
+admin.site.register(Comentario)
+
 admin.site.register(Tarjeta) #esto no debería ir
 
 class UserAdmin(admin.ModelAdmin):

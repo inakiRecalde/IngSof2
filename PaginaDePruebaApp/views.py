@@ -71,7 +71,7 @@ def Login(request):
                 persona=Cliente.objects.get(pk=usuario.id)
             except: 
                 messages.error(request, "message") 
-                return render(request,"PaginaDePruebaApp/inicio.html", {"form": form})
+                return render(request,"PaginaDePruebaApp/inicio.html")
             if persona is not None:
                 return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
             else:
@@ -79,13 +79,13 @@ def Login(request):
                     persona=Chofer.objects.get(pk=usuario.id)
                 except: 
                     messages.error(request, "message") 
-                    return render(request,"PaginaDePruebaApp/inicio.html", {"form": form})
+                    return render(request,"PaginaDePruebaApp/inicio.html")
                 if persona is not None:
                     return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
                 else:
                     return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
         else:
-            return render(request,"PaginaDePruebaApp/login.html", {"form": form})
+            return render(request,"PaginaDePruebaApp/login.html")
     else:
         form = LoginForm()
         return render(request,"PaginaDePruebaApp/login.html", {"form": form})
