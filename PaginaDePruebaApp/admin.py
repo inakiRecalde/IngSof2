@@ -64,14 +64,17 @@ admin.site.register(Lugar,LugarAdmin)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
     search_field = ("fechaSalida")
+    readonly_fields=("enCurso","finalizado")
     actions = ['delete_model']
 
+    #esta funcion elimina la accion de eliminar por defecto que tiene django
     def get_actions(self, request):
         actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
 
+    #aca defino una accion de eliminar propia
     @admin.action(description='Eliminar los viajes seleccionados')
     def delete_model(modeladmin, request, queryset):
         for obj in queryset:

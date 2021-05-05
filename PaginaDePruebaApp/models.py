@@ -180,6 +180,7 @@ class Viaje(models.Model):
     precio=models.DecimalField(max_digits=10, decimal_places=2,validators=[validatePrecio])
     
     def clean(self):
+        #chequea que las fechas sean a futuro y la de llegada no sea antes que la de salida
         if self.fechaSalida == self.fechaLlegada:
             raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
         if self.fechaSalida < timezone.now():
@@ -188,13 +189,20 @@ class Viaje(models.Model):
             raise ValidationError('Fecha de llegada inválida')
         if self.fechaLlegada < self.fechaSalida:
             raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
+        
+        #chequea que no se superpongan las combis
+        viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
+        if viajesConMismaCombi is not None:
+            for viaje in viajesConMismaCombi:
+                if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
+                    raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
 
     class Meta:
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
 
     def __str__(self):
-        return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
+        return "con ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3} y Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
 
 class Pasaje(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)
