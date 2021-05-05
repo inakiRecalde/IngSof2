@@ -169,6 +169,8 @@ class Ruta(models.Model):
         verbose_name_plural="Rutas"
         
 class Viaje(models.Model):
+    enCurso=models.BooleanField(default=False, verbose_name="Viaje iniciado")
+    finalizado=models.BooleanField(default=False, verbose_name="Viaje finalizado")
     insumo = models.ManyToManyField(Insumo, verbose_name="Lista de insumos", blank=True)
     combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.PROTECT)
     ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.PROTECT)
@@ -176,8 +178,7 @@ class Viaje(models.Model):
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
     precio=models.DecimalField(max_digits=10, decimal_places=2,validators=[validatePrecio])
-    enCurso=models.BooleanField(default=False)
-    finalizado=models.BooleanField(default=False)
+    
 
     def clean(self):
         if self.fechaSalida == self.fechaLlegada:
@@ -193,11 +194,12 @@ class Viaje(models.Model):
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
 
-    #def delete(self):                         #pense algo asi pero no deja eliminar nada
-     #   if self.enCurso:
-      #      raise ValidationError('Viaje iniciado, no se puede eliminar')
-     #   else:
-      #      self.delete
+    def delete(self):
+        print("Entro al delete()")                         #pense algo asi pero no deja eliminar nada
+        if self.enCurso:
+            raise ValidationError('Viaje iniciado, no se puede eliminar')
+        else:
+            self.delete
 
     def __str__(self):
         return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)

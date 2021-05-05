@@ -63,7 +63,6 @@ admin.site.register(Lugar,LugarAdmin)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
     search_field = ("fechaSalida")
-    readonly_fields=("enCurso","finalizado")
 
 admin.site.register(Viaje,ViajeAdmin)
 
