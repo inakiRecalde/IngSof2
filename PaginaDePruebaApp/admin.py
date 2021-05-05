@@ -2,6 +2,7 @@ from django.contrib import admin
 from PaginaDePruebaApp.models import *
 from PaginaDePruebaApp.models import User 
 from .models import User
+from django.contrib import messages
 # Register your models here.
 
 ##UserAdmin  adminCombi19 contra: 12345
@@ -63,6 +64,21 @@ admin.site.register(Lugar,LugarAdmin)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
     search_field = ("fechaSalida")
+    actions = ['delete_model']
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    @admin.action(description='Eliminar los viajes seleccionados')
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            if obj.enCurso:
+                messages.error(request, "El viaje con fecha {0} no puede eliminarse porque se encuentra en curso".format(obj.fechaSalida.strftime("%b %d %Y %H:%M")))
+            else:
+                obj.delete()
 
 admin.site.register(Viaje,ViajeAdmin)
 

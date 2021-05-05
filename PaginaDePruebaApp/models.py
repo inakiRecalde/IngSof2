@@ -179,7 +179,6 @@ class Viaje(models.Model):
     duracion=models.TimeField()
     precio=models.DecimalField(max_digits=10, decimal_places=2,validators=[validatePrecio])
     
-
     def clean(self):
         if self.fechaSalida == self.fechaLlegada:
             raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
@@ -193,13 +192,6 @@ class Viaje(models.Model):
     class Meta:
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
-
-    def delete(self):
-        print("Entro al delete()")                         #pense algo asi pero no deja eliminar nada
-        if self.enCurso:
-            raise ValidationError('Viaje iniciado, no se puede eliminar')
-        else:
-            self.delete
 
     def __str__(self):
         return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
