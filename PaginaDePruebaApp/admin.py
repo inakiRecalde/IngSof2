@@ -64,7 +64,7 @@ admin.site.register(Lugar,LugarAdmin)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
     search_field = ("fechaSalida")
-    readonly_fields=("enCurso","finalizado")
+    readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']
 
     #esta funcion elimina la accion de eliminar por defecto que tiene django
