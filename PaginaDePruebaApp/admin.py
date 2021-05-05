@@ -64,6 +64,7 @@ admin.site.register(Lugar,LugarAdmin)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
     search_field = ("fechaSalida")
+    readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']
 
     def get_actions(self, request):
