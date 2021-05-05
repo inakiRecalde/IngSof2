@@ -81,7 +81,7 @@ class Tarjeta(models.Model):
     nro=models.IntegerField()
     fechaVto=models.DateTimeField()
     codigo=models.IntegerField() 
-    user = models.ForeignKey(User, on_delete= models.CASCADE)
+    user = models.ForeignKey(User, on_delete= models.PROTECT)
 
     class Meta:
         verbose_name="Tarjeta"
@@ -95,7 +95,7 @@ class Combi(models.Model):
     modelo=models.CharField(max_length=30)
     cantAsientos= models.PositiveIntegerField(default=0)
     patente = models.CharField(max_length=20, unique=True)
-    chofer = models.OneToOneField(Chofer, on_delete= models.CASCADE)
+    chofer = models.OneToOneField(Chofer, on_delete= models.PROTECT)
     tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
    ## created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
@@ -149,8 +149,8 @@ class Lugar(models.Model):
         verbose_name_plural="Lugares"
 
 class Ruta(models.Model):
-    origen = models.ForeignKey(Lugar, on_delete= models.CASCADE,related_name = 'rutaOrigen')
-    destino = models.ForeignKey(Lugar, on_delete= models.CASCADE, related_name = 'rutaDestino')
+    origen = models.ForeignKey(Lugar, on_delete= models.PROTECT,related_name = 'rutaOrigen')
+    destino = models.ForeignKey(Lugar, on_delete= models.PROTECT, related_name = 'rutaDestino')
     distancia=models.PositiveIntegerField() #distancia en km
     descripcion = models.CharField(max_length=50, blank=False)
     def getDescripcion(self):
@@ -169,10 +169,9 @@ class Ruta(models.Model):
         verbose_name_plural="Rutas"
         
 class Viaje(models.Model):
-    
     insumo = models.ManyToManyField(Insumo, verbose_name="Lista de insumos", blank=True)
-    combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.CASCADE)
-    ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.CASCADE)
+    combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.PROTECT)
+    ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.PROTECT)
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
@@ -193,6 +192,12 @@ class Viaje(models.Model):
     class Meta:
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
+
+    #def delete(self):                         #pense algo asi pero no deja eliminar nada
+     #   if self.enCurso:
+      #      raise ValidationError('Viaje iniciado, no se puede eliminar')
+     #   else:
+      #      self.delete
 
     def __str__(self):
         return "ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3}, Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
