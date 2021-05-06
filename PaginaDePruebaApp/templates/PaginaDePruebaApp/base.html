@@ -49,13 +49,13 @@
                     <li class="nav-item {% if request.path == 'Comentarios' %}active{% endif %} px-lg-4">
                         <a class="nav-link text-uppercase text-expanded" href="{% url 'Comentarios' %}">Comentarios</a>
                     </li>
-                    <li class="nav-item {% if request.path == 'Contacto' %}active{% endif %} px-lg-4">
-                        <a class="nav-link text-uppercase text-expanded" href="{% url 'Contacto' %}">Contacto</a>
-                    </li>
                     {% if user.is_authenticated %}
                         {% if user.is_superuser %}
                             <li class="nav-item {% if request.path == 'RegistroChofer' %}active{% endif %} px-lg-4">
                                 <a class="nav-link text-uppercase text-expanded" href="{% url 'RegistroChofer' %}">Registrar chofer</a>
+                            </li>
+                            <li class="nav-item {% if request.path == 'PanelAdmin' %}active{% endif %} px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="http://127.0.0.1:8000/admin/">Panel administración</a>
                             </li>
                         {% endif %}
                         {% if user.esChofer %}
@@ -67,15 +67,16 @@
                             <li class="nav-item">
                                 <a class="nav-link text-uppercase text-expanded" href="">Historial de viajes</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-uppercase text-expanded" href="">Perfil</a>
+                            </li>
                             {% if persona.esGold %}
                                 <li class="nav-item">
                                     <a class="nav-link text-uppercase text-expanded" href="">Ahorro</a>
                                 </li>
                             {% endif %}
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link text-uppercase text-expanded" href="">{{user.email}}</a>
-                        </li>
+                        
                         <li class="nav-item">
                             <a class="nav-link text-uppercase text-expanded" href="{% url 'logout' %}">Cerrar sesion</a>
                         </li>

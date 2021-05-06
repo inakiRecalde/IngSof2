@@ -318,11 +318,11 @@ ul.errorlist{
     align-items: center;
     justify-content: center;
     background-color: white;
+    margin:auto;
 }
 .login {
-    padding: 20px;
     align-items: center;
     justify-content: center;
     background-color: white;
+    margin:auto;
 }
-
