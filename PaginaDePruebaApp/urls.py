@@ -3,7 +3,7 @@ from PaginaDePruebaApp import views
 from django.contrib.auth.views import LoginView
 
 urlpatterns = [
-    path('Inicio/', views.Inicio,name = "Inicio"),
+    path('', views.Inicio,name = "Inicio"),
     path('Comentarios/', views.Comentarios,name = "Comentarios"),
     path('Perfil/', views.Perfil,name = "Perfil"),
     path('Contacto/', views.Contacto,name = "Contacto"),

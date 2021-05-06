@@ -16,7 +16,7 @@ class UserAdmin(admin.ModelAdmin):
     model=User
     list_display = ("first_name","last_name","email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("first_name","last_name")  ## campos por los que se puede buscar
-    filter = ("is_staff")
+    list_filter = ("esChofer","esCliente")
     actions = ['delete_model']
 
     #para que no pueda aniadir desde el panel
@@ -37,7 +37,7 @@ class UserAdmin(admin.ModelAdmin):
             if obj.email=="admin@gmail.com":
                 messages.error(request, "El usuario administrador no puede eliminarse")
             else:
-                obj.delete()
+                obj.delete()                
 
 admin.site.register(User, UserAdmin)
 
