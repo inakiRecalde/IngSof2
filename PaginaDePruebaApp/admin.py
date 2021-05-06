@@ -11,23 +11,41 @@ admin.site.register(Comentario)
 
 admin.site.register(Tarjeta) #esto no debería ir
 
+
 class UserAdmin(admin.ModelAdmin):
     model=User
     list_display = ("username", "email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
     filter = ("is_staff")
 
+    #para que no pueda aniadir desde el panel
+    def has_add_permission(self, request, obj=None):
+        return False
+
 admin.site.register(User, UserAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("user", "dni", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
+
+    #para que no pueda aniadir desde el panel
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
     
 admin.site.register(Cliente,ClienteAdmin)
 
 class ChoferAdmin(admin.ModelAdmin):
     list_display=("user","telefono")
 
+    #para que no pueda aniadir desde el panel
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 admin.site.register(Chofer,ChoferAdmin)
 
