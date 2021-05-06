@@ -14,19 +14,36 @@ admin.site.register(Tarjeta) #esto no debería ir
 
 class UserAdmin(admin.ModelAdmin):
     model=User
-    list_display = ("username", "email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
-    search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
+    list_display = ("first_name","last_name","email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
+    search_fields = ("first_name","last_name")  ## campos por los que se puede buscar
     filter = ("is_staff")
+    actions = ['delete_model']
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
         return False
 
+    #esta funcion elimina la accion de eliminar por defecto que tiene django
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    #aca defino una accion de eliminar propia
+    @admin.action(description='Eliminar los usuarios seleccionados')
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            if obj.email=="admin@gmail.com":
+                messages.error(request, "El usuario administrador no puede eliminarse")
+            else:
+                obj.delete()
+
 admin.site.register(User, UserAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ("user", "dni", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
-    search_fields = ("nombre","apellido")  ## campos por los que se puede buscar
+    list_display = ("dni","user", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
+    search_fields = ("dni",)  ## campos por los que se puede buscar
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
@@ -52,7 +69,7 @@ admin.site.register(Chofer,ChoferAdmin)
 
 class CombiAdmin(admin.ModelAdmin):
     list_display = ("modelo", "cantAsientos","chofer")  #Campos que va a mostrar cuando presione Usuarios
-    search_fields = ("modelo","cantAsientos")  ## campos por los que se puede buscar
+    search_fields = ("modelo",)  ## campos por los que se puede buscar
 
 admin.site.register(Combi, CombiAdmin)
 
