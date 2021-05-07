@@ -68,7 +68,7 @@ admin.site.register(Chofer,ChoferAdmin)
 
 
 class CombiAdmin(admin.ModelAdmin):
-    list_display = ("modelo", "cantAsientos","chofer")  #Campos que va a mostrar cuando presione Usuarios
+    list_display = ("modelo", "cantAsientos","patente", "chofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("modelo",)  ## campos por los que se puede buscar
 
 admin.site.register(Combi, CombiAdmin)
@@ -97,7 +97,7 @@ admin.site.register(Lugar,LugarAdmin)
 ##admin.site.register(Pasaje,PasajeAdmin)
 
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ("fechaSalida","fechaLlegada","enCurso","finalizado","precio") 
+    list_display = ("ruta", "fechaSalida","fechaLlegada","precio") 
     search_field = ("fechaSalida")
     readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']

@@ -101,7 +101,7 @@ class Combi(models.Model):
   ##  updated=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return "Modelo: {0}, Asientos: {1}, Chofer: {2}".format(self.modelo, self.cantAsientos,self.chofer)
+        return "Modelo: {0}, Asientos:{1}, Patente: {2}, Chofer: {3}".format(self.modelo, self.cantAsientos, self.patente, self.chofer)
 
     class Meta:
         verbose_name="Combi"
@@ -173,7 +173,7 @@ class Viaje(models.Model):
     finalizado=models.BooleanField(default=False, verbose_name="Viaje finalizado")
     insumo = models.ManyToManyField(Insumo, verbose_name="Lista de insumos", blank=True)
     combi = models.ForeignKey(Combi, verbose_name="Lista de combis",on_delete=models.PROTECT)
-    ruta = models.ForeignKey(Ruta, verbose_name="Lista de rutas",on_delete=models.PROTECT)
+    ruta = models.ForeignKey(Ruta, verbose_name="ruta",on_delete=models.PROTECT)
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
