@@ -23,10 +23,6 @@ class UserAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
 
-    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
-    def has_delete_permission(self,request, obj=None):
-        return False
-
     #esta funcion elimina la accion de eliminar por defecto que tiene django
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -88,26 +84,6 @@ admin.site.register(Combi, CombiAdmin)
 class InsumoAdmin(admin.ModelAdmin):
     list_display = ("nombre", "precio") 
     search_field = ("nombre")
-    actions=['delete_model']
-
-    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
-    def has_delete_permission(self,request, obj=None):
-        return False
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-
-    @admin.action(description='Eliminar los insumos seleccionados')  
-    def delete_model(modeladmin, request, queryset):
-        for obj in queryset:
-            viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=obj.nombre)
-            if viajesConInsumo is not None:
-                messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
-            else:
-                obj.delete()   
 
 admin.site.register(Insumo, InsumoAdmin)
 
@@ -133,10 +109,6 @@ class ViajeAdmin(admin.ModelAdmin):
     search_field = ("fechaSalida")
     readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']
-
-    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
-    def has_delete_permission(self,request, obj=None):
-        return False
 
     #esta funcion elimina la accion de eliminar por defecto que tiene django
     def get_actions(self, request):
