@@ -84,22 +84,6 @@ admin.site.register(Combi, CombiAdmin)
 class InsumoAdmin(admin.ModelAdmin):
     list_display = ("nombre", "precio") 
     search_field = ("nombre")
-    actions=['delete_model']
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
-        return actions
-    
-    @admin.action(description='Eliminar los insumos seleccionados')
-    def delete_model(modeladmin, request, queryset):
-        for obj in queryset:
-            insumos_en_viajes=Viaje.objects.filter(insumo=obj.nombre)
-            if insumos_en_viajes:
-                messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
-            else:
-                obj.delete()
 
 admin.site.register(Insumo, InsumoAdmin)
 
