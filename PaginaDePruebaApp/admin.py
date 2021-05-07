@@ -37,7 +37,15 @@ class UserAdmin(admin.ModelAdmin):
             if obj.email=="admin@gmail.com":
                 messages.error(request, "El usuario administrador no puede eliminarse")
             else:
-                obj.delete()                
+                if obj.esChofer:
+                    combisChof=Combi.objects.filter(id=obj.id)
+                    if combisChof is not None:
+                        messages.error(request, "El chofer {0} no puede eliminarse porque se encuentra asignada/o a una combi".format(obj.first_name))
+                    else:
+                        obj.delete()
+                else:
+                    obj.delete() 
+                           
 
 admin.site.register(User, UserAdmin)
 
