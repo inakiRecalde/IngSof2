@@ -91,15 +91,15 @@ class InsumoAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
-    @admin.action(description='Eliminar los insumos seleccionados')
     
+    @admin.action(description='Eliminar los insumos seleccionados')
     def delete_model(modeladmin, request, queryset):
         for obj in queryset:
-            insumos=Insumo.objects.filter(nombre=obj.nombre)
-            if insumos is not None:
+            insumos_en_viajes=Viaje.objects.filter(insumo=obj.nombre)
+            if insumos_en_viajes:
                 messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
             else:
-                obj.delete()   
+                obj.delete()
 
 admin.site.register(Insumo, InsumoAdmin)
 
