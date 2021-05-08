@@ -119,7 +119,7 @@ class Insumo(models.Model):
 
     class Meta:
         verbose_name="Insumo"
-        verbose_name_plural="Insumos"
+        verbose_name_plural="Insumos"        
 
 class Comentario(models.Model):
     texto=models.CharField(max_length=200)
@@ -203,6 +203,7 @@ class Viaje(models.Model):
 
     def __str__(self):
         return "con ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3} y Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
+
 
 class Pasaje(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)
