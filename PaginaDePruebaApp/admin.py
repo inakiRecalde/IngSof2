@@ -108,7 +108,7 @@ class InsumoAdmin(admin.ModelAdmin):
     def delete_model(modeladmin, request, queryset):
         for obj in queryset:
             viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=obj.nombre)
-            if viajesConInsumo is not None:
+            if viajesConInsumo:
                 messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
             else:
                 obj.delete()   

@@ -117,6 +117,11 @@ class Insumo(models.Model):
     def __str__(self):
         return "{0}, Precio: ${1}".format(self.nombre,self.precio)
 
+    def clean(self):
+        viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=self.nombre)
+        if viajesConInsumo:
+            raise ValidationError('La informacion del insumo seleccionado no se puede modificar debido a que esta asignado a un viaje.')
+
     class Meta:
         verbose_name="Insumo"
         verbose_name_plural="Insumos"        
@@ -149,6 +154,7 @@ class Lugar(models.Model):
         verbose_name_plural="Lugares"
 
 class Ruta(models.Model):
+    id = models.AutoField(primary_key=True)
     origen = models.ForeignKey(Lugar, on_delete= models.PROTECT,related_name = 'rutaOrigen')
     destino = models.ForeignKey(Lugar, on_delete= models.PROTECT, related_name = 'rutaDestino')
     distancia=models.PositiveIntegerField() #distancia en km
@@ -159,6 +165,10 @@ class Ruta(models.Model):
     def clean(self):
         if self.origen == self.destino:
             raise ValidationError('Mismo lugar de origen y destino')
+        viajesConRuta=Viaje.objects.filter(ruta_id=self.id)
+        print(viajesConRuta)
+        if viajesConRuta:
+            raise ValidationError('La informacion de la ruta seleccionada no se puede modificar debido a que esta asignado a un viaje.')
  
     def __str__(self):
         return "Origen: {0}, Destino: {1}, km: {2}, Des: {3}".format(self.origen, self.destino,self.distancia,self.descripcion)
