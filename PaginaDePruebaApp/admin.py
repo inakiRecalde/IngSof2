@@ -14,10 +14,12 @@ admin.site.register(Tarjeta) #esto no debería ir
 
 class UserAdmin(admin.ModelAdmin):
     model=User
+    fields=("first_name","last_name","email","esCliente","esChofer")
     list_display = ("first_name","last_name","email","esCliente","esChofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("first_name","last_name")  ## campos por los que se puede buscar
     list_filter = ("esChofer","esCliente")
     actions = ['delete_model']
+    readonly_fields=("first_name","last_name","email")
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
@@ -56,6 +58,7 @@ admin.site.register(User, UserAdmin)
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("dni","user", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("dni",)  ## campos por los que se puede buscar
+    readonly_fields=("user","dni")
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
@@ -68,6 +71,7 @@ admin.site.register(Cliente,ClienteAdmin)
 
 class ChoferAdmin(admin.ModelAdmin):
     list_display=("user","telefono")
+    readonly_fields=("user",)
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
