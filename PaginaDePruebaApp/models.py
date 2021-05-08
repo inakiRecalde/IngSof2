@@ -94,7 +94,7 @@ class Combi(models.Model):
     )
     modelo=models.CharField(max_length=30)
     cantAsientos= models.PositiveIntegerField(default=0)
-    patente = models.CharField(max_length=20, unique=True)
+    patente = models.CharField(max_length=20)
     chofer = models.OneToOneField(Chofer, on_delete= models.PROTECT)
     tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
    ## created=models.DateTimeField(auto_now_add=True)
@@ -106,6 +106,15 @@ class Combi(models.Model):
     class Meta:
         verbose_name="Combi"
         verbose_name_plural="Combis"
+
+    def clean(self):
+        viajesConMismaCombi=Viaje.objects.filter(combi_id=self.id)
+        if viajesConMismaCombi:
+            combiVieja=Combi.objects.filter(id=viajesConMismaCombi[0].combi_id)
+            if self.cantAsientos < combiVieja[0].cantAsientos:
+                raise ValidationError("Esta combi se encuentra asignada a un viaje, no se puede modificar la cantidad de asientos a un número menor que el anterior")
+            if combiVieja[0].tipo == "SuperComodo" and self.tipo == "Comodo":
+                raise ValidationError("Esta combi se encuentra asignada a un viaje, no se puede cambiar el tipo a uno inferior que el anterior")
 
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)
