@@ -129,7 +129,7 @@ admin.site.register(Lugar,LugarAdmin)
 ##admin.site.register(Pasaje,PasajeAdmin)
 
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ("ruta", "fechaSalida","fechaLlegada","precio") 
+    list_display = ("ruta", "fechaSalida","fechaLlegada","precio","enCurso") 
     search_field = ("fechaSalida")
     readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']
