@@ -213,8 +213,30 @@ class Viaje(models.Model):
         viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
         if viajesConMismaCombi is not None:
             for viaje in viajesConMismaCombi:
-                if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
-                    raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
+                if(viaje.id != self.id):
+                    if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
+                        raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
+
+        viajeActual = Viaje.objects.filter(id= self.id)
+        if( self.combi != viaje.combi):
+              if(viaje.combi.tipo != self.combi.tipo):
+                    if(viaje.combi.tipo == 'SuperComodo' or viaje.combi.tipo == 'Súper Comodo'):  
+                         raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior')   
+        if(not self.enCurso or not self.finalizado):
+
+            for viaje in viajeActual:
+                if( self.fechaLlegada.date() != viaje.fechaLlegada.date()):
+                    raise ValidationError('No puede cambiar la fecha de llegada de un viaje iniciado o finalizado')
+                if( self.fechaSalida.date() != viaje.fechaSalida.date()):
+                    raise ValidationError('No puede cambiar la fecha de salida de un viaje iniciado o finalizado')
+                if( self.precio != viaje.precio):
+                    raise ValidationError('No puede cambiar el precio de un viaje iniciado o finalizado')
+                if( self.ruta.id != viaje.ruta.id):
+                    raise ValidationError('No puede cambiar la ruta de un viaje iniciado o finalizado')
+                if( self.combi != viaje.combi):
+                    raise ValidationError('No puede cambiar la combi de un viaje iniciado o finalizado')
+                if( self.duracion != viaje.duracion):
+                    raise ValidationError('No puede cambiar la duracion de un viaje iniciado o finalizado')
 
     class Meta:
         verbose_name="Viaje"
