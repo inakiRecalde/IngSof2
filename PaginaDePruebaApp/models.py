@@ -97,8 +97,6 @@ class Combi(models.Model):
     patente = models.CharField(max_length=20)
     chofer = models.OneToOneField(Chofer, on_delete= models.PROTECT)
     tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
-   ## created=models.DateTimeField(auto_now_add=True)
-  ##  updated=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return "Modelo: {0}, Asientos:{1}, Patente: {2}, Chofer: {3}".format(self.modelo, self.cantAsientos, self.patente, self.chofer)
@@ -108,6 +106,15 @@ class Combi(models.Model):
         verbose_name_plural="Combis"
 
     def clean(self):
+        #se fija si está modificando o agregando una combi, en el caso de estar modificando entraría al if
+        combiAntes=Combi.objects.filter(id=self.id)
+        if combiAntes:
+            if combiAntes[0].modelo != self.modelo:
+                raise ValidationError("No se puede modificar el modelo de una combi")
+            if combiAntes[0].patente != self.patente:
+                raise ValidationError("No se puede modificar la patente de una combi") 
+                
+        #se fija si la combi está asignada a algun viaje y hace las validaciones necesarias
         viajesConMismaCombi=Viaje.objects.filter(combi_id=self.id)
         if viajesConMismaCombi:
             combiVieja=Combi.objects.filter(id=viajesConMismaCombi[0].combi_id)
@@ -115,6 +122,7 @@ class Combi(models.Model):
                 raise ValidationError("Esta combi se encuentra asignada a un viaje, no se puede modificar la cantidad de asientos a un número menor que el anterior")
             if combiVieja[0].tipo == "SuperComodo" and self.tipo == "Comodo":
                 raise ValidationError("Esta combi se encuentra asignada a un viaje, no se puede cambiar el tipo a uno inferior que el anterior")
+        
 
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)

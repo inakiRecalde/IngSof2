@@ -69,16 +69,14 @@ def Login(request):
             login(request,usuario)  
             try: 
                 persona=Cliente.objects.get(pk=usuario.id)
-            except: 
-                messages.error(request, "message") 
+            except:  
                 return render(request,"PaginaDePruebaApp/inicio.html",{"form":form})
             if persona is not None:
                 return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})
             else:
                 try: 
                     persona=Chofer.objects.get(pk=usuario.id)
-                except: 
-                    messages.error(request, "message") 
+                except:  
                     return render(request,"PaginaDePruebaApp/inicio.html",{"form":form})
                 if persona is not None:
                     return render(request,"PaginaDePruebaApp/inicio.html", {"persona": persona})

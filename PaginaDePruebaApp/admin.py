@@ -86,7 +86,7 @@ admin.site.register(Chofer,ChoferAdmin)
 class CombiAdmin(admin.ModelAdmin):
     list_display = ("modelo", "cantAsientos","patente", "chofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("modelo",)  ## campos por los que se puede buscar
-    readonly_fields=("patente","modelo")
+    #readonly_fields=("patente","modelo")
 
 admin.site.register(Combi, CombiAdmin)
 
