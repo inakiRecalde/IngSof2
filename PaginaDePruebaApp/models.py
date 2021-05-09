@@ -94,7 +94,7 @@ class Combi(models.Model):
     )
     modelo=models.CharField(max_length=30)
     cantAsientos= models.PositiveIntegerField(default=0)
-    patente = models.CharField(max_length=20)
+    patente = models.CharField(max_length=20, unique=True)
     chofer = models.OneToOneField(Chofer, on_delete= models.PROTECT)
     tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
     
@@ -127,7 +127,7 @@ class Combi(models.Model):
 class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)
     descripcion=models.CharField(max_length=50) #esto sería opcional
-    precio=models.DecimalField(max_digits=10, decimal_places=2)
+    precio=models.PositiveIntegerField()
   ##  created=models.DateTimeField(auto_now_add=True)
   ##  updated=models.DateTimeField(auto_now_add=True)
     
@@ -204,7 +204,7 @@ class Viaje(models.Model):
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.TimeField()
-    precio=models.DecimalField(max_digits=10, decimal_places=2,validators=[validatePrecio])
+    precio=models.PositiveIntegerField()
     
     def clean(self):
         #chequea que las fechas sean a futuro y la de llegada no sea antes que la de salida
