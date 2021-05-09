@@ -207,15 +207,17 @@ class Viaje(models.Model):
     precio=models.PositiveIntegerField()
     
     def clean(self):
-        #chequea que las fechas sean a futuro y la de llegada no sea antes que la de salida
-        if self.fechaSalida == self.fechaLlegada:
-            raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
-        if self.fechaSalida < timezone.now():
-            raise ValidationError('Fecha de salida inválida')
-        if self.fechaLlegada < timezone.now():
-            raise ValidationError('Fecha de llegada inválida')
-        if self.fechaLlegada < self.fechaSalida:
-            raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
+        #si el viaje ya esta en curso o finalizo no tiene q mostrar estos mensajes, muestra los mesajes de error por Modificar
+        if( not self.enCurso and not self.finalizado):
+            #chequea que las fechas sean a futuro y la de llegada no sea antes que la de salida
+            if self.fechaSalida == self.fechaLlegada:
+                raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
+            if self.fechaSalida < timezone.now():
+                raise ValidationError('Fecha de salida inválida')
+            if self.fechaLlegada < timezone.now():
+                raise ValidationError('Fecha de llegada inválida')
+            if self.fechaLlegada < self.fechaSalida:
+                raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
         
         #chequea que no se superpongan las combis
         viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
@@ -224,34 +226,37 @@ class Viaje(models.Model):
                 if(viaje.id != self.id):
                     if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
                         raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
-
+        
+        
+         #se fija si está modificando o agregando un viaje, en el caso de estar modificando entraría al if
         viajeActual = Viaje.objects.filter(id= self.id)
-        if( self.combi != viaje.combi):
-              if(viaje.combi.tipo != self.combi.tipo):
+        if viajeActual:
+            #chequeo si se modifico la combi del viaje
+            if( self.combi.patente != viaje.combi.patente):
+                if(viaje.combi.tipo != self.combi.tipo):
                     if(viaje.combi.tipo == 'SuperComodo' or viaje.combi.tipo == 'Súper Comodo'):  
-                         raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior')   
-        if(not self.enCurso or not self.finalizado):
-
-            for viaje in viajeActual:
-                if( self.fechaLlegada.date() != viaje.fechaLlegada.date()):
-                    raise ValidationError('No puede cambiar la fecha de llegada de un viaje iniciado o finalizado')
-                if( self.fechaSalida.date() != viaje.fechaSalida.date()):
-                    raise ValidationError('No puede cambiar la fecha de salida de un viaje iniciado o finalizado')
-                if( self.precio != viaje.precio):
-                    raise ValidationError('No puede cambiar el precio de un viaje iniciado o finalizado')
-                if( self.ruta.id != viaje.ruta.id):
-                    raise ValidationError('No puede cambiar la ruta de un viaje iniciado o finalizado')
-                if( self.combi != viaje.combi):
-                    raise ValidationError('No puede cambiar la combi de un viaje iniciado o finalizado')
-                if( self.duracion != viaje.duracion):
-                    raise ValidationError('No puede cambiar la duracion de un viaje iniciado o finalizado')
+                        raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior')   
+            if(self.enCurso or self.finalizado):
+                for viaje in viajeActual:
+                    if( self.fechaLlegada.date() != viaje.fechaLlegada.date()):
+                        raise ValidationError('No puede cambiar la fecha de llegada de un viaje iniciado o finalizado')
+                    if( self.fechaSalida.date() != viaje.fechaSalida.date()):
+                        raise ValidationError('No puede cambiar la fecha de salida de un viaje iniciado o finalizado')
+                    if( self.precio != viaje.precio):
+                        raise ValidationError('No puede cambiar el precio de un viaje iniciado o finalizado')
+                    if( self.ruta.id != viaje.ruta.id):
+                        raise ValidationError('No puede cambiar la ruta de un viaje iniciado o finalizado')
+                    if( self.combi != viaje.combi):
+                        raise ValidationError('No puede cambiar la combi de un viaje iniciado o finalizado')
+                    if( self.duracion != viaje.duracion):
+                        raise ValidationError('No puede cambiar la duracion de un viaje iniciado o finalizado')
 
     class Meta:
         verbose_name="Viaje"
         verbose_name_plural="Viajes"
 
     def __str__(self):
-        return "con ruta: {0}, combi: {1}, fechaSalida: {2}, fechaLlegada: {3} y Precio: ${4}".format(self.ruta.descripcion, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
+        return "origen: {0}, destino: {1}, combi: {2}, fecha salida: {3}, fecha llegada: {4} y precio: ${5}".format(self.ruta.origen,self.ruta.destino, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
 
 
 class Pasaje(models.Model):
