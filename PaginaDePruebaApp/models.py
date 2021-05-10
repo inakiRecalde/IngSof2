@@ -99,7 +99,7 @@ class Combi(models.Model):
     tipo=models.CharField(max_length=11,choices=TIPO, default='Comodo')
     
     def __str__(self):
-        return "Modelo: {0}, Asientos:{1}, Patente: {2}, Chofer: {3}".format(self.modelo, self.cantAsientos, self.patente, self.chofer)
+        return "Modelo: {0}, Asientos:{1}, Patente: {2}, Chofer: {3}, Tipo: {4}".format(self.modelo, self.cantAsientos, self.patente, self.chofer,self.tipo)
 
     class Meta:
         verbose_name="Combi"
@@ -207,54 +207,35 @@ class Viaje(models.Model):
     precio=models.PositiveIntegerField()
     
     def clean(self):
-        
         #chequea que no se superpongan las combis , lo hace tanto al modificar o al agregar
-        #viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
-        #if viajesConMismaCombi is not None:
-        #    for viaje in viajesConMismaCombi:
-        #        if(viaje.id != self.id):
-         #           if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
-         #               raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
-        #
-        
-# chequea q no se superponga el chofer
-        viajesConMismoChofer=Viaje.objects.select_related('combi__chofer') ## no logre hacer el filtro aca
-        if viajesConMismoChofer is not None:
-            for viaje in viajesConMismoChofer:
-                if (viaje.combi.chofer_id == self.combi.chofer_id):
-                    if(viaje.id != self.id):
-                        if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
-                            raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con el mismo chofer dentro de las mismas fechas')
+        viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
+        if viajesConMismaCombi is not None:
+            for viaje in viajesConMismaCombi:
+                if(viaje.id != self.id):
+                    if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
+                        raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
         
         
-        
-         #se fija si está modificando o agregando un viaje, en el caso de estar modificando entraría al if
-        viajeActual = Viaje.objects.filter(id= self.id)
-        if viajeActual:
-
+        #se fija si está modificando o agregando un viaje, en el caso de estar modificando entraría al if
+        viajeAntes = Viaje.objects.filter(id= self.id)
+        if viajeAntes:
             #chequeos en modificar
-            if( self.combi.patente != viajeActual[0].combi.patente):
-                if(viajeActual[0].combi.tipo != self.combi.tipo):
-                    if(viajeActual[0].combi.tipo == 'SuperComodo' or viajeActual[0].combi.tipo == 'Súper Comodo'):  
+            if( self.combi.patente != viajeAntes[0].combi.patente):
+                if(viajeAntes[0].combi.tipo != self.combi.tipo):
+                    if(viajeAntes[0].combi.tipo == 'SuperComodo'):  
                         raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
-                    else:
-                        if(viajeActual[0].combi.cantAsientos < self.combi.cantAsientos): 
-                            raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
-                else:
-                    if(viajeActual[0].combi.cantAsientos < self.combi.cantAsientos): 
-                        raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior')
+                if(self.combi.cantAsientos < viajeAntes[0].combi.cantAsientos): 
+                       raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')
             
-            if( self.fechaLlegada.date() != viajeActual[0].fechaLlegada.date()):
+            if( self.fechaLlegada.date() != viajeAntes[0].fechaLlegada.date()):
                 raise ValidationError('No puede cambiar la fecha de llegada de un viaje')
-            if( self.fechaSalida.date() != viajeActual[0].fechaSalida.date()):
+            if( self.fechaSalida.date() != viajeAntes[0].fechaSalida.date()):
                 raise ValidationError('No puede cambiar la fecha de salida de un viaje')
-            if( self.precio != viajeActual[0].precio):
+            if( self.precio != viajeAntes[0].precio):
                 raise ValidationError('No puede cambiar el precio de un viaje')
-            if( self.ruta.id != viajeActual[0].ruta.id):
+            if( self.ruta.id != viajeAntes[0].ruta.id):
                 raise ValidationError('No puede cambiar la ruta de un viaje')
-            if( self.combi != viajeActual[0].combi):
-                raise ValidationError('No puede cambiar la combi de un viaje')
-            if( self.duracion != viajeActual[0].duracion):
+            if( self.duracion != viajeAntes[0].duracion):
                 raise ValidationError('No puede cambiar la duracion de un viaje')
         
         else: # chequeos en agregar
