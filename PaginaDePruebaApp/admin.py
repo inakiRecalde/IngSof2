@@ -7,7 +7,7 @@ from django.contrib import messages
 
 ##UserAdmin  adminCombi19 contra: 12345
 
-admin.site.register(Comentario)
+#admin.site.register(Comentario) #esto lo implementamos en otra demo
 
 #admin.site.register(Tarjeta) #esto no debería ir, el admin no debería poder ver las tarjetas 
 
@@ -37,20 +37,20 @@ class UserAdmin(admin.ModelAdmin):
         return actions
 
     #aca defino una accion de eliminar propia
-   # @admin.action(description='Eliminar los usuarios seleccionados')
-   # def delete_model(modeladmin, request, queryset):
-   #     for obj in queryset:
-    #        if obj.email=="admin@gmail.com":
-    #            messages.error(request, "El usuario administrador no puede eliminarse")
-    #        else:
-     #           if obj.esChofer:
-      #              combisChof=Combi.objects.filter(id=obj.id)
-       #             if combisChof is not None:
-       #                 messages.error(request, "El chofer {0} no puede eliminarse porque se encuentra asignada/o a una combi".format(obj.first_name))
-       #             else:
-       #                 obj.delete()
-        #        else:
-       #             obj.delete() 
+    @admin.action(description='Eliminar los usuarios seleccionados')
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            if obj.email=="admin@gmail.com":
+                messages.error(request, "El usuario administrador no puede eliminarse")
+            else:
+                if obj.esChofer:
+                    combisChof=Combi.objects.filter(chofer_id=obj.id)
+                    if combisChof:
+                        messages.error(request, "El chofer {0} no puede eliminarse porque se encuentra asignada/o a una combi".format(obj.first_name))
+                    else:
+                        obj.delete()
+                else:
+                    obj.delete() 
                            
 
 admin.site.register(User, UserAdmin)
@@ -87,6 +87,27 @@ class CombiAdmin(admin.ModelAdmin):
     list_display = ("modelo", "cantAsientos","patente", "chofer")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("modelo",)  ## campos por los que se puede buscar
 
+    #actions agrega la opcion de eliminar propia
+    actions=['delete_model']
+    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
+    def has_delete_permission(self,request, obj=None):
+        return False
+    #aca saco la opcion de eliminar por defecto    
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+    #aca hago un eliminar propio
+    @admin.action(description='Eliminar las combis seleccionadas')  
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            viajesConCombi=Viaje.objects.filter(combi_id=obj.id)
+            if viajesConCombi:
+                messages.error(request, "La combi {0} no puede eliminarse porque se encuentra asignada a un viaje".format(obj.modelo))
+            else:
+                obj.delete()  
+
 admin.site.register(Combi, CombiAdmin)
 
 class InsumoAdmin(admin.ModelAdmin):
@@ -104,14 +125,14 @@ class InsumoAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
-   # @admin.action(description='Eliminar los insumos seleccionados')  
-   # def delete_model(modeladmin, request, queryset):
-   #     for obj in queryset:
-    #        viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=obj.nombre)
-    #        if viajesConInsumo:
-    #            messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
-    #        else:
-    #            obj.delete()   
+    @admin.action(description='Eliminar los insumos seleccionados')  
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=obj.nombre)
+            if viajesConInsumo:
+                messages.error(request, "El insumo {0} no puede eliminarse porque se encuentra asignada/o a un viaje".format(obj.nombre))
+            else:
+                obj.delete()   
 
 admin.site.register(Insumo, InsumoAdmin)
 
@@ -119,20 +140,75 @@ class RutaAdmin(admin.ModelAdmin):
     list_display = ("origen", "destino","descripcion") 
     search_fields = ("origen", "destino")
 
+    #actions agrega la opcion de eliminar propia
+    actions=['delete_model']
+    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
+    def has_delete_permission(self,request, obj=None):
+        return False
+    #aca saco la opcion de eliminar por defecto    
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+    #aca hago un eliminar propio
+    @admin.action(description='Eliminar las rutas seleccionadas')  
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            viajesConRuta=Viaje.objects.filter(ruta_id=obj.id)
+            if viajesConRuta:
+                messages.error(request, "La ruta {0} no puede eliminarse porque se encuentra asignada a un viaje".format(obj.descripcion))
+            else:
+                obj.delete()  
+
 admin.site.register(Ruta, RutaAdmin)
 
 class LugarAdmin(admin.ModelAdmin):
     list_display = ("nombre", "codigoPostal") 
     search_fields = ("nombre", "codigoPostal")
 
+    #actions agrega la opcion de eliminar propia
+    actions=['delete_model']
+    #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
+    def has_delete_permission(self,request, obj=None):
+        return False
+    #aca saco la opcion de eliminar por defecto    
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+    #aca hago un eliminar propio
+    @admin.action(description='Eliminar los lugares seleccionados')  
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            rutasConLugarDestino=Ruta.objects.filter(destino_id=obj.codigoPostal)
+            rutasConLugarOrigen=Ruta.objects.filter(origen_id=obj.codigoPostal)
+            if rutasConLugarDestino or rutasConLugarOrigen:
+                messages.error(request, "El lugar {0} no puede eliminarse porque se encuentra asignado a una ruta".format(obj.nombre))
+            else:
+                obj.delete()  
+
 admin.site.register(Lugar,LugarAdmin)
 
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ("ruta", "fechaSalida","fechaLlegada","precio","enCurso","finalizado") 
+    list_display = ("get_ruta", "fechaSalida","fechaLlegada","get_combi","precio","enCurso","finalizado") 
     #search_fields = ("fechaSalida","fechaLlegada","ruta")
     readonly_fields= ("enCurso","finalizado")
     actions = ['delete_model']
-    #list_filter = ("finalizado","enCurso")
+    list_filter = ("finalizado","enCurso")
+
+    #este metodo es para que, en vez de mostrar todo el objeto, muestre solo el modelo de la combi en la lista de viajes
+    def get_combi(self,obj):
+        return obj.combi.modelo
+    get_combi.short_description='Combi'
+    get_combi.admin_order_field='modelo__combi'
+
+    #este metodo es para que, en vez de mostrar todo el objeto, muestre solo la descripcion de la ruta en la lista de viajes
+    def get_ruta(self,obj):
+        return obj.ruta.descripcion
+    get_ruta.short_description='Ruta'
+    get_ruta.admin_order_field='descripcion__ruta'
 
     #esto es para que no aparezca el boton de eliminar cuando entrás a una instancia
     def has_delete_permission(self,request, obj=None):
@@ -146,13 +222,13 @@ class ViajeAdmin(admin.ModelAdmin):
         return actions
 
     #aca defino una accion de eliminar propia
-   # @admin.action(description='Eliminar los viajes seleccionados')
-   # def delete_model(modeladmin, request, queryset):
-   #     for obj in queryset:
-    #        if obj.enCurso:
-    #            messages.error(request, "El viaje con fecha {0} no puede eliminarse porque se encuentra en curso".format(obj.fechaSalida.strftime("%b %d %Y %H:%M")))
-    #        else:
-     #           obj.delete()
+    @admin.action(description='Eliminar los viajes seleccionados')
+    def delete_model(modeladmin, request, queryset):
+        for obj in queryset:
+            if obj.enCurso:
+                messages.error(request, "El viaje con fecha {0} no puede eliminarse porque se encuentra en curso".format(obj.fechaSalida.strftime("%b %d %Y %H:%M")))
+            else:
+                obj.delete()
 
 admin.site.register(Viaje,ViajeAdmin)
 
