@@ -54,6 +54,10 @@ def Contacto (request):
 def Ahorro (request):
     return render(request,"PaginaDePruebaApp/ahorro.html")
 
+def HistorialDeViajes (request):
+
+    return render(request,"PaginaDePruebaApp/historialDeViajes.html")
+
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
 
