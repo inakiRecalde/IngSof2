@@ -193,8 +193,7 @@ admin.site.register(Lugar,LugarAdmin)
 
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ("get_ruta", "fechaSalida","fechaLlegada","get_combi","precio","enCurso","finalizado") 
-    #search_fields = ("fechaSalida","fechaLlegada","ruta")
-    readonly_fields= ("enCurso","finalizado")
+    readonly_fields= ("enCurso","finalizado","duracion")
     actions = ['delete_model']
     list_filter = ("finalizado","enCurso")
 

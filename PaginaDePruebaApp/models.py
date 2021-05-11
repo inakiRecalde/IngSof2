@@ -204,16 +204,18 @@ class Viaje(models.Model):
     ruta = models.ForeignKey(Ruta, verbose_name="ruta",on_delete=models.PROTECT)
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
-    duracion=models.TimeField()
+    duracion=models.CharField(max_length=20, default='')
     precio=models.PositiveIntegerField()   
     
 
     def clean(self):
-        
         #primero valida que las fechas no sean un string cualquiera así no rompe todo
         if (self.fechaSalida is None) or (self.fechaLlegada is None):
             raise ValidationError('')
         else:
+            
+            #esta linea no se donde se hace
+            #self.duracion=str(self.fechaLlegada - self.fechaSalida)
 
             #se fija si está modificando o agregando un viaje, en el caso de estar modificando entraría al if
             viajeAntes = Viaje.objects.filter(id= self.id)
@@ -256,7 +258,6 @@ class Viaje(models.Model):
                     if(viaje.id != self.id):
                         if self.fechaSalida.date() <= viaje.fechaLlegada.date() and self.fechaLlegada.date() >= viaje.fechaSalida.date():
                             raise ValidationError('No se pudo agregar el viaje debido a que ya hay otro viaje con la misma combi dentro de las mismas fechas')
-            
 
     class Meta:
         verbose_name="Viaje"
@@ -264,7 +265,7 @@ class Viaje(models.Model):
 
     def __str__(self):
         return "origen: {0}, destino: {1}, combi: {2}, fecha salida: {3}, fecha llegada: {4} y precio: ${5}".format(self.ruta.origen,self.ruta.destino, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
-
+ 
 
 class Pasaje(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)
