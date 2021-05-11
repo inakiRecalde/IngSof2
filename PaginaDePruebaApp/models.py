@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import datetime
+from django.db.models.fields import IntegerField
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
@@ -44,7 +45,7 @@ class User(AbstractUser):
 
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    telefono= models.IntegerField( null= True,blank= False )
+    telefono= models.PositiveIntegerField(null= True,blank= False, max_length=10)
     def __str__(self):
         return self.user.email
 
@@ -180,7 +181,7 @@ class Ruta(models.Model):
         return self.descripcion
 
     def clean(self):
-        if self.origen == self.destino:
+        if self.origen_id == self.destino_id:
             raise ValidationError('Mismo lugar de origen y destino')
         viajesConRuta=Viaje.objects.filter(ruta_id=self.id)
         print(viajesConRuta)

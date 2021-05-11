@@ -48,7 +48,7 @@ class ChoferRegisterForm(UserCreationForm):
     email = forms.EmailField()
     password1 = forms.CharField(label='Contraseña',widget= forms.PasswordInput(attrs=contra_attr))
     password2 = forms.CharField(label='Confirmar contraseña',widget= forms.PasswordInput(attrs=contra_attr))
-    tel = forms.CharField(label='Teléfono',widget=forms.TextInput(attrs=tel_attr))
+    tel = forms.IntegerField(label='Teléfono',widget=forms.TextInput(attrs=tel_attr), max_value=9999999999)
 
     class Meta:
         model = get_user_model()
