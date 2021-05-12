@@ -130,6 +130,11 @@ class InsumoAdmin(admin.ModelAdmin):
             del actions['delete_selected']
         return actions
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return self.readonly_fields + ('nombre',)
+        return self.readonly_fields
+
     @admin.action(description='Eliminar los insumos seleccionados')  
     def delete_model(modeladmin, request, queryset):
         for obj in queryset:
@@ -193,6 +198,11 @@ class LugarAdmin(admin.ModelAdmin):
                 messages.error(request, "El lugar {0} no puede eliminarse porque se encuentra asignado a una ruta".format(obj.nombre))
             else:
                 obj.delete()  
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return self.readonly_fields + ('codigoPostal',)
+        return self.readonly_fields
 
 admin.site.register(Lugar,LugarAdmin)
 
