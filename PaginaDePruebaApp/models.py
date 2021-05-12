@@ -250,7 +250,8 @@ class Viaje(models.Model):
                     raise ValidationError('Fecha de llegada inválida')
                 if self.fechaLlegada < self.fechaSalida:
                     raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
-
+                self.duracion=(self.fechaLlegada - self.fechaSalida)
+                print(self.duracion)
             #chequea que no se superpongan las combis , lo hace tanto al modificar o al agregar
             viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
             if viajesConMismaCombi is not None:
