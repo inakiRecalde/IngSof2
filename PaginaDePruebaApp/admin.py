@@ -196,6 +196,7 @@ class ViajeAdmin(admin.ModelAdmin):
     readonly_fields= ("enCurso","finalizado","duracion")
     actions = ['delete_model']
     list_filter = ("finalizado","enCurso")
+    filter_horizontal = ('insumo',)
 
     #este metodo es para que, en vez de mostrar todo el objeto, muestre solo el modelo de la combi en la lista de viajes
     def get_combi(self,obj):

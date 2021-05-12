@@ -218,23 +218,30 @@ class Viaje(models.Model):
             viajeAntes = Viaje.objects.filter(id= self.id)
             if viajeAntes:
                 #chequeos en modificar
-                if( self.combi.patente != viajeAntes[0].combi.patente):
-                    if(viajeAntes[0].combi.tipo != self.combi.tipo):
-                        if(viajeAntes[0].combi.tipo == 'SuperComodo'):  
-                            raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
-                    if(self.combi.cantAsientos < viajeAntes[0].combi.cantAsientos): 
-                        raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')
-                
-                if( self.fechaLlegada.date() != viajeAntes[0].fechaLlegada.date()):
-                    raise ValidationError('No puede cambiar la fecha de llegada de un viaje')
-                if( self.fechaSalida.date() != viajeAntes[0].fechaSalida.date()):
-                    raise ValidationError('No puede cambiar la fecha de salida de un viaje')
-                if( self.precio != viajeAntes[0].precio):
-                    raise ValidationError('No puede cambiar el precio de un viaje')
-                if( self.ruta.id != viajeAntes[0].ruta.id):
-                    raise ValidationError('No puede cambiar la ruta de un viaje')
-                if( self.duracion != viajeAntes[0].duracion):
-                    raise ValidationError('No puede cambiar la duracion de un viaje')
+                if self.enCurso:
+                    raise ValidationError('Este viaje no puede modificarse debido a que se encuentra iniciado y/o finalizado')
+                else:
+                    if( self.combi.patente != viajeAntes[0].combi.patente):
+                        if(viajeAntes[0].combi.tipo != self.combi.tipo):
+                            if(viajeAntes[0].combi.tipo == 'SuperComodo'):  
+                                raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
+                        if(self.combi.cantAsientos < viajeAntes[0].combi.cantAsientos): 
+                            raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')
+                    
+                    #query con los objetos insumo que tenía antes
+                    queryInsumosAntes=Viaje.insumo.through.objects.filter(viaje_id=viajeAntes[0].id)
+                    #lista con los id de los insumos que tenía antes
+                    listaInsumosAntes=set(insumo.id for insumo in queryInsumosAntes)
+
+                    if( self.ruta.id != viajeAntes[0].ruta.id):
+                        raise ValidationError('No puede cambiar la ruta de un viaje')
+                    if( self.fechaSalida != viajeAntes[0].fechaSalida):
+                        raise ValidationError('No puede cambiar la fecha de salida de un viaje')
+                    if( self.fechaLlegada != viajeAntes[0].fechaLlegada):
+                        raise ValidationError('No puede cambiar la fecha de llegada de un viaje')
+                    
+                    if( self.precio != viajeAntes[0].precio):
+                        raise ValidationError('No puede cambiar el precio de un viaje')
             
             else: # chequeos en agregar
                 
