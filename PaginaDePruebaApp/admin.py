@@ -108,6 +108,11 @@ class CombiAdmin(admin.ModelAdmin):
             else:
                 obj.delete()  
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return self.readonly_fields + ('patente','modelo')
+        return self.readonly_fields
+
 admin.site.register(Combi, CombiAdmin)
 
 class InsumoAdmin(admin.ModelAdmin):
@@ -220,6 +225,12 @@ class ViajeAdmin(admin.ModelAdmin):
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return self.readonly_fields + ('insumo','ruta','fechaSalida','fechaLlegada','precio')
+        return self.readonly_fields
+
 
     #aca defino una accion de eliminar propia
     @admin.action(description='Eliminar los viajes seleccionados')

@@ -107,13 +107,6 @@ class Combi(models.Model):
         verbose_name_plural="Combis"
 
     def clean(self):
-        #se fija si está modificando o agregando una combi, en el caso de estar modificando entraría al if
-        combiAntes=Combi.objects.filter(id=self.id)
-        if combiAntes:
-            if combiAntes[0].modelo != self.modelo:
-                raise ValidationError("No se puede modificar el modelo de una combi")
-            if combiAntes[0].patente != self.patente:
-                raise ValidationError("No se puede modificar la patente de una combi") 
                 
         #se fija si la combi está asignada a algun viaje y hace las validaciones necesarias
         viajesConMismaCombi=Viaje.objects.filter(combi_id=self.id)
@@ -227,21 +220,6 @@ class Viaje(models.Model):
                                 raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
                         if(self.combi.cantAsientos < viajeAntes[0].combi.cantAsientos): 
                             raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')
-                    
-                    #query con los objetos insumo que tenía antes
-                    queryInsumosAntes=Viaje.insumo.through.objects.filter(viaje_id=viajeAntes[0].id)
-                    #lista con los id de los insumos que tenía antes
-                    listaInsumosAntes=set(insumo.id for insumo in queryInsumosAntes)
-
-                    if( self.ruta.id != viajeAntes[0].ruta.id):
-                        raise ValidationError('No puede cambiar la ruta de un viaje')
-                    if( self.fechaSalida != viajeAntes[0].fechaSalida):
-                        raise ValidationError('No puede cambiar la fecha de salida de un viaje')
-                    if( self.fechaLlegada != viajeAntes[0].fechaLlegada):
-                        raise ValidationError('No puede cambiar la fecha de llegada de un viaje')
-                    
-                    if( self.precio != viajeAntes[0].precio):
-                        raise ValidationError('No puede cambiar el precio de un viaje')
             
             else: # chequeos en agregar
                 
