@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from django.forms import widgets
 from .models import Cliente, User,Chofer
 from django.contrib.auth import authenticate
 
@@ -84,6 +85,10 @@ class LoginForm(forms.ModelForm):
             password = self.cleaned_data.get('password')
             if not authenticate(email=email, password=password):
                 raise forms.ValidationError('Email o contraseña invalidos')
+
+class ChoferAdminForm(forms.ModelForm):
+    class Meta:
+        widgets={'telefono': forms.TextInput(attrs={'size':15})}
 
 
 
