@@ -213,9 +213,6 @@ class Viaje(models.Model):
         if (self.fechaSalida is None) or (self.fechaLlegada is None):
             raise ValidationError('')
         else:
-            
-            #esta linea no se donde se hace
-            #self.duracion=str(self.fechaLlegada - self.fechaSalida)
 
             #se fija si está modificando o agregando un viaje, en el caso de estar modificando entraría al if
             viajeAntes = Viaje.objects.filter(id= self.id)
