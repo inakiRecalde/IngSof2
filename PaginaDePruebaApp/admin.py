@@ -3,6 +3,7 @@ from PaginaDePruebaApp.models import *
 from PaginaDePruebaApp.models import User 
 from .models import User
 from django.contrib import messages
+from PaginaDePruebaApp.forms import ChoferAdminForm
 # Register your models here.
 
 ##UserAdmin  adminCombi19 contra: 12345
@@ -72,6 +73,8 @@ admin.site.register(Cliente,ClienteAdmin)
 class ChoferAdmin(admin.ModelAdmin):
     list_display=("user","telefono")
     readonly_fields=("user",)
+    model=Chofer
+    form=ChoferAdminForm
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
