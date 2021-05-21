@@ -119,7 +119,7 @@ class CombiAdmin(admin.ModelAdmin):
 admin.site.register(Combi, CombiAdmin)
 
 class InsumoAdmin(admin.ModelAdmin):
-    list_display = ("nombre", "precio") 
+    list_display = ("nombre", "precio","stock") 
     search_field = ("nombre")
     actions=['delete_model']
 
