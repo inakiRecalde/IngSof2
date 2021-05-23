@@ -1,0 +1,16 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+{% if viajes %}
+    <h2>Viajes Encontrados:</h2>
+    {% for viaje in viajes %} 
+        <li>
+            {{viaje.fechaSalida}} &nbsp; {{viaje.fechaLlegada}} &nbsp; {{viaje.precio}}
+        </li>
+    {% endfor %}    
+{% else %}
+    <h4>No se encontro ningún viaje</h4>
+{% endif %}
+{% endblock %}

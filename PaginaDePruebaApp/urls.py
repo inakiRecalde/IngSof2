@@ -14,4 +14,5 @@ urlpatterns = [
     path('logout/', views.Logout_request,name = "logout"),
     path('login/', views.Login,name = "login"),
     path('HistorialDeViajes/', views.HistorialDeViajes,name = "HistorialDeViajes"),
+    path('Busqueda/', views.Busqueda,name = "Busqueda" ),
 ]

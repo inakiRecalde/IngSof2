@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente,User,Chofer
+from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje
 from datetime import date
 from .forms import UserRegisterForm, LoginForm, ChoferRegisterForm
 from django.core.mail import EmailMultiAlternatives
@@ -36,8 +36,8 @@ def mail_disponible(mail):
     return True    
 
 def Inicio (request):
-
     return render(request,"PaginaDePruebaApp/inicio.html")
+    
 
 def Comentarios (request):
 
@@ -141,3 +141,30 @@ def RegistroChofer(request):
     else:
         form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+
+def Busqueda(request):
+    origen=""
+    destino=""
+    fecha=""
+    if request.GET["origen"]:
+        origen=request.GET["origen"]
+    if request.GET["destino"]:
+        destino=request.GET["destino"]
+    if request.GET["fecha"]:
+        fecha=request.GET["fecha"]
+    if origen and destino and fecha:
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, ruta__destino__nombre__icontains=destino, fechaSalida__icontains=fecha)
+    elif origen and destino and fecha=="":
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, ruta__destino__nombre__icontains=destino)
+    elif origen and destino=="" and fecha=="":
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen)   
+    elif origen and destino=="" and fecha:
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, fechaSalida__icontains=fecha)  
+    elif origen=="" and destino and fecha:
+        viajes=Viaje.objects.filter(ruta__destino__nombre__icontains=destino, fechaSalida__icontains=fecha)
+    elif origen=="" and destino and fecha=="":
+        viajes=Viaje.objects.filter(ruta__destino__nombre__icontains=destino)
+    elif origen=="" and destino=="" and fecha:
+        viajes=Viaje.objects.filter(fechaSalida__icontains=fecha)
+    if origen or destino or fecha:
+        return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
