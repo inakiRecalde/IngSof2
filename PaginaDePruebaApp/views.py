@@ -112,7 +112,6 @@ def Registro(request):
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
-            print(form.error_messages)
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
@@ -168,3 +167,5 @@ def Busqueda(request):
         viajes=Viaje.objects.filter(fechaSalida__icontains=fecha)
     if origen or destino or fecha:
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
+    else:
+        return render(request,"PaginaDePruebaApp/inicio.html") 
