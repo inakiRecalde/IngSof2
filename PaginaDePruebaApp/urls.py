@@ -14,9 +14,6 @@ urlpatterns = [
     path('logout/', views.Logout_request,name = "logout"),
     path('login/', views.Login,name = "login"),
     path('HistorialDeViajes/', views.HistorialDeViajes,name = "HistorialDeViajes"),
-<<<<<<< HEAD
     path('Perfil/CambiarContrasena/<int:id_usuario>', views.CambiarContrasena,name = "CambiarContrasena"),
-=======
     path('Busqueda/', views.Busqueda,name = "Busqueda" ),
->>>>>>> 9e30029e9af64e3c53803857d57f58a7de019f29
 ]

@@ -143,7 +143,6 @@ def RegistroChofer(request):
         form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
 
-<<<<<<< HEAD
 
 def Perfil(request):
     if request.method == "POST":
@@ -174,7 +173,6 @@ def CambiarContrasena(request,id_usuario):
         form = PasswordChangeForm(user = usuario)
         return render(request, "PaginaDepruebaApp/cambiarContrasena.html", {"form": form, 'usuario':usuario})
 
-=======
 def Busqueda(request):
     origen=""
     destino=""
@@ -203,4 +201,3 @@ def Busqueda(request):
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
     else:
         return render(request,"PaginaDePruebaApp/inicio.html") 
->>>>>>> 9e30029e9af64e3c53803857d57f58a7de019f29
