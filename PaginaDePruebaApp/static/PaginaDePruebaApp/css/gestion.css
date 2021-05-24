@@ -326,3 +326,9 @@ ul.errorlist{
     background-color: white;
     margin:auto;
 }
+.busqueda {
+  align-items: center;
+  justify-content: center;
+  background-color:black;
+  margin:auto;
+}

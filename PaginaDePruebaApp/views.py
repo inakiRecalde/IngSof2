@@ -168,4 +168,5 @@ def Busqueda(request):
     if origen or destino or fecha:
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
     else:
-        return render(request,"PaginaDePruebaApp/inicio.html") 
+        msg ="INGRESE DATOS PARA SU BUSQUEDA."
+        return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 

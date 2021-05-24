@@ -87,7 +87,7 @@ class Insumo(models.Model):
     nombre=models.CharField(max_length=30, unique=True, primary_key=True)
     descripcion=models.CharField(max_length=50) #esto sería opcional
     precio=models.PositiveIntegerField()
-    stock=models.PositiveIntegerField()
+    stock=models.PositiveIntegerField(default=0)
     
     def __str__(self):
         return "{0}, Precio: ${1}".format(self.nombre,self.precio)
@@ -153,6 +153,7 @@ class Viaje(models.Model):
     fechaSalida=models.DateTimeField()
     fechaLlegada=models.DateTimeField()
     duracion=models.CharField(max_length=20, default='')
+    asientosDisponibles=models.PositiveIntegerField()
     precio=models.PositiveIntegerField()   
     
 
@@ -188,7 +189,9 @@ class Viaje(models.Model):
                 if self.fechaLlegada < self.fechaSalida:
                     raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
                 self.duracion=(self.fechaLlegada - self.fechaSalida)
+                self.asientosDisponibles=(self.combi.cantAsientos)
                 print(self.duracion)
+                print(self.asientosDisponibles)
             #chequea que no se superpongan las combis , lo hace tanto al modificar o al agregar
             viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
             if viajesConMismaCombi is not None:

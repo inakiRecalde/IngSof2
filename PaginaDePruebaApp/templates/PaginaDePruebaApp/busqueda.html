@@ -1,15 +1,20 @@
 {% extends "PaginaDePruebaApp/base.html" %}
 
 {% load static %}
-
 {% block content %}
 {% if viajes %}
-    <h2>Viajes Encontrados:</h2>
-    {% for viaje in viajes %} 
-        <li>
-            {{viaje.fechaSalida}} &nbsp; {{viaje.fechaLlegada}} &nbsp; {{viaje.precio}}
+ <div style="background-color: white;"> 
+    <h2 style="margin-left: 20px;">Viajes Encontrados:</h2>
+    {% for viaje in viajes %}
+        <li style="margin-left: 20px;">
+            <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
         </li>
-    {% endfor %}    
+        {% if viaje.asientosDisponibles > 0 %}
+            <button style="margin-left: 20px;" class="btn btn-primary">COMPRAR PASAJE</button>
+        {% endif %}    
+        <button style="margin-left: 20px;" class="btn btn-primary">MAS INFO</button>
+    {% endfor %}  
+  </div>     
 {% else %}
     <h4>No se encontro ningún viaje</h4>
 {% endif %}
