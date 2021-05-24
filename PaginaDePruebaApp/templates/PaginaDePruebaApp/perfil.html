@@ -4,5 +4,40 @@
 
 {% block content %}
 
+<div class="formPerfil">
+    <form class="perfil" action="" method="post">
+        <h2>Editar datos personales </h2>
+        {% csrf_token %}
+        <table> {{form.as_table}} </table>
+        <button class="btn" type="submit">Guardar</button>
+        <h5> olvido su contrasena ? </h5>
+        <a href = "{% url 'CambiarContrasena' user.id %}">Cambiar contrasena</a>
+    </form>
+</div>
+<div class="infoGold">
+    {% if persona.esGold %}
+        <h3>Info tarjetas</h3>
+        <a href="#">agregar o cambiar tarjetas</a>
+    {% else %} 
+        <section class="page-section cta">
+            <div class="container-3">
+                <div class="row">
+                    <div class="col-xl-9 mx-auto">
+                        <div class="cta-inner text-center rounded">
+                            <h2 class="section-heading mb-4">
+                                <span class="section-heading-upper">Suscripción</span>
+                                <span class="section-heading-lower">Gold</span>
+                            </h2>
+                            <p class="mb-0">Suscribite hoy a nuestra membresía Gold por tan solo $250 mensuales y obtené un 10% de descuento en cualquier pasaje!</p>
+                            <a href="#" class="btn btn-primary">Suscribirse</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+ </div>
+    {% endif %}
+</div>
+
 
 {% endblock %}

@@ -43,6 +43,7 @@ class User(AbstractUser):
         verbose_name="Usuario"
         verbose_name_plural="Usuarios"
 
+
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     telefono= models.PositiveIntegerField(null= True,blank= False, max_length=10)

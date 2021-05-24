@@ -1,0 +1,14 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="CambiarContrasenaForm">
+    <form class="CambiarContrasena" action="" method="post">
+        <h2>Cambiar Contrasena</h2>
+        {% csrf_token %}
+        <table> {{form.as_table}} </table>
+        <button class="btn" type="submit">Guardar</button>
+    </form>
+</div>
+{% endblock %}

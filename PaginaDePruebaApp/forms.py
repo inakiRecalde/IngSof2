@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
+from django.forms.fields import Field
 from .models import Cliente, User,Chofer
 from django.contrib.auth import authenticate
 
@@ -92,3 +93,27 @@ class ChoferAdminForm(forms.ModelForm):
 
 
 
+class EditarForm(forms.ModelForm):
+
+    #campos del formulario
+    first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput())
+    last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput())
+    email = forms.EmailField()
+    #fechaDeNacimiento = forms.DateField(label='Fecha de nacimiento', widget=forms.SelectDateWidget(years=range(1920, 2100)))
+
+    class Meta:
+        model = get_user_model()
+        fields= ['first_name','last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super(EditarForm, self).__init__(*args, **kwargs)
+        #self.fields['fechaDeNacimiento'].widget.attrs['disabled'] = True
+
+class CambiarContraForm(forms.ModelForm):
+    passwordActual = forms.CharField(label='Contraseña actual',widget= forms.PasswordInput())
+    password1 = forms.CharField(label='Contraseña nueva',widget= forms.PasswordInput())
+    password2 = forms.CharField(label='Confirmar contraseña nueva',widget= forms.PasswordInput())
+
+    class Meta:
+        model = get_user_model()
+        fields= ['passwordActual','password1','password2']
