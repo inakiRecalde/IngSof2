@@ -2,7 +2,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente,User,Chofer
+from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje
 from datetime import date
 from .forms import CambiarContraForm, EditarForm, UserRegisterForm, LoginForm, ChoferRegisterForm
 from django.core.mail import EmailMultiAlternatives
@@ -38,8 +38,8 @@ def mail_disponible(mail):
     return True    
 
 def Inicio (request):
-
     return render(request,"PaginaDePruebaApp/inicio.html")
+    
 
 def Comentarios (request):
 
@@ -114,7 +114,6 @@ def Registro(request):
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
-            print(form.error_messages)
             for msg in form.error_messages:
                  messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
@@ -144,6 +143,7 @@ def RegistroChofer(request):
         form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
 
+<<<<<<< HEAD
 
 def Perfil(request):
     if request.method == "POST":
@@ -174,3 +174,33 @@ def CambiarContrasena(request,id_usuario):
         form = PasswordChangeForm(user = usuario)
         return render(request, "PaginaDepruebaApp/cambiarContrasena.html", {"form": form, 'usuario':usuario})
 
+=======
+def Busqueda(request):
+    origen=""
+    destino=""
+    fecha=""
+    if request.GET["origen"]:
+        origen=request.GET["origen"]
+    if request.GET["destino"]:
+        destino=request.GET["destino"]
+    if request.GET["fecha"]:
+        fecha=request.GET["fecha"]
+    if origen and destino and fecha:
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, ruta__destino__nombre__icontains=destino, fechaSalida__icontains=fecha)
+    elif origen and destino and fecha=="":
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, ruta__destino__nombre__icontains=destino)
+    elif origen and destino=="" and fecha=="":
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen)   
+    elif origen and destino=="" and fecha:
+        viajes=Viaje.objects.filter(ruta__origen__nombre__icontains=origen, fechaSalida__icontains=fecha)  
+    elif origen=="" and destino and fecha:
+        viajes=Viaje.objects.filter(ruta__destino__nombre__icontains=destino, fechaSalida__icontains=fecha)
+    elif origen=="" and destino and fecha=="":
+        viajes=Viaje.objects.filter(ruta__destino__nombre__icontains=destino)
+    elif origen=="" and destino=="" and fecha:
+        viajes=Viaje.objects.filter(fechaSalida__icontains=fecha)
+    if origen or destino or fecha:
+        return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
+    else:
+        return render(request,"PaginaDePruebaApp/inicio.html") 
+>>>>>>> 9e30029e9af64e3c53803857d57f58a7de019f29
