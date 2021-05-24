@@ -5,7 +5,7 @@
 {% block content %}
 <div class="CambiarContrasenaForm">
     <form class="CambiarContrasena" action="" method="post">
-        <h2>Cambiar Contrasena</h2>
+        <h2>Cambiar Contraseña</h2>
         {% csrf_token %}
         <table> {{form.as_table}} </table>
         <button class="btn" type="submit">Guardar</button>

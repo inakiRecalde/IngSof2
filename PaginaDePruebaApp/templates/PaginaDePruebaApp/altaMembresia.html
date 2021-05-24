@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form class="alta-membresia" action="" method= "post" style="background-color: white;">
+<form class="alta-membresia" action="" method= "post" >
     {% csrf_token %}
     <table>{{form.as_table}}</table>
     <br>

@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 {% if viajes %}
- <div style="background-color: white;"> 
+ <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 20px;">Viajes Encontrados:</h2>
     {% for viaje in viajes %}
         <li style="margin-left: 20px;">
@@ -16,6 +16,6 @@
     {% endfor %}  
   </div>     
 {% else %}
-    <h4>No se encontro ningún viaje</h4>
+    <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No se encontró ningún viaje</h4>
 {% endif %}
 {% endblock %}
