@@ -62,15 +62,6 @@ def Comentarios (request):
     else:
         return render(request,"PaginaDePruebaApp/comentarios.html")
 
-
-def Perfil (request):
-    if request.user.is_authenticated and not request.user.is_staff:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        print(persona.esGold())
-        return render(request,"PaginaDePruebaApp/perfil.html", {"persona":persona})
-    else:
-        return render(request,"PaginaDePruebaApp/perfil.html")
-
 def Contacto (request):
 
     return render(request,"PaginaDePruebaApp/contacto.html")
@@ -203,9 +194,10 @@ def Perfil(request):
         else:
             return render(request,"PaginaDePruebaApp/perfil.html", {"form": form})
     else:
+        persona=Cliente.objects.get(user_id=request.user.id)
         usuario = User.objects.filter(id= request.user.id).first()
         form = EditarForm(instance= usuario)
-        return render(request, "PaginaDepruebaApp/perfil.html", {"form": form, 'usuario':usuario})
+        return render(request, "PaginaDepruebaApp/perfil.html", {"form": form, "persona":persona})
 
 
 def CambiarContrasena(request,id_usuario):

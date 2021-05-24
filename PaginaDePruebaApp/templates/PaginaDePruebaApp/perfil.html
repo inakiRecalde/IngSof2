@@ -16,8 +16,11 @@
 </div>
 <div class="infoGold">
     {% if persona.esGold %}
-        <h3>Info tarjetas</h3>
-        <a href="#">agregar o cambiar tarjetas</a>
+        <div>
+            <h3>Tarjetas</h3>
+            <br>
+            <a href="{% url 'AltaMembresia' %}">Agregar o cambiar tarjetas</a>
+        </div>
     {% else %} 
         <section class="page-section cta">
             <div class="container-3">
