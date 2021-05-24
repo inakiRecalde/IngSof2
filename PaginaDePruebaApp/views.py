@@ -66,6 +66,7 @@ def Comentarios (request):
 def Perfil (request):
     if request.user.is_authenticated and not request.user.is_staff:
         persona=Cliente.objects.get(user_id=request.user.id) 
+        print(persona.esGold())
         return render(request,"PaginaDePruebaApp/perfil.html", {"persona":persona})
     else:
         return render(request,"PaginaDePruebaApp/perfil.html")
@@ -151,7 +152,7 @@ def Registro(request):
                 if esMayor(diccionario["fechaDeNacimiento"]):
                     usuario = form.save()
                     login(request,usuario)
-                    return redirect(Inicio,{"persona": request.user})
+                    return redirect(Inicio)
                 else: 
                     msg ="El usario no es mayor de edad."   ## Mensaje de eeror si es menor
                     form.add_error("fechaDeNacimiento", msg)

@@ -10,8 +10,8 @@
         {% csrf_token %}
         <table> {{form.as_table}} </table>
         <button class="btn" type="submit">Guardar</button>
-        <h5> olvido su contrasena ? </h5>
-        <a href = "{% url 'CambiarContrasena' user.id %}">Cambiar contrasena</a>
+        <h5> olvido su contraseña ? </h5>
+        <a href = "{% url 'CambiarContrasena' user.id %}">Cambiar contraseña</a>
     </form>
 </div>
 <div class="infoGold">
@@ -29,15 +29,13 @@
                                 <span class="section-heading-lower">Gold</span>
                             </h2>
                             <p class="mb-0">Suscribite hoy a nuestra membresía Gold por tan solo $250 mensuales y obtené un 10% de descuento en cualquier pasaje!</p>
-                            <a href="#" class="btn btn-primary">Suscribirse</a>
                         </div>
                     </div>
+                    <a href="{% url 'AltaMembresia' %}" class="btn btn-primary">Suscribirse</a>
                 </div>
             </div>
         </section>
- </div>
     {% endif %}
-</div>
-
+ </div>
 
 {% endblock %}
