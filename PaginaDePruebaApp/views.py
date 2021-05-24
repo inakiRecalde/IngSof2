@@ -1,12 +1,16 @@
+
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje
 from datetime import date
-from .forms import UserRegisterForm, LoginForm, ChoferRegisterForm
+from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
+from django.views.generic import FormView
 
 # Create your views here.
 def envio_Mail(destinatario):
@@ -22,6 +26,12 @@ def envio_Mail(destinatario):
     email.attach_alternative(content, 'text/html')
     email.send()
 
+def chequearVencimiento(fecha):
+    fechaActual=date.today()
+    if fecha<fechaActual:
+        return False
+    return True
+
 def esMayor(nacimiento):
     fecha_actual=date.today()
     resultado=fecha_actual.year - nacimiento.year
@@ -36,27 +46,59 @@ def mail_disponible(mail):
     return True    
 
 def Inicio (request):
-    return render(request,"PaginaDePruebaApp/inicio.html")
-    
+    if request.user.is_authenticated and not request.user.is_staff :
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/inicio.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/inicio.html")
+        
 
 def Comentarios (request):
-
-    return render(request,"PaginaDePruebaApp/comentarios.html")
-
-def Perfil (request):
-
-    return render(request,"PaginaDePruebaApp/perfil.html")
+    if request.user.is_authenticated and not request.user.is_staff:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/comentarios.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/comentarios.html")
 
 def Contacto (request):
 
     return render(request,"PaginaDePruebaApp/contacto.html")
 
 def Ahorro (request):
-    return render(request,"PaginaDePruebaApp/ahorro.html")
+    if request.user.is_authenticated:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/ahorro.html")
 
 def HistorialDeViajes (request):
+    if request.user.is_authenticated:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html")
 
-    return render(request,"PaginaDePruebaApp/historialDeViajes.html")
+def AltaMembresia (request):
+    if request.method== "POST":
+        form= TarjetaForm(request.user, request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if chequearVencimiento(diccionario["fechaVto"]):
+                tarjeta=form.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoMembresia.html")
+            else:
+                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
+                form.add_error("fechaVto", msg)
+                return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+        else:        
+            return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+    else:
+        form = TarjetaForm(request.user)
+        return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
 
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
@@ -135,11 +177,42 @@ def RegistroChofer(request):
             diccionario=form.cleaned_data
             print(form.error_messages)
             for msg in form.error_messages:
-                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
+                messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
     else:
         form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
+
+
+def Perfil(request):
+    if request.method == "POST":
+        usuario = User.objects.get(pk= request.user.id)
+        form = EditarForm(request.POST, instance= usuario)
+        if form.is_valid():
+            form.save()
+            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form, 'usuario':usuario})
+        else:
+            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form})
+    else:
+        persona=Cliente.objects.get(user_id=request.user.id)
+        usuario = User.objects.filter(id= request.user.id).first()
+        form = EditarForm(instance= usuario)
+        return render(request, "PaginaDepruebaApp/perfil.html", {"form": form, "persona":persona})
+
+
+def CambiarContrasena(request,id_usuario):
+    if request.method == "POST":
+        usuario = User.objects.get(pk= id_usuario)
+        form = PasswordChangeForm(user = usuario, data= request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(Login)
+        else:
+            return render(request,"PaginaDePruebaApp/cambiarContrasena.html", {"form": form})
+    else:
+        usuario = User.objects.filter(id= id_usuario).first()
+        form = PasswordChangeForm(user = usuario)
+        return render(request, "PaginaDepruebaApp/cambiarContrasena.html", {"form": form, 'usuario':usuario})
 
 def Busqueda(request):
     origen=""
@@ -168,5 +241,9 @@ def Busqueda(request):
     if origen or destino or fecha:
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
     else:
+<<<<<<< HEAD
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
         return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 
+=======
+        return render(request,"PaginaDePruebaApp/inicio.html") 
+>>>>>>> 2516035132bfbcc0cc580500f3fb0bfa7409d8fd

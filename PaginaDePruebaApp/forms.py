@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
-from .models import Cliente, User,Chofer
+from .models import Cliente, Tarjeta, User,Chofer
+from django.forms.fields import Field
 from django.contrib.auth import authenticate
 
 class UserRegisterForm(UserCreationForm):
@@ -91,4 +92,54 @@ class ChoferAdminForm(forms.ModelForm):
         widgets={'telefono': forms.TextInput(attrs={'size':15})}
 
 
+class TarjetaForm(forms.ModelForm):
+    nroTarjeta= forms.IntegerField(label="Número de tarjeta")
+    fechaVto=forms.DateField(label='Fecha de vencimiento', widget=forms.SelectDateWidget(years=range(1990, 2100)))
+    codigo=forms.IntegerField(label="Código")
 
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(TarjetaForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+            model = Tarjeta
+            fields= ['nroTarjeta', 'codigo']
+            help_text = {k:"" for k in fields }
+
+    def save(self):
+        tarjeta=Tarjeta.objects.create(
+            nro=self.cleaned_data.get('nroTarjeta'), 
+            fechaVto=self.cleaned_data.get('fechaVto'),
+            codigo=self.cleaned_data.get('codigo')
+        )
+
+        cliente=Cliente.objects.get(user_id=self.user.id)
+        cliente.esGold=True
+        cliente.tarjeta=tarjeta
+        cliente.save()
+        return tarjeta
+
+class EditarForm(forms.ModelForm):
+
+    #campos del formulario
+    first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput())
+    last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput())
+    email = forms.EmailField()
+    #fechaDeNacimiento = forms.DateField(label='Fecha de nacimiento', widget=forms.SelectDateWidget(years=range(1920, 2100)))
+
+    class Meta:
+        model = get_user_model()
+        fields= ['first_name','last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super(EditarForm, self).__init__(*args, **kwargs)
+        #self.fields['fechaDeNacimiento'].widget.attrs['disabled'] = True
+
+class CambiarContraForm(forms.ModelForm):
+    passwordActual = forms.CharField(label='Contraseña actual',widget= forms.PasswordInput())
+    password1 = forms.CharField(label='Contraseña nueva',widget= forms.PasswordInput())
+    password2 = forms.CharField(label='Confirmar contraseña nueva',widget= forms.PasswordInput())
+
+    class Meta:
+        model = get_user_model()
+        fields= ['passwordActual','password1','password2']
