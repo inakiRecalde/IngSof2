@@ -11,14 +11,9 @@ from PaginaDePruebaApp.validators import *
 
 ## CHEACK para aplicar restrincciones mediante expreciones logicas q devuelvan V o F
 class CustomUserManager(BaseUserManager):
-    """
-    Custom user model manager where email is the unique identifiers
-    for authentication instead of usernames.
-    """
+   
     def create_user(self, email, password, **extra_fields):
-        """
-        Create and save a User with the given email and password.
-        """
+        
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
@@ -203,17 +198,26 @@ class Viaje(models.Model):
 
     def __str__(self):
         return "origen: {0}, destino: {1}, combi: {2}, fecha salida: {3}, fecha llegada: {4} y precio: ${5}".format(self.ruta.origen,self.ruta.destino, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
- 
+
+class Tarjeta(models.Model):
+    nro=models.IntegerField()
+    fechaVto=models.DateTimeField()
+    codigo=models.IntegerField() 
+
+    class Meta:
+        verbose_name="Tarjeta"
+        verbose_name_plural="Tarjetas" 
+
 class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     dni= models.IntegerField(null= True, blank = False)
     suspendido=models.BooleanField(default=False)
     esGold=models.BooleanField(default=False)
-    historialViajes=models.ManyToManyField(Viaje)
+    historialViajes=models.ManyToManyField(Viaje,default=None,null=True)
 
     #solo si es gold
-    #ahorro=models.FloatField(default=0) 
-    #tarjeta=models.OneToOneField(Tarjeta, on_delete=models.CASCADE)
+    ahorro=models.FloatField(default=0) 
+    tarjeta=models.OneToOneField(Tarjeta, on_delete=models.CASCADE, null=True, default=None)
 
     def __str__(self):
         return self.user.email
@@ -221,16 +225,6 @@ class Cliente(models.Model):
     class Meta:
         verbose_name="Cliente"
         verbose_name_plural="Clientes"  
-
-class Tarjeta(models.Model):
-    nro=models.IntegerField()
-    fechaVto=models.DateTimeField()
-    codigo=models.IntegerField() 
-    user = models.ForeignKey(Cliente, on_delete= models.PROTECT)
-
-    class Meta:
-        verbose_name="Tarjeta"
-        verbose_name_plural="Tarjetas" 
 
 class Pasaje(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)

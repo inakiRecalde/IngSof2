@@ -16,7 +16,6 @@
     <!-- Styles -->
     <link href="{% static 'PaginaDePruebaApp/css/gestion.css' %}" rel="stylesheet">
 
-    <link rel="stylesheet" href="./styles/style.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -96,6 +95,9 @@
 
     {% block content %}
 
+    {% block styles %}
+    {% endblock %}
+    
     {% endblock %}
 
     <!-- Footer -->

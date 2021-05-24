@@ -66,25 +66,30 @@
 
 
 
- <!-- Message -->
- <section class="page-section cta">
-   <div class="container-3">
-     <div class="row">
-       <div class="col-xl-9 mx-auto">
-         <div class="cta-inner text-center rounded">
-           <h2 class="section-heading mb-4">
-             <span class="section-heading-upper">Suscripción</span>
-             <span class="section-heading-lower">Gold</span>
-           </h2>
-           <p class="mb-0">Suscribite hoy a nuestra membresía Gold por tan solo $250 mensuales y obtené un 10% de descuento en cualquier pasaje!</p>
-           <a href="#" class="btn btn-primary">Suscribirse</a>
-         </div>
-       </div>
-     </div>
-   </div>
- </section>
- </div>
-
+  <!-- Membresia -->
+  <section class="page-section cta">
+    <div class="container-3">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <div class="cta-inner text-center rounded">
+            <h2 class="section-heading mb-4">
+              <span class="section-heading-upper">Suscripción</span>
+              <span class="section-heading-lower">Gold</span>
+            </h2>
+            <p class="mb-0">Suscribite hoy a nuestra membresía Gold por tan solo $250 mensuales y obtené un 10% de descuento en cualquier pasaje!</p>
+            
+          </div>
+          {% if user.is_authenticated %}
+            {% if not persona.esGold %}
+              <a href="{% url 'AltaMembresia' %}" class="btn btn-primary">Suscribirse</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+ 
 
 
   {% endblock %}

@@ -1,9 +1,10 @@
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje
 from datetime import date
-from .forms import UserRegisterForm, LoginForm, ChoferRegisterForm
+from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
@@ -22,6 +23,12 @@ def envio_Mail(destinatario):
     email.attach_alternative(content, 'text/html')
     email.send()
 
+def chequearVencimiento(fecha):
+    fechaActual=date.today()
+    if fecha<fechaActual:
+        return False
+    return True
+
 def esMayor(nacimiento):
     fecha_actual=date.today()
     resultado=fecha_actual.year - nacimiento.year
@@ -36,27 +43,67 @@ def mail_disponible(mail):
     return True    
 
 def Inicio (request):
-    return render(request,"PaginaDePruebaApp/inicio.html")
-    
+    if request.user.is_authenticated and not request.user.is_staff :
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/inicio.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/inicio.html")
+        
 
 def Comentarios (request):
+    if request.user.is_authenticated and not request.user.is_staff:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/comentarios.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/comentarios.html")
 
-    return render(request,"PaginaDePruebaApp/comentarios.html")
 
 def Perfil (request):
-
-    return render(request,"PaginaDePruebaApp/perfil.html")
+    if request.user.is_authenticated and not request.user.is_staff:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/perfil.html", {"persona":persona})
+    else:
+        return render(request,"PaginaDePruebaApp/perfil.html")
 
 def Contacto (request):
 
     return render(request,"PaginaDePruebaApp/contacto.html")
 
 def Ahorro (request):
-    return render(request,"PaginaDePruebaApp/ahorro.html")
+    if request.user.is_authenticated:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/ahorro.html")
 
 def HistorialDeViajes (request):
+    if request.user.is_authenticated:
+        persona=Cliente.objects.get(user_id=request.user.id) 
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona})
+        
+    else:
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html")
 
-    return render(request,"PaginaDePruebaApp/historialDeViajes.html")
+def AltaMembresia (request):
+    if request.method== "POST":
+        form= TarjetaForm(request.user, request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if chequearVencimiento(diccionario["fechaVto"]):
+                tarjeta=form.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoMembresia.html")
+            else:
+                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
+                form.add_error("fechaVto", msg)
+                return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+        else:        
+            return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+    else:
+        form = TarjetaForm(request.user)
+        return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
 
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
@@ -101,7 +148,7 @@ def Registro(request):
                 if esMayor(diccionario["fechaDeNacimiento"]):
                     usuario = form.save()
                     login(request,usuario)
-                    return redirect(Inicio)
+                    return redirect(Inicio,{"persona": request.user})
                 else: 
                     msg ="El usario no es mayor de edad."   ## Mensaje de eeror si es menor
                     form.add_error("fechaDeNacimiento", msg)

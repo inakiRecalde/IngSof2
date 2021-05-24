@@ -314,15 +314,3 @@ ul.errorlist{
   color: red;
 }
 
-.registro {
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    margin:auto;
-}
-.login {
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    margin:auto;
-}

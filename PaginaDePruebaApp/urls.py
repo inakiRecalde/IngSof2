@@ -15,4 +15,5 @@ urlpatterns = [
     path('login/', views.Login,name = "login"),
     path('HistorialDeViajes/', views.HistorialDeViajes,name = "HistorialDeViajes"),
     path('Busqueda/', views.Busqueda,name = "Busqueda" ),
+    path('AltaMembresia/', views.AltaMembresia,name = "AltaMembresia" ),
 ]

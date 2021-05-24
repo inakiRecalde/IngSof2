@@ -1,0 +1,14 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<form class="alta-membresia" action="" method= "post" style="background-color: white;">
+    {% csrf_token %}
+    <table>{{form.as_table}}</table>
+    <br>
+    <button class="btn" type="submit"> Suscribirse</button>
+</form>
+
+{% endblock %}

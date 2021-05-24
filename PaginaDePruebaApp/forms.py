@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
-from .models import Cliente, User,Chofer
+from .models import Cliente, Tarjeta, User,Chofer
 from django.contrib.auth import authenticate
 
 class UserRegisterForm(UserCreationForm):
@@ -91,4 +91,30 @@ class ChoferAdminForm(forms.ModelForm):
         widgets={'telefono': forms.TextInput(attrs={'size':15})}
 
 
+class TarjetaForm(forms.ModelForm):
+    nroTarjeta= forms.IntegerField(label="Número de tarjeta")
+    fechaVto=forms.DateField(label='Fecha de vencimiento', widget=forms.SelectDateWidget(years=range(1990, 2100)))
+    codigo=forms.IntegerField(label="Código")
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(TarjetaForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+            model = Tarjeta
+            fields= ['nroTarjeta', 'codigo']
+            help_text = {k:"" for k in fields }
+
+    def save(self):
+        tarjeta=Tarjeta.objects.create(
+            nro=self.cleaned_data.get('nroTarjeta'), 
+            fechaVto=self.cleaned_data.get('fechaVto'),
+            codigo=self.cleaned_data.get('codigo')
+        )
+
+        cliente=Cliente.objects.get(user_id=self.user.id)
+        cliente.esGold=True
+        cliente.tarjeta=tarjeta
+        cliente.save()
+        return tarjeta
 
