@@ -42,6 +42,7 @@ class User(AbstractUser):
 class Chofer(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     telefono= models.PositiveIntegerField(null= True,blank= False, max_length=10)
+
     def __str__(self):
         return self.user.email
 
@@ -88,14 +89,14 @@ class Insumo(models.Model):
     def __str__(self):
         return "{0}, Precio: ${1}".format(self.nombre,self.precio)
 
+    class Meta:
+        verbose_name="Insumo"
+        verbose_name_plural="Insumos" 
+
     def clean(self):
         viajesConInsumo=Viaje.insumo.through.objects.filter(insumo_id=self.nombre)
         if viajesConInsumo:
-            raise ValidationError('La informacion del insumo seleccionado no se puede modificar debido a que esta asignado a un viaje.')
-
-    class Meta:
-        verbose_name="Insumo"
-        verbose_name_plural="Insumos"        
+            raise ValidationError('La informacion del insumo seleccionado no se puede modificar debido a que esta asignado a un viaje.')       
 
 class Comentario(models.Model):
     texto=models.CharField(max_length=200)

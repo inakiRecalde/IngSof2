@@ -46,39 +46,34 @@ def mail_disponible(mail):
     return True    
 
 def Inicio (request):
-    if request.user.is_authenticated and not request.user.is_staff :
-        persona=Cliente.objects.get(user_id=request.user.id) 
+    if request.user.is_authenticated and not request.user.is_staff:
+        if request.user.esChofer:
+            persona=Chofer.objects.get(user_id=request.user.id)
+        else:
+            persona=Cliente.objects.get(user_id=request.user.id) 
         return render(request,"PaginaDePruebaApp/inicio.html", {"persona":persona})
-        
     else:
         return render(request,"PaginaDePruebaApp/inicio.html")
         
 
 def Comentarios (request):
-    if request.user.is_authenticated and not request.user.is_staff:
+    if request.user.is_authenticated and not request.user.is_staff and not request.user.esChofer:
         persona=Cliente.objects.get(user_id=request.user.id) 
         return render(request,"PaginaDePruebaApp/comentarios.html", {"persona":persona})
-        
     else:
         return render(request,"PaginaDePruebaApp/comentarios.html")
-
-def Contacto (request):
-
-    return render(request,"PaginaDePruebaApp/contacto.html")
 
 def Ahorro (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id) 
-        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona})
-        
+        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona}) 
     else:
         return render(request,"PaginaDePruebaApp/ahorro.html")
 
 def HistorialDeViajes (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id) 
-        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona})
-        
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona})       
     else:
         return render(request,"PaginaDePruebaApp/historialDeViajes.html")
 

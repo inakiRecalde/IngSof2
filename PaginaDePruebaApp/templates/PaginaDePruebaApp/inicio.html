@@ -82,10 +82,12 @@
             <p class="mb-0">Suscribite hoy a nuestra membresía Gold por tan solo $250 mensuales y obtené un 10% de descuento en cualquier pasaje!</p>
             
           </div>
-          {% if not user.is_staff %}
-            {% if user.is_authenticated %}
-              {% if not persona.esGold %}
-                <a href="{% url 'AltaMembresia' %}" class="btn btn-primary">Suscribirse</a>
+          {% if user.is_authenticated %}
+            {% if not user.is_staff %}
+              {% if not user.esChofer %}
+                {% if not persona.esGold %}
+                  <a href="{% url 'AltaMembresia' %}" class="btn btn-primary">Suscribirse</a>
+                {% endif %}
               {% endif %}
             {% endif %}
           {% endif %}

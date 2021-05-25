@@ -3,12 +3,12 @@
 {% load static %}
 
 {% block content %}
-
-<form class="alta-membresia" action="" method= "post" >
-    {% csrf_token %}
-    <table>{{form.as_table}}</table>
-    <br>
-    <button class="btn" type="submit"> Suscribirse</button>
-</form>
-
+<div >
+    <form class="alta-membresia" action="" method= "post" >
+        {% csrf_token %}
+        <table>{{form.as_table}}</table>
+        <br>
+        <button class="btn" type="submit"> Suscribirse</button>
+    </form>
+</div>
 {% endblock %}
