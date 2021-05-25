@@ -1,0 +1,13 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <div id="mensaje-membresia" style="background-color: white; padding:10em; text-align: center; font-size: 1.5em;">
+        Si se desuscribe de nuestra membresía ya no obtendrá 10% de descuento en sus pasajes, ¿está segur@?
+        <a href="{% url 'BajaMembresia' %}">Desuscribirse</a>
+        <a href="{% url 'Perfil' %}">Cancelar</a>
+    </div>
+    
+
+{% endblock %}

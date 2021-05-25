@@ -337,7 +337,6 @@ ul.errorlist{
   flex-flow: row wrap;
   background-color: rgba(255, 255, 255,0.7);
   margin: 20px 20px;
-  
 }
 
 .CambiarContrasenaForm{
@@ -383,4 +382,17 @@ ul.errorlist{
   align-items: center;
   padding-top: 80px;
   padding-bottom: 80px;
+}
+#mensaje-membresia{
+  color: black;
+  background-color: rgba(255, 255, 255,0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+.baja-membresia{
+  padding:10px
 }

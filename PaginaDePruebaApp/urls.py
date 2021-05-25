@@ -16,4 +16,6 @@ urlpatterns = [
     path('Perfil/CambiarContrasena/<int:id_usuario>', views.CambiarContrasena,name = "CambiarContrasena"),
     path('Busqueda/', views.Busqueda,name = "Busqueda" ),
     path('AltaMembresia/', views.AltaMembresia,name = "AltaMembresia" ),
+    path('ConfirmacionBajaMembresia/', views.ConfirmacionBajaMembresia,name = "ConfirmacionBajaMembresia" ),
+    path('BajaMembresia/', views.BajaMembresia,name = "BajaMembresia" ),
 ]

@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
@@ -12,7 +11,7 @@ from django.template.loader import get_template
 from django.conf import settings
 from django.views.generic import FormView
 
-# Create your views here.
+# metodos.
 def envio_Mail(destinatario):
     context = {'destinatario': destinatario}
     template = get_template('PaginaDePruebaApp/correo.html')
@@ -45,6 +44,7 @@ def mail_disponible(mail):
         return False
     return True    
 
+#views 
 def Inicio (request):
     if request.user.is_authenticated and not request.user.is_staff:
         if request.user.esChofer:
@@ -94,6 +94,16 @@ def AltaMembresia (request):
     else:
         form = TarjetaForm(request.user)
         return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+
+def ConfirmacionBajaMembresia(request):
+    return render(request, "PaginaDePruebaApp/confirmacionBajaMembresia.html")
+
+def BajaMembresia(request):
+    persona=Cliente.objects.get(user_id=request.user.id)
+    persona.tarjeta=None
+    persona.esGold=False
+    persona.save()
+    return render(request, "PaginaDePruebaApp/bajaMembresia.html")
 
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
