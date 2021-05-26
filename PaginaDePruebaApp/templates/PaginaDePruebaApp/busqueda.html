@@ -6,6 +6,7 @@
  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Encontrados:</h2>
     {% for viaje in viajes %}
+<<<<<<< HEAD
         {% if not viaje.enCurso %}
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
@@ -19,6 +20,16 @@
     {% if ok %}
         <h4 style="color:black; margin-left: 20px;">No se encontró ningún viaje</h4>
     {% endif %}
+=======
+        <li style="margin-left: 20px;">
+            <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
+        </li>
+        {% if viaje.asientosDisponibles > 0 %}
+            <a href="{% url 'Compra' viaje_id=viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMPRAR PASAJE</a>
+        {% endif %}    
+        <button style="margin-left: 20px;" class="btn btn-primary">MAS INFO</button>
+    {% endfor %}  
+>>>>>>> e4af3a3b0cc3ee3caa24344189d3eb606df3fde6
   </div>     
 {% else %}
     <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No se encontró ningún viaje</h4>

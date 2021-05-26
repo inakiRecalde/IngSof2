@@ -125,15 +125,17 @@ class EditarForm(forms.ModelForm):
     first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput())
     last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput())
     email = forms.EmailField()
+    #dni = forms.IntegerField()
     #fechaDeNacimiento = forms.DateField(label='Fecha de nacimiento', widget=forms.SelectDateWidget(years=range(1920, 2100)))
 
     class Meta:
         model = get_user_model()
+        
         fields= ['first_name','last_name', 'email']
 
     def __init__(self, *args, **kwargs):
-        super(EditarForm, self).__init__(*args, **kwargs)
-        #self.fields['fechaDeNacimiento'].widget.attrs['disabled'] = True
+        super(EditarForm, self).__init__(*args, **kwargs) 
+
 
 class CambiarContraForm(forms.ModelForm):
     passwordActual = forms.CharField(label='Contraseña actual',widget= forms.PasswordInput())

@@ -231,13 +231,15 @@ class Cliente(models.Model):
         verbose_name="Cliente"
         verbose_name_plural="Clientes"  
 
-class Pasaje(models.Model):
+class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
     total=models.FloatField()
     viaje = models.ForeignKey(Viaje, on_delete= models.CASCADE) 
     user = models.ForeignKey(Cliente, on_delete= models.CASCADE)
-    ##insumos = models.ManyToManyField(Insumo, on_delete= models.CASCADE)
+    insumos = models.ManyToManyField(Insumo,default=None,null=True)
     comentario=models.OneToOneField(Comentario,on_delete=models.CASCADE)
+    pendiente=models.BooleanField(default=True)
+    cancelado=models.BooleanField(default=False)
     class Meta:
-        verbose_name="Pasaje"
-        verbose_name_plural="Pasajes" 
+        verbose_name="Compra"
+        verbose_name_plural="Compras" 
