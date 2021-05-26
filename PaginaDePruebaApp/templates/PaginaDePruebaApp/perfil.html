@@ -17,10 +17,13 @@
 <div class="infoGold">
     {% if persona.esGold %}
         <div>
-            <h3>Tarjetas</h3>
+            <h3>Tarjeta</h3>
             <br>
-            <a href="#">Agregar o cambiar tarjetas</a>
-            
+            <h4>Numero = {{ persona.tarjeta.nro }}</h4>
+            <br>
+            <a href="{% url 'AltaMembresia' %}">Cambiar tarjeta</a>
+            <br>
+            <a href="{% url 'ConfirmacionBajaMembresia' %}">Desuscribirse de membresía gold</a>
         </div>
     {% else %} 
         <section class="page-section cta">
@@ -41,10 +44,4 @@
         </section>
     {% endif %}
  </div>
-{% if persona.esGold %}
-    <div class="infoGold baja-membresia">
-        <a href="{% url 'ConfirmacionBajaMembresia' %}">Desuscribirse de membresía gold</a>
-    </div>
-{% endif %}
-
 {% endblock %}
