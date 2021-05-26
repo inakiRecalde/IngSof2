@@ -192,6 +192,7 @@ def RegistroChofer(request):
 def Perfil(request):
     if request.method == "POST":
         usuario = User.objects.get(pk= request.user.id)
+        cliente = Cliente.objects.get(pk= request.user.id)
         form = EditarForm(request.POST, instance= usuario)
         if form.is_valid():
             form.save()
