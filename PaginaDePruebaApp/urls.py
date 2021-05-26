@@ -18,4 +18,5 @@ urlpatterns = [
     path('AltaMembresia/', views.AltaMembresia,name = "AltaMembresia" ),
     path('ConfirmacionBajaMembresia/', views.ConfirmacionBajaMembresia,name = "ConfirmacionBajaMembresia" ),
     path('BajaMembresia/', views.BajaMembresia,name = "BajaMembresia" ),
+    path('Compra/<int:viaje_id>', views.Compra, name = "Compra" ),
 ]

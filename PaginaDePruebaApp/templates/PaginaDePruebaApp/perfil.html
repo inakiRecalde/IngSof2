@@ -10,7 +10,7 @@
         {% csrf_token %}
         <table> {{form.as_table}} </table>
         <button class="btn" type="submit">Guardar</button>
-        <h5> olvido su contraseña ? </h5>
+        <h5> ¿olvidó su contraseña? </h5>
         <a href = "{% url 'CambiarContrasena' user.id %}">Cambiar contraseña</a>
     </form>
 </div>

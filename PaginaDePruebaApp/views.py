@@ -248,3 +248,23 @@ def Busqueda(request):
     else:
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
         return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 
+
+def Compra(request,viaje_id):
+    viaje=Viaje.objects.get(id=viaje_id)
+    if request.method== "POST":
+        form= TarjetaForm(request.user, request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if chequearVencimiento(diccionario["fechaVto"]):
+                tarjeta=form.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoMembresia.html")
+            else:
+                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
+                form.add_error("fechaVto", msg)
+                return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje})
+        else:        
+            return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje})
+    else:
+        form = TarjetaForm(request.user)
+        return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"viaje":viaje})
+    
