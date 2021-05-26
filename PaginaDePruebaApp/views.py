@@ -105,6 +105,10 @@ def BajaMembresia(request):
     persona.save()
     return render(request, "PaginaDePruebaApp/bajaMembresia.html")
 
+def infoViaje(request, id_viaje):
+    viaje = Viaje.objects.get(pk=id_viaje)
+    return render(request,"PaginaDePruebaApp/infoViaje.html",{"ruta": viaje.ruta, 'fechaSalida':viaje.fechaSalida, 'fechaLlegada':viaje.fechaLlegada, 'duracion':viaje.duracion, 'asientosDisponibles':viaje.asientosDisponibles, 'combi':viaje.combi, 'precio':viaje.precio})    
+
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
 
