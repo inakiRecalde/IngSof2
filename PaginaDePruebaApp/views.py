@@ -203,15 +203,15 @@ def Perfil(request):
                 if diccionario["dni"] >= 0:
                     form.save()
                     form2.save()
-                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
+                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,"persona":cliente,"form2":form2,"cliente":cliente})
                 else:
                     msg ="El dni debe ser un numero positivo"    ## Mensaje de error
                     form2.add_error("dni", msg)
-                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
+                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,"persona":cliente,"form2":form2,"cliente":cliente})
             else:
-                return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente}) 
+                return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,"persona":cliente,"form2":form2,"cliente":cliente}) 
         else:
-            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
+            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,"persona":cliente,"form2":form2,"cliente":cliente})
     else:
         form = EditarForm(instance = usuario)
         form2 = EditarDniForm(instance = cliente)
