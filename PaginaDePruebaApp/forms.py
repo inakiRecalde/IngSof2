@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
+from django.forms import fields
 from .models import Cliente, Tarjeta, User,Chofer
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
@@ -118,14 +119,18 @@ class TarjetaForm(forms.ModelForm):
         cliente.tarjeta=tarjeta
         cliente.save()
         return tarjeta
+class EditarDniForm(forms.ModelForm):
+    dni = forms.IntegerField()
 
+    class Meta:
+        model = get_user_model()
+        fields = ['dni']
 class EditarForm(forms.ModelForm):
 
     #campos del formulario
     first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput())
     last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput())
     email = forms.EmailField()
-    #dni = forms.IntegerField()
     #fechaDeNacimiento = forms.DateField(label='Fecha de nacimiento', widget=forms.SelectDateWidget(years=range(1920, 2100)))
 
     class Meta:
@@ -133,9 +138,8 @@ class EditarForm(forms.ModelForm):
         
         fields= ['first_name','last_name', 'email']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self ,*args, **kwargs):
         super(EditarForm, self).__init__(*args, **kwargs) 
-
 
 class CambiarContraForm(forms.ModelForm):
     passwordActual = forms.CharField(label='Contraseña actual',widget= forms.PasswordInput())

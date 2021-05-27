@@ -9,7 +9,6 @@ from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
-from django.views.generic import FormView
 
 # metodos.
 def envio_Mail(destinatario):
@@ -192,23 +191,31 @@ def RegistroChofer(request):
         form = ChoferRegisterForm()
         return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
 
-
 def Perfil(request):
+    cliente=Cliente.objects.get(user_id=request.user.id)
+    usuario = User.objects.filter(id= request.user.id).first()
     if request.method == "POST":
-        usuario = User.objects.get(pk= request.user.id)
-        cliente = Cliente.objects.get(pk= request.user.id)
         form = EditarForm(request.POST, instance= usuario)
+        form2 = EditarDniForm(request.POST, instance = cliente)
         if form.is_valid():
-            form.save()
-            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form, 'usuario':usuario})
+            if form2.is_valid():
+                diccionario=form2.cleaned_data
+                if diccionario["dni"] >= 0:
+                    form.save()
+                    form2.save()
+                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
+                else:
+                    msg ="El dni debe ser un numero positivo"    ## Mensaje de error
+                    form2.add_error("dni", msg)
+                    return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
+            else:
+                return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente}) 
         else:
-            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form})
+            return render(request,"PaginaDePruebaApp/perfil.html", {"form": form,'usuario':usuario,"form2":form2,"cliente":cliente})
     else:
-        persona=Cliente.objects.get(user_id=request.user.id)
-        usuario = User.objects.filter(id= request.user.id).first()
-        form = EditarForm(instance= usuario)
-        return render(request, "PaginaDepruebaApp/perfil.html", {"form": form, "persona":persona})
-
+        form = EditarForm(instance = usuario)
+        form2 = EditarDniForm(instance = cliente)
+        return render(request, "PaginaDepruebaApp/perfil.html", {"form": form, "persona":cliente,"form2":form2,"cliente":cliente})
 
 def CambiarContrasena(request,id_usuario):
     if request.method == "POST":
