@@ -11,11 +11,16 @@
                 <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
             </li>
             {% if viaje.asientosDisponibles > 0 %}
-                <a href="{% url 'Compra' viaje_id=viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMPRAR PASAJE</a>
+                {% if user.is_authenticated and not user.esChofer %}
+                    <a href="{% url 'Compra' viaje_id=viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMPRAR PASAJE</a>  
+                {% endif %} 
             {% endif %}    
             <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
-    {% endfor %}  
+    {% endfor %} 
+    {% if not user.is_authenticated %} 
+    <p style="color: rgb(248, 17, 17); background-color: rgba(255, 255, 255,0.8); ">*Para comprar pasajes debe iniciar sesión*</p>
+    {% endif %}
   </div>     
 {% else %}
     <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No se encontró ningún viaje</h4>

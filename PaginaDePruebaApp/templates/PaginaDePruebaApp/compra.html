@@ -5,7 +5,27 @@
 {% block content %}
 <div class="compra">
     <div id="info-compra">
-        {{viaje}}
+        <li style="margin-left: 20px;"><b>Origen: </b>{{viaje.ruta.origen}}</li>
+        <li style="margin-left: 20px;"><b>Destino: </b>{{viaje.ruta.destino}}</li>
+        <li style="margin-left: 20px;"><b>Fecha de partida: </b>{{viaje.fechaSalida}}</li>
+        <li style="margin-left: 20px;"><b>Fecha de llegada: </b>{{viaje.fechaLlegada}}</li>
+        <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
+        <li style="margin-left: 20px;"><b>Tipo de combi: </b>{{viaje.combi.tipo}}</li>
+        <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
+        <li style="margin-left: 20px;"><b>Insumos:</b>
+            <!--<form class="compra-insumos" action="" method= "post">
+                {% csrf_token %}
+                <table>{{form2.as_table}}</table>
+                <br>
+                <button class="btn btn-primary" type="submit">Comprar</button>
+            </form>-->
+        {% for insumo in insumos %}
+            <li style="margin-left: 20px;">
+                
+            </li>
+            <b> </b>{{insumo.nombre}} &nbsp; <b>Descripción: </b>{{insumo.descripcion}} &nbsp; <b>Precio: $</b>{{insumo.precio}} &nbsp;
+        {% endfor %}
+    </li>
     </div>
     <div id="insumos-compra">
         

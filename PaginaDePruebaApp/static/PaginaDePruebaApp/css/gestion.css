@@ -399,3 +399,9 @@ ul.errorlist{
 .compra {
   background-color: rgba(255, 255, 255,0.7);
 }
+#tabla-insumos{
+  table-layout: fixed;
+  width: 50%;
+  border-collapse: collapse;
+  border: 2px solid rgb(2, 1, 2);
+}

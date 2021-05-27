@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje
+from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje,Insumo
 from datetime import date
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
@@ -106,7 +106,9 @@ def BajaMembresia(request):
 
 def infoViaje(request, id_viaje):
     viaje = Viaje.objects.get(pk=id_viaje)
-    return render(request,"PaginaDePruebaApp/infoViaje.html",{"ruta": viaje.ruta, 'fechaSalida':viaje.fechaSalida, 'fechaLlegada':viaje.fechaLlegada, 'duracion':viaje.duracion, 'asientosDisponibles':viaje.asientosDisponibles, 'combi':viaje.combi, 'precio':viaje.precio})    
+    viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
+    insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
+    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
@@ -263,6 +265,9 @@ def Busqueda(request):
 
 def Compra(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)
+    viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=viaje_id)
+    insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
+    
     if request.method== "POST":
         form= TarjetaForm(request.user, request.POST)
         if form.is_valid():
@@ -273,10 +278,11 @@ def Compra(request,viaje_id):
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 form.add_error("fechaVto", msg)
-                return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje})
+                return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje,"insumos":insumos})
         else:        
-            return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje})
+            return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje,"insumos":insumos})
     else:
         form = TarjetaForm(request.user)
-        return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"viaje":viaje})
-    
+        #form2=CompraInsumosForm(request.POST,instance=viaje)
+        return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"viaje":viaje,"insumos":insumos})
+

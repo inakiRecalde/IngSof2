@@ -3,20 +3,39 @@
 {% load static %}
 {% block content %}
 <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
-    <li style="margin-left: 20px;"><b>Origen: </b>{{ruta.origen}}</li>
-    <li style="margin-left: 20px;"><b>Destino: </b>{{ruta.destino}}</li>
-    <li style="margin-left: 20px;"><b>Salida: </b>{{fechaSalida}}</li>
-    <li style="margin-left: 20px;"><b>Llegada: </b>{{fechaLlegada}}</li>
-    <li style="margin-left: 20px;"><b>Duracion: </b>{{duracion}}</li>
-    <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{asientosDisponibles}}</li>
-    <li style="margin-left: 20px;"><b>Distancia: </b>{{ruta.distancia}}<text>km</text></li>
-    <li style="margin-left: 20px;"><b>Descripcion de la ruta: </b>{{ruta.descripcion}}</li>
-    <li style="margin-left: 20px;"><b>Combi: </b>{{combi.modelo}}</li>
-    <li style="margin-left: 20px;"><b>Tipo: </b>{{combi.tipo}}</li>
-    <li style="margin-left: 20px;"><b>Chofer: </b>{{combi.chofer}}</li>
-    <li style="margin-left: 20px;"><b>Precio: $</b>{{precio}}</li>
-    <li style="margin-left: 20px;"><b>Insumos:</b>
-        <!-- ACA IRIA UN FOR QUE RECORRA LA LISTA DE INSUMOS -->
+    <li style="margin-left: 20px;"><b>Origen: </b>{{viaje.ruta.origen}}</li>
+    <li style="margin-left: 20px;"><b>Destino: </b>{{viaje.ruta.destino}}</li>
+    <li style="margin-left: 20px;"><b>Salida: </b>{{viaje.fechaSalida}}</li>
+    <li style="margin-left: 20px;"><b>Llegada: </b>{{viaje.fechaLlegada}}</li>
+    <li style="margin-left: 20px;"><b>Duracion: </b>{{viaje.duracion}}</li>
+    <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
+    <li style="margin-left: 20px;"><b>Distancia: </b>{{viaje.ruta.distancia}}<text>km</text></li>
+    <li style="margin-left: 20px;"><b>Descripcion de la ruta: </b>{{viaje.ruta.descripcion}}</li>
+    <li style="margin-left: 20px;"><b>Combi: </b>{{viaje.combi.modelo}}</li>
+    <li style="margin-left: 20px;"><b>Tipo: </b>{{viaje.combi.tipo}}</li>
+    <li style="margin-left: 20px;"><b>Chofer: </b>{{viaje.combi.chofer}}</li>
+    <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
+    <li style="margin-left: 20px;"><b>Lista de insumos:</b>
+        <div>
+            <table id=tabla-insumos>
+            <thead>
+                <tr>
+                    <th>nombre</th>
+                    <th>descripcion</th>
+                    <th>precio</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for insumo in insumos %}
+                <tr>
+                    <td>{{insumo.nombre}}</td>
+                    <td>{{insumo.descripcion}}</td>
+                    <td>${{insumo.precio}}</td>
+                </tr>                
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
     </li>
 </div>     
 

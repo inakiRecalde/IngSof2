@@ -3,9 +3,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
 from django.forms import fields
-from .models import Cliente, Tarjeta, User,Chofer
+from .models import Cliente, Tarjeta, User,Chofer,Insumo,Viaje
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
+from django.forms.models import ModelMultipleChoiceField
 
 class UserRegisterForm(UserCreationForm):
     #mensajes de error
@@ -119,20 +120,21 @@ class TarjetaForm(forms.ModelForm):
         cliente.tarjeta=tarjeta
         cliente.save()
         return tarjeta
+        
 class EditarDniForm(forms.ModelForm):
     dni = forms.IntegerField()
 
     class Meta:
         model = get_user_model()
         fields = ['dni']
+
 class EditarForm(forms.ModelForm):
 
     #campos del formulario
     first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput())
     last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput())
     email = forms.EmailField()
-    #fechaDeNacimiento = forms.DateField(label='Fecha de nacimiento', widget=forms.SelectDateWidget(years=range(1920, 2100)))
-
+    
     class Meta:
         model = get_user_model()
         
@@ -149,3 +151,27 @@ class CambiarContraForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields= ['passwordActual','password1','password2']
+
+class MyMultipleModelChoiceField(ModelMultipleChoiceField):
+
+    def label_from_instance(self, obj):
+        return "%s, precio: $%s" % (obj.nombre,obj.precio)
+
+"""class CompraInsumosForm(forms.ModelForm):
+
+    class Meta:
+        model = Insumo
+        fields = (
+            'nombre',
+            )
+
+    def __init__(self, *args, **kwargs):
+
+        # call the parent init
+        super(CompraInsumosForm, self).__init__(*args, **kwargs)
+        viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=self.instance.id)
+
+        self.fields['nombre'] = MyMultipleModelChoiceField(
+            queryset=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery), 
+            required=True, 
+            widget=forms.SelectMultiple())"""
