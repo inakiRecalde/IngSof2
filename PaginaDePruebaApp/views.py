@@ -72,7 +72,7 @@ def Ahorro (request):
 def HistorialDeViajes (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id)
-        compras=Compra.objects.filter(user__id__icontains=request.user.id)  
+        compras=Compra.objects.filter(user__user__id__icontains=request.user.id)  
         return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona,"compras":compras})       
     else:
         return render(request,"PaginaDePruebaApp/historialDeViajes.html")
@@ -129,7 +129,7 @@ def infoViaje(request, id_viaje):
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
     insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
     if request.user.is_authenticated:
-        compra = Compra.objects.get(viaje_id=id_viaje, user_id=request.user.id)
+        compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
         if compra:
             if not compra.cancelado:
                 compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
