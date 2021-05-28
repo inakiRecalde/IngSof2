@@ -20,4 +20,6 @@ urlpatterns = [
     path('BajaMembresia/', views.BajaMembresia,name = "BajaMembresia" ),
     path('infoViaje/<int:id_viaje>', views.infoViaje, name= "infoViaje"),
     path('Compra/<int:viaje_id>', views.CompraView, name = "Compra" ),
+    path('CambioTarjeta/', views.CambioTarjeta, name = "CambioTarjeta" ),
+    path('RegistroInvitado/', views.RegistroInvitado, name = "RegistroInvitado" ),
 ]

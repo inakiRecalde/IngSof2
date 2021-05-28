@@ -23,8 +23,10 @@
             {% csrf_token %}
             <table>{{form2.as_table}}</table>
             <br>
-            <button class="btn btn-primary" type="submit">Comprar</button>
         </form>
+    </div>
+    <div id="invitados">
+        <a href="{% url 'RegistroInvitado' %}" style="color: black;">Para comprar pasaje adicional haga click aquí</a>
     </div>
     <div id=form-compra>
         {% if not persona.esGold %}
@@ -32,8 +34,16 @@
             {% csrf_token %}
             <table>{{form.as_table}}</table>
             <br>
-            <button class="btn btn-primary" type="submit">Comprar</button>
+            <button class="btn btn-primary" type="submit">Comprar</button> 
+            
         </form>
+        {% else %}
+            <a href="#">[ ] Utilizar tarjeta</a>
+            <br>
+            <h4>Numero = {{ persona.tarjeta.nro }}</h4>
+            <br>
+            <a href="#">[ ] Pagar con otra tarjeta</a>
+            <button class="btn btn-primary" type="submit">Comprar</button>
         {% endif %}
     </div>
 

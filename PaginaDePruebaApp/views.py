@@ -94,8 +94,27 @@ def AltaMembresia (request):
         form = TarjetaForm(request.user)
         return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
 
+def CambioTarjeta (request):
+    if request.method== "POST":
+        form= TarjetaForm(request.user, request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            if chequearVencimiento(diccionario["fechaVto"]):
+                tarjeta=form.save()
+                return render(request,"PaginaDePruebaApp/mensajeCambioTarjeta.html")
+            else:
+                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
+                form.add_error("fechaVto", msg)
+                return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+        else:        
+            return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+    else:
+        form = TarjetaForm(request.user)
+        return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+
 def ConfirmacionBajaMembresia(request):
     return render(request, "PaginaDePruebaApp/confirmacionBajaMembresia.html")
+
 
 def BajaMembresia(request):
     persona=Cliente.objects.get(user_id=request.user.id)
@@ -285,9 +304,25 @@ def CompraView(request,viaje_id):
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 form.add_error("fechaVto", msg)
-        
     else:
         form = TarjetaForm(request.user)
-        
     return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"form2":form2, "viaje":viaje,"insumos":insumos,"persona":persona})
+
+def RegistroInvitado(request):
+    
+    if request.method== "POST":
+        form=InvitadoForm(request.POST)
+        if form.is_valid():
+            diccionario=form.cleaned_data
+            invitado=form.save()
+            print(invitado.nombre)
+            print(invitado.apellido)
+            print(invitado.dni)
+            return render(request,"PaginaDePruebaApp/compra.html")
+        else:
+            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
+    else:
+        form=InvitadoForm(request.POST)
+        return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
+
 
