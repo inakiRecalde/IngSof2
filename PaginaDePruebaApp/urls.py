@@ -19,5 +19,5 @@ urlpatterns = [
     path('ConfirmacionBajaMembresia/', views.ConfirmacionBajaMembresia,name = "ConfirmacionBajaMembresia" ),
     path('BajaMembresia/', views.BajaMembresia,name = "BajaMembresia" ),
     path('infoViaje/<int:id_viaje>', views.infoViaje, name= "infoViaje"),
-    path('Compra/<int:viaje_id>', views.Compra, name = "Compra" ),
+    path('Compra/<int:viaje_id>', views.CompraView, name = "Compra" ),
 ]

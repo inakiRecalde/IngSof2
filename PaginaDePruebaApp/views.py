@@ -258,12 +258,13 @@ def Busqueda(request):
     elif origen=="" and destino=="" and fecha:
         viajes=Viaje.objects.filter(fechaSalida__icontains=fecha)
     if origen or destino or fecha:
+        print(viajes)
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
     else:
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
         return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 
 
-def Compra(request,viaje_id):
+def CompraView(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)
     persona=Cliente.objects.get(user_id=request.user.id)
 
@@ -271,7 +272,7 @@ def Compra(request,viaje_id):
     id_insumos=viajeInsumosQuery.values_list('insumo_id')
     insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
     insumos=list(insumo for insumo in insumosQuery)
-    
+
     form2=CompraInsumosForm(request.POST,instance=viaje)
     if request.method== "POST":
         form= TarjetaForm(request.user, request.POST)
