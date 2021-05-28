@@ -265,11 +265,17 @@ def Busqueda(request):
 
 def Compra(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)
+    persona=Cliente.objects.get(user_id=request.user.id)
+
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=viaje_id)
-    insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
+    id_insumos=viajeInsumosQuery.values_list('insumo_id')
+    insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
+    insumos=list(insumo for insumo in insumosQuery)
     
+    form2=CompraInsumosForm(request.POST,instance=viaje)
     if request.method== "POST":
         form= TarjetaForm(request.user, request.POST)
+        
         if form.is_valid():
             diccionario=form.cleaned_data
             if chequearVencimiento(diccionario["fechaVto"]):
@@ -278,11 +284,9 @@ def Compra(request,viaje_id):
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 form.add_error("fechaVto", msg)
-                return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje,"insumos":insumos})
-        else:        
-            return render(request,"PaginaDePruebaApp/compra.html", {"form": form,"viaje":viaje,"insumos":insumos})
+        
     else:
         form = TarjetaForm(request.user)
-        #form2=CompraInsumosForm(request.POST,instance=viaje)
-        return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"viaje":viaje,"insumos":insumos})
+        
+    return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"form2":form2, "viaje":viaje,"insumos":insumos,"persona":persona})
 

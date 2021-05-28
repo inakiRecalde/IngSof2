@@ -12,31 +12,29 @@
         <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
         <li style="margin-left: 20px;"><b>Tipo de combi: </b>{{viaje.combi.tipo}}</li>
         <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
-        <li style="margin-left: 20px;"><b>Insumos:</b>
-            <!--<form class="compra-insumos" action="" method= "post">
-                {% csrf_token %}
-                <table>{{form2.as_table}}</table>
-                <br>
-                <button class="btn btn-primary" type="submit">Comprar</button>
-            </form>-->
-        {% for insumo in insumos %}
-            <li style="margin-left: 20px;">
-                
-            </li>
-            <b> </b>{{insumo.nombre}} &nbsp; <b>Descripción: </b>{{insumo.descripcion}} &nbsp; <b>Precio: $</b>{{insumo.precio}} &nbsp;
-        {% endfor %}
+        <li style="margin-left: 20px;"><b>Insumos:</b> 
     </li>
     </div>
-    <div id="insumos-compra">
         
+    <br>
+    <div id="insumos-compra">
+        <p>Si desea puede comprar insumos para su viaje</p>
+        <form class="compra-insumos" action="" method= "post">
+            {% csrf_token %}
+            <table>{{form2.as_table}}</table>
+            <br>
+            <button class="btn btn-primary" type="submit">Comprar</button>
+        </form>
     </div>
     <div id=form-compra>
+        {% if not persona.esGold %}
         <form class="compra" action="" method= "post">
             {% csrf_token %}
             <table>{{form.as_table}}</table>
             <br>
             <button class="btn btn-primary" type="submit">Comprar</button>
         </form>
+        {% endif %}
     </div>
 
 </div>
