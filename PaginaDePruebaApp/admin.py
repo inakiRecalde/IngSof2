@@ -8,11 +8,6 @@ from PaginaDePruebaApp.forms import ChoferAdminForm
 
 ##UserAdmin  adminCombi19 contra: 12345
 
-#admin.site.register(Comentario) #esto lo implementamos en otra demo
-
-#admin.site.register(Tarjeta) #esto no debería ir, el admin no debería poder ver las tarjetas 
-
-
 class UserAdmin(admin.ModelAdmin):
     model=User
     fields=("first_name","last_name","email","esCliente","esChofer")

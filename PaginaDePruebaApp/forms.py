@@ -1,9 +1,10 @@
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
 from django.forms import fields
-from .models import Cliente, Tarjeta, User,Chofer,Insumo,Viaje
+from .models import Cliente, Compra, Invitado, Tarjeta, User,Chofer,Insumo,Viaje
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
 from django.forms.models import ModelMultipleChoiceField
@@ -152,17 +153,20 @@ class CambiarContraForm(forms.ModelForm):
         model = get_user_model()
         fields= ['passwordActual','password1','password2']
 
+
+#formularios para la compra
+
 class MyMultipleModelChoiceField(ModelMultipleChoiceField):
 
     def label_from_instance(self, obj):
         return "%s, precio: $%s" % (obj.nombre,obj.precio)
 
-"""class CompraInsumosForm(forms.ModelForm):
-
+class CompraInsumosForm(forms.ModelForm):
+    
     class Meta:
-        model = Insumo
+        model = Compra
         fields = (
-            'nombre',
+            'insumos',
             )
 
     def __init__(self, *args, **kwargs):
@@ -170,8 +174,26 @@ class MyMultipleModelChoiceField(ModelMultipleChoiceField):
         # call the parent init
         super(CompraInsumosForm, self).__init__(*args, **kwargs)
         viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=self.instance.id)
+        id_insumos=viajeInsumosQuery.values_list('insumo_id')
+        
+        self.fields['insumos'] = MyMultipleModelChoiceField(
+            queryset=Insumo.objects.filter(pk__in=id_insumos), 
+            required=False, 
+            widget=forms.SelectMultiple()
+            
+            )
 
-        self.fields['nombre'] = MyMultipleModelChoiceField(
-            queryset=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery), 
-            required=True, 
-            widget=forms.SelectMultiple())"""
+class InvitadoForm(forms.ModelForm):
+    nombre_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su nombre")', 'oninput': 'this.setCustomValidity("")'}
+    apellido_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su apellido")', 'oninput': 'this.setCustomValidity("")'}
+    dni_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su DNI")', 'oninput': 'this.setCustomValidity("")'}
+
+    nombre=forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput(attrs=nombre_attr))
+    apellido=forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput(attrs=apellido_attr))
+    dni = forms.IntegerField(label='DNI', max_value=99999999,widget=forms.TextInput(attrs=dni_attr))
+
+    class Meta:
+        model = Invitado
+        fields = (
+            'nombre','apellido','dni'
+            )

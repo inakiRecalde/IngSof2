@@ -231,6 +231,11 @@ class Cliente(models.Model):
         verbose_name="Cliente"
         verbose_name_plural="Clientes"  
 
+class Invitado(models.Model):
+    nombre=models.CharField(max_length=30)
+    apellido=models.CharField(max_length=30)
+    dni=models.IntegerField()
+
 class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
     total=models.FloatField()
@@ -238,6 +243,7 @@ class Compra(models.Model):
     user = models.ForeignKey(Cliente, on_delete= models.CASCADE)
     insumos = models.ManyToManyField(Insumo,default=None,null=True)
     comentario=models.OneToOneField(Comentario,on_delete=models.CASCADE)
+    invitados=models.ForeignKey(Invitado,on_delete=models.CASCADE,default=None,null=True)
     pendiente=models.BooleanField(default=True)
     cancelado=models.BooleanField(default=False)
     class Meta:
