@@ -7,11 +7,11 @@
 <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Futuros:</h2>
     {% for compra in compras %}
-        {% if not compra.viaje.enCurso %}
+        {% if not compra.viaje.enCurso and not compra.cancelado %}
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}} &nbsp; <b>Fecha de la Compra: </b>{{compra.fechaCompra}} &nbsp; <b>Precio total: $</b>{{compra.total}}
             </li>
-            <a href="{% url '' %}" style="margin-left: 20px;" class="btn btn-primary">CANCELAR PASAJE</a>  
+            <a href="{% url 'cancelarPasaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">CANCELAR PASAJE</a>  
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
@@ -20,7 +20,7 @@
   <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Realizados:</h2>
     {% for compra in compras %}
-        {% if compra.viaje.finalizado %}
+        {% if compra.viaje.finalizado and not compra.cancelado%}
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}} &nbsp; <b>Fecha de la Compra: </b>{{compra.fechaCompra}} &nbsp; <b>Precio total: $</b>{{compra.total}}
             </li>

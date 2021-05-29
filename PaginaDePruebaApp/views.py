@@ -334,4 +334,12 @@ def RegistroInvitado(request):
         form=InvitadoForm(request.POST)
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
 
+def CancelarPasaje(request, id_viaje):
+    compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+    dinero=compra.total
+    compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
+    #Falta sumarle los asientos disponibles de los invitados
+    compra.cancelado=True
+    #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
+    return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 
