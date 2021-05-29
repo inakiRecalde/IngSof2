@@ -56,15 +56,22 @@ def Inicio (request):
         
 
 def Comentarios (request):
-    if request.user.is_authenticated and not request.user.is_staff and not request.user.esChofer:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        return render(request,"PaginaDePruebaApp/comentarios.html", {"persona":persona})
+    if request.method== "POST":
+        form= ComentInputForm(request.POST)
+        if form.is_valid():
+            coment=form.save()
+            return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form})
+        else:        
+            return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form})
     else:
-        return render(request,"PaginaDePruebaApp/comentarios.html")
+        form = ComentInputForm()
+        comentarios = Comentario.objects.all()
+        return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form, "comentarios": comentarios})
 
 def Ahorro (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id) 
+        persona=Cliente.objects.get(user_id=request.user.id)
         return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona}) 
     else:
         return render(request,"PaginaDePruebaApp/ahorro.html")

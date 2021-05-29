@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
 from django.forms import fields
-from .models import Cliente, Compra, Invitado, Tarjeta, User,Chofer,Insumo,Viaje
+from .models import Cliente, Comentario, Compra, Invitado, Tarjeta, User,Chofer,Insumo,Viaje
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
 from django.forms.models import ModelMultipleChoiceField
@@ -197,3 +197,27 @@ class InvitadoForm(forms.ModelForm):
         fields = (
             'nombre','apellido','dni'
             )
+
+
+
+#CHOICES = [('1', '★'), ('2', '★'),('3', '★'), ('4', '★'),('5', '★')]
+class ComentInputForm(forms.ModelForm):
+    texto_attr = {'oninvalid': 'this.setCustomValidity("Por favor un texto")', 'oninput': 'this.setCustomValidity("")'}   
+
+    texto=forms.CharField(label='Ingrese un comentario', max_length=30,widget=forms.TextInput(attrs=texto_attr))
+    #forms.ChoiceField(choices=CHOICES,type="radio",widget= forms.RadioSelect(attrs={'class' : 'Estrella'}))
+
+    
+    class Meta:
+        model = Comentario  
+        fields = (
+            'texto',
+        ) 
+
+    def save(self):
+        coment = Comentario.objects.create(
+            texto=self.cleaned_data.get('texto'),
+            puntuacion = '2'
+        )
+        return coment
+          
