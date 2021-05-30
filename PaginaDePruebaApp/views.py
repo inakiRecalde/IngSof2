@@ -310,7 +310,16 @@ def CompraView(request,viaje_id):
     id_insumos=viajeInsumosQuery.values_list('insumo_id')
     insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
     insumosViaje=list(insumo for insumo in insumosQuery)
-    compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=persona)
+    try:
+        compra=Compra.objects.get(user_id=request.user.id,viaje_id=viaje_id)
+    except :
+        compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=persona)
+
+    if compra.pendiente:
+        print("usted ya realizo compra para este viaje")
+        return render(request,"PaginaDePruebaApp/mensajeCompraFallida.html")
+    else:
+        compra=Compra.objects.get(user_id=request.user.id,viaje_id=viaje_id)
 
     formInsumos=CompraInsumosForm(request.POST,instance=viaje)
 
@@ -323,7 +332,9 @@ def CompraView(request,viaje_id):
                 if formInsumos.is_valid():
                     insumosCompra=formInsumos.save()
                 print(insumosCompra)
-                return render(request,"PaginaDePruebaApp/Inicio.html")
+                compra.pendiente=True
+                compra.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html")
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)
@@ -335,23 +346,29 @@ def RegistroInvitado(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)
     persona=Cliente.objects.get(user_id=request.user.id)
 
+    compra=Compra.objects.get(viaje_id=viaje.id, user_id=request.user.id)
+    print(compra)
+
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=viaje_id)
     id_insumos=viajeInsumosQuery.values_list('insumo_id')
     insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
     insumos=list(insumo for insumo in insumosQuery)
     formInsumos=CompraInsumosForm(request.POST,instance=viaje)
+
     if request.method== "POST":
         formTarjeta= TarjetaForm(request.user, request.POST)
         formInvitado=InvitadoForm(request.POST)
         if formInvitado.is_valid():
             diccionario=formInvitado.cleaned_data
+
             invitado=formInvitado.save()
+            #print(invitado)
             return render(request,"PaginaDePruebaApp/compra.html",{"form": formTarjeta ,"form2":formInsumos, "viaje":viaje,"insumos":insumos,"persona":persona})
         else:
-            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado})
+            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado,"viaje":viaje})
     else:
         formInvitado=InvitadoForm(request.POST)
-        return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado})
+        return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado,"viaje":viaje})
 
 def CancelarPasaje(request, id_viaje):
     compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)

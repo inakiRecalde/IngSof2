@@ -244,7 +244,7 @@ class Compra(models.Model):
     insumos = models.ManyToManyField(Insumo,default=None,null=True)
     comentario=models.OneToOneField(Comentario,on_delete=models.CASCADE,default=None,null=True)
     invitados=models.ForeignKey(Invitado,on_delete=models.CASCADE,default=None,null=True)
-    pendiente=models.BooleanField(default=True)
+    pendiente=models.BooleanField(default=False)
     cancelado=models.BooleanField(default=False)
     class Meta:
         verbose_name="Compra"
