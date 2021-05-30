@@ -8,13 +8,14 @@
     <li style="margin-left: 20px;"><b>Salida: </b>{{viaje.fechaSalida}}</li>
     <li style="margin-left: 20px;"><b>Llegada: </b>{{viaje.fechaLlegada}}</li>
     <li style="margin-left: 20px;"><b>Duracion: </b>{{viaje.duracion}}</li>
-    <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
     <li style="margin-left: 20px;"><b>Distancia: </b>{{viaje.ruta.distancia}}<text>km</text></li>
     <li style="margin-left: 20px;"><b>Descripcion de la ruta: </b>{{viaje.ruta.descripcion}}</li>
     <li style="margin-left: 20px;"><b>Combi: </b>{{viaje.combi.modelo}}</li>
     <li style="margin-left: 20px;"><b>Tipo: </b>{{viaje.combi.tipo}}</li>
     <li style="margin-left: 20px;"><b>Chofer: </b>{{viaje.combi.chofer}}</li>
     <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
+    {% if not compra %}
+    <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
     <li style="margin-left: 20px;"><b>Lista de insumos:</b>
         <div>
             <table id=tabla-insumos>
@@ -37,6 +38,33 @@
             </table>
         </div>
     </li>
+    {% else %}
+    {% if not compra.cancelado %}
+    <li style="margin-left: 20px;"><b> Precio total: </b>{{compra.total}}</li>
+    <li style="margin-left: 20px;"><b>Lista de insumos comprados:</b>
+        <div>
+            <table id=tabla-insumos>
+            <thead>
+                <tr>
+                    <th>nombre</th>
+                    <th>descripcion</th>
+                    <th>precio</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for insumo in insumosComprados %}
+                <tr>
+                    <td>{{insumo.nombre}}</td>
+                    <td>{{insumo.descripcion}}</td>
+                    <td>${{insumo.precio}}</td>
+                </tr>                
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </li>
+    {% endif %}
+    {% endif %}
 </div>     
 
 {% endblock %}

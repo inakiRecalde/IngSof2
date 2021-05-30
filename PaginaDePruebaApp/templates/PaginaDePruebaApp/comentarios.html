@@ -4,5 +4,27 @@
 
 {% block content %}
 
+<div class = "comentInput">
+    <form class="coment-input" action="" method= "post" >
+        {% csrf_token %}
+        <table>{{form.as_table}}</table>
+        <br>
+        <button class="btn" type="submit">Guardar</button>
+    </form>
+</div>
 
+<div class= "comentView">
+<h2>Comentarios:</h2>
+    {% for coment in comentarios %}
+        <li style="margin-left: 20px;">
+            <b></b>{{coment.texto}}
+        </li>
+    {% endfor %} 
+</div>
+
+ <script>
+  function submitForms2(){
+    document.forms[0].submit();
+  }
+</script>
 {% endblock %}

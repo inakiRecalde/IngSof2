@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje,Insumo
+from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
 from datetime import date
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
@@ -56,23 +56,31 @@ def Inicio (request):
         
 
 def Comentarios (request):
-    if request.user.is_authenticated and not request.user.is_staff and not request.user.esChofer:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        return render(request,"PaginaDePruebaApp/comentarios.html", {"persona":persona})
+    if request.method== "POST":
+        form= ComentInputForm(request.POST)
+        if form.is_valid():
+            coment=form.save()
+            return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form})
+        else:        
+            return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form})
     else:
-        return render(request,"PaginaDePruebaApp/comentarios.html")
+        form = ComentInputForm()
+        comentarios = Comentario.objects.all()
+        return render(request,"PaginaDePruebaApp/comentarios.html", {"form": form, "comentarios": comentarios})
 
 def Ahorro (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id) 
+        persona=Cliente.objects.get(user_id=request.user.id)
         return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona}) 
     else:
         return render(request,"PaginaDePruebaApp/ahorro.html")
 
 def HistorialDeViajes (request):
     if request.user.is_authenticated:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona})       
+        persona=Cliente.objects.get(user_id=request.user.id)
+        compras=Compra.objects.filter(user__user__id__icontains=request.user.id)  
+        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona,"compras":compras})       
     else:
         return render(request,"PaginaDePruebaApp/historialDeViajes.html")
 
@@ -131,6 +139,14 @@ def infoViaje(request, id_viaje):
     viaje = Viaje.objects.get(pk=id_viaje)
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
     insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
+    if request.user.is_authenticated:
+        compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+        if compra:
+            if not compra.cancelado:
+                compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
+                insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)    
+                return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra, "insumosComprados":insumosComprados})
+            return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
 def ViajesChofer (request):
@@ -337,4 +353,12 @@ def RegistroInvitado(request,viaje_id):
         formInvitado=InvitadoForm(request.POST)
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado})
 
+def CancelarPasaje(request, id_viaje):
+    compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+    dinero=compra.total
+    compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
+    #Falta sumarle los asientos disponibles de los invitados
+    compra.cancelado=True
+    #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
+    return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 

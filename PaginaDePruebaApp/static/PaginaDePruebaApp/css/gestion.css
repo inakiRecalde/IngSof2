@@ -318,7 +318,7 @@ ul.errorlist{
 
 .formPerfil{
   width: 50%;
-  height: 40%;
+  height: max-content;
   display: flex;
   align-items: center;
   justify-content: center;

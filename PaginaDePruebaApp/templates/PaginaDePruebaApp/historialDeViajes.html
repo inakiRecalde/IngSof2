@@ -1,8 +1,48 @@
 {% extends "PaginaDePruebaApp/base.html" %}
 
 {% load static %}
-
 {% block content %}
+{% if compras %}
+ 
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    <h2 style="margin-left: 10px;">Viajes Futuros:</h2>
+    {% for compra in compras %}
+        {% if not compra.viaje.enCurso and not compra.cancelado %}
+            <li style="margin-left: 20px;">
+                <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}} &nbsp; <b>Fecha de la Compra: </b>{{compra.fechaCompra}} &nbsp; <b>Precio total: $</b>{{compra.total}}
+            </li>
+            <a href="{% url 'cancelarPasaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">CANCELAR PASAJE</a>  
+            <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+        {% endif %}
+    {% endfor %}
+  </div>
+  
+  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    <h2 style="margin-left: 10px;">Viajes Realizados:</h2>
+    {% for compra in compras %}
+        {% if compra.viaje.finalizado and not compra.cancelado%}
+            <li style="margin-left: 20px;">
+                <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}} &nbsp; <b>Fecha de la Compra: </b>{{compra.fechaCompra}} &nbsp; <b>Precio total: $</b>{{compra.total}}
+            </li>
+            <a href="{% url 'comentario' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMENTAR VIAJE</a> 
+            <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+        {% endif %}
+    {% endfor %}
+  </div>
 
-
+  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    <h2 style="margin-left: 10px;">Viajes Cancelados:</h2>
+    {% for compra in compras %}
+        {% if compra.cancelado %}
+            <li style="margin-left: 20px;">
+                <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}}
+            </li> 
+            <a href="{% url '' %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+        {% endif %}
+    {% endfor %}
+  </div>
+  
+{% else %}
+    <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No hay viajes en su historial</h4>
+{% endif %}
 {% endblock %}
