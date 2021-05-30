@@ -79,7 +79,7 @@ def Ahorro (request):
 def HistorialDeViajes (request):
     if request.user.is_authenticated:
         persona=Cliente.objects.get(user_id=request.user.id)
-        compras=Compra.objects.filter(user__user__id__icontains=request.user.id)  
+        compras=Compra.objects.filter(user__user__id__icontains=request.user.id, pendiente=True)  
         return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona,"compras":compras})       
     else:
         return render(request,"PaginaDePruebaApp/historialDeViajes.html")
@@ -140,13 +140,15 @@ def infoViaje(request, id_viaje):
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
     insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
     if request.user.is_authenticated:
-        compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
-        if compra:
-            if not compra.cancelado:
-                compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
-                insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)    
-                return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra, "insumosComprados":insumosComprados})
-            return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
+        compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+        if compras:
+            for compra in compras:
+                if not compra.cancelado:
+                    #compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
+                    #insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)    
+                    #Al return de abajo faltaria mandarle los insumos por parametro
+                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
+                return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
 def ViajesChofer (request):
@@ -333,6 +335,7 @@ def CompraView(request,viaje_id):
                     insumosCompra=formInsumos.save()
                 print(insumosCompra)
                 compra.pendiente=True
+                compra.insumos=insumosCompra
                 compra.save()
                 return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html")
             else:
@@ -371,11 +374,13 @@ def RegistroInvitado(request,viaje_id):
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": formInvitado,"viaje":viaje})
 
 def CancelarPasaje(request, id_viaje):
-    compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
-    dinero=compra.total
-    compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
-    #Falta sumarle los asientos disponibles de los invitados
-    compra.cancelado=True
-    #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
-    return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
+    compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+    for compra in compras:
+        dinero=compra.total
+        compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
+        #Falta sumarle los asientos disponibles de los invitados
+        compra.cancelado=True
+        #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
+        print("Antes del render")
+        return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 
