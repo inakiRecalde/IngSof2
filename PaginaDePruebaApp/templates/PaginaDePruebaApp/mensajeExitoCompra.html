@@ -3,8 +3,33 @@
 {% load static %}
 
 {% block content %}
-    <div id="mensaje-membresia" style="background-color: white; padding:10em; text-align: center; font-size: 1.5em;">
-        Su compra ha sido exitosa
+    <div id="mensaje-membresia" style="background-color: white; padding:5em; text-align: center; font-size: 1.5em;">
+        <h2>Resumen de su compra</h2>
+        <h3>Viaje </h3>
+        <li style="margin-left: 20px;"><b>Origen: </b>{{viaje.ruta.origen}}</li>
+        <li style="margin-left: 20px;"><b>Destino: </b>{{viaje.ruta.destino}}</li>
+        <li style="margin-left: 20px;"><b>Fecha de partida: </b>{{viaje.fechaSalida}}</li>
+        <li style="margin-left: 20px;"><b>Fecha de llegada: </b>{{viaje.fechaLlegada}}</li>
+        <li style="margin-left: 20px;"><b>Tipo de combi: </b>{{viaje.combi.tipo}}</li>
+        <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
+        
+        {% if insumos %}
+            <h3>Lista de insumos</h3>
+            {% for insumo in insumos %}
+                <li style="margin-left: 20px;">
+                    <b>Nombre: </b>{{insumo.nombre}} &nbsp; <b></b>{{insumo.descripcion}} &nbsp; <b>precio: </b>{{insumo.precio}} &nbsp; 
+                </li>    
+            {% endfor %}
+        {% endif %}
+        {% if invitados %}
+            <h3>Lista de invitados</h3>
+            {% for invitado in invitados %}
+                <li style="margin-left: 20px;">
+                    <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
+                </li>    
+            {% endfor %}
+        {% endif %}
+        <h3>Precio total:  ${{compra.total}}</h3>
     </div>
 
 {% endblock %}

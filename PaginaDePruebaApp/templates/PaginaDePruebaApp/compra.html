@@ -45,7 +45,6 @@
             <br>
             <button class="btn btn-primary" type="submit">Comprar</button>
             <input class="btn btn-primary" type="button" value="No funciona" onclick="submitForms()" />
-            
         </form>
         {% else %}
             <a href="#">[ ] Utilizar tarjeta</a>
@@ -53,6 +52,13 @@
             <h4>Numero = {{ persona.tarjeta.nro }}</h4>
             <br>
             <a href="#">[ ] Pagar con otra tarjeta</a>
+            <form class="compra" action="" method= "post">
+                {% csrf_token %}
+                <table>{{formTarjeta.as_table}}</table>
+                <br>
+                <button class="btn btn-primary" type="submit">Comprar</button>
+                <input class="btn btn-primary" type="button" value="No funciona" onclick="submitForms()" />
+            </form>
             <button class="btn btn-primary" type="submit">Comprar</button>
         {% endif %}
     </div>

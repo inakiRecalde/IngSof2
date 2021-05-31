@@ -328,6 +328,10 @@ def getInsumosViaje(id_viaje):
     insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
     return list(insumo for insumo in insumosQuery)
 
+def aplicarDescuento(precio):
+    descuento=(precio/100)*10
+    return precio-descuento
+
 def CompraView(request,viaje_id):
 
     #Traigo el viaje y el usuario
@@ -360,10 +364,19 @@ def CompraView(request,viaje_id):
             if chequearVencimiento(diccionario["fechaVto"]):                
                 if formInsumos.is_valid():
                     insumosCompra=formInsumos.save()
+                    #al total hay que agregar los insumos y en caso de ser gold hacer el descuento
                     print(insumosCompra)
                 compra.pendiente=True
+                #aplica descuento si es gold
+                if persona.esGold:
+                    pasajeConDescuento=aplicarDescuento(viaje.precio)
+                    compra.total=pasajeConDescuento+pasajeConDescuento*len(invitadosCompra)
+                else:
+                    compra.total=compra.total+viaje.precio*len(invitadosCompra)
                 compra.save()
-                return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html")
+                viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
+                viaje.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumos":insumosCompra})
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)
