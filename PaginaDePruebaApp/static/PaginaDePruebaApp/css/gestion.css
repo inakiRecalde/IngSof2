@@ -397,7 +397,7 @@ ul.errorlist{
   padding:10px
 }
 .compra {
-  background-color: rgba(255, 255, 255,0.7);
+  background-color: rgba(255, 255, 255,0.8);
   margin:auto;
   padding:20px;
   display: flex;
@@ -408,4 +408,8 @@ ul.errorlist{
   width: 50%;
   border-collapse: collapse;
   border: 2px solid rgb(2, 1, 2);
+}
+#invitados{
+  display: flex;
+  flex-direction: column;
 }

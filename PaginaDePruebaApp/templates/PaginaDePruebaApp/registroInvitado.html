@@ -4,13 +4,12 @@
 
 {% block content %}
 
-
     <form class="registro" action="" method="post">
-        {% csrf_token %}
+        <a class="btn btn-primary" href="{% url 'Compra' viaje.id %}" ">Volver a la compra</a>
+        {% csrf_token %}        
         <table> {{formInvitado.as_table}} </table>
-        <button class="btn" type="submit">Guardar</button>
-
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        
     </form>
-    <a href="{% url 'Compra' viaje.id %}">Volver a la compra</a>
 
 {% endblock %}  

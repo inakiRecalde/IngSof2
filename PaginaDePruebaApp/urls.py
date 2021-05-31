@@ -24,4 +24,5 @@ urlpatterns = [
     path('CambioTarjeta/', views.CambioTarjeta, name = "CambioTarjeta" ),
     path('RegistroInvitado/<int:viaje_id>', views.RegistroInvitado, name = "RegistroInvitado" ),
     path('CancelarPasaje/<int:id_viaje>', views.CancelarPasaje, name= "CancelarPasaje"),
+    path('EliminarInvitado/<int:dni><int:viaje_id>', views.EliminarInvitado, name= "EliminarInvitado"),
     ]

@@ -12,23 +12,30 @@
         <li style="margin-left: 20px;"><b>Asientos disponibles: </b>{{viaje.asientosDisponibles}}</li>
         <li style="margin-left: 20px;"><b>Tipo de combi: </b>{{viaje.combi.tipo}}</li>
         <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
-        <li style="margin-left: 20px;"><b>Insumos:</b> 
     </li>
     </div>
         
     <br>
     <div id="insumos-compra">
-        <p>Si desea puede comprar insumos para su viaje</p>
+        <h3>Insumos para su viaje</h3>
         <form class="compra-insumos" action="" method= "post">
             {% csrf_token %}
             <table>{{formInsumos.as_table}}</table>
             <br>
         </form>
     </div>
+    
     <div id="invitados">
-
-        <a href="{% url 'RegistroInvitado' viaje.id %}" style="color: black;">Para comprar pasaje adicional haga click aquí</a>
-        
+        {% if invitados %}
+            <h3>Lista de invitados</h3>
+            {% for invitado in invitados %}
+                <li style="margin-left: 20px;">
+                    <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
+                    <a href="{% url 'EliminarInvitado' invitado.dni viaje.id %}">Eliminar invitado</a>
+                </li>    
+            {% endfor %}
+        {% endif %}
+        &nbsp; &nbsp; <a href="{% url 'RegistroInvitado' viaje.id %}" style="color: black; font-size: medium; ">Para agregar un invitado haga click aquí</a>
     </div>
     <div id=form-compra>
         {% if not persona.esGold %}
@@ -36,8 +43,8 @@
             {% csrf_token %}
             <table>{{formTarjeta.as_table}}</table>
             <br>
-            <input type="button" value="Guardar" onclick="submitForms()" />
-            <button class="btn btn-primary" type="submit">Comprar</button> 
+            <button class="btn btn-primary" type="submit">Comprar</button>
+            <input class="btn btn-primary" type="button" value="No funciona" onclick="submitForms()" />
             
         </form>
         {% else %}
@@ -53,8 +60,8 @@
 </div>
 <script>
     function submitForms(){
-      document.forms[0].submit();
-      document.forms[1].submit();
+      document.forms['formTarjeta'].submit();
+      document.forms['formInsumos'].submit();
     }
   </script>
 {% endblock %}
