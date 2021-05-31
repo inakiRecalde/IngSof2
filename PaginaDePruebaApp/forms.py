@@ -222,24 +222,23 @@ class InvitadoForm(forms.ModelForm):
 
 
 
-#CHOICES = [('1', '★'), ('2', '★'),('3', '★'), ('4', '★'),('5', '★')]
+CHOICES = [('1', '★'), ('2', '★★'),('3', '★★★'), ('4', '★★★★'),('5', '★★★★★')]
 class ComentInputForm(forms.ModelForm):
     texto_attr = {'oninvalid': 'this.setCustomValidity("Por favor un texto")', 'oninput': 'this.setCustomValidity("")'}   
-
-    texto=forms.CharField(label='Ingrese un comentario', max_length=30,widget=forms.TextInput(attrs=texto_attr))
-    #forms.ChoiceField(choices=CHOICES,type="radio",widget= forms.RadioSelect(attrs={'class' : 'Estrella'}))
-
-    
+    puntuacion_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese una puntuacion")', 'oninput': 'this.setCustomValidity("")'}
+    texto=forms.CharField(label='Ingrese un comentario', max_length=200,widget=forms.TextInput(attrs=texto_attr))
+    #puntuacion =forms.ChoiceField(choices=CHOICES,type="radio",widget= forms.RadioSelect(attrs={'class' : 'Estrella'}))
+    puntuacion=forms.ChoiceField(choices= CHOICES)
     class Meta:
         model = Comentario  
         fields = (
-            'texto',
+            'texto','puntuacion'
         ) 
 
-    def save(self):
+    def save(self,compra):
         coment = Comentario.objects.create(
             texto=self.cleaned_data.get('texto'),
-            puntuacion = '2'
+            puntuacion = self.cleaned_data.get('puntuacion'),
         )
-        return coment
-          
+        compra.comentario = coment
+        compra.save()  

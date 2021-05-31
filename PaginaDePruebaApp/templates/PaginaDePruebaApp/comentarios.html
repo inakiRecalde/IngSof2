@@ -3,28 +3,38 @@
 {% load static %}
 
 {% block content %}
-
-<div class = "comentInput">
-    <form class="coment-input" action="" method= "post" >
-        {% csrf_token %}
-        <table>{{form.as_table}}</table>
-        <br>
-        <button class="btn" type="submit">Guardar</button>
-    </form>
-</div>
-
-<div class= "comentView">
+<div class= "comentarios">
 <h2>Comentarios:</h2>
     {% for coment in comentarios %}
-        <li style="margin-left: 20px;">
-            <b></b>{{coment.texto}}
+    <form>
+        <li style="padding:5px;background-color: rgba(173, 175, 192,0.5);;margin: 20px 20px;">
+            <b></b>{{coment.texto}}&nbsp;
+            {% if coment.puntuacion == 1 %} <b class = "Estrella">★</b> {% endif %}
+            {% if coment.puntuacion == 2 %} <b class = "Estrella">★★</b> {% endif %}
+            {% if coment.puntuacion == 3 %} <b class = "Estrella">★★★</b> {% endif %}
+            {% if coment.puntuacion == 4 %} <b class = "Estrella">★★★★</b> {% endif %}
+            {% if coment.puntuacion == 5 %} <b class = "Estrella">★★★★★</b> {% endif %}
+            {% if user.esCliente %}
+                <br><button class="btn" onclick="eliminarComentario('{{ coment.id }}')">Eliminar</button>
+            {% endif %}
         </li>
-    {% endfor %} 
+    </form>
+    {% endfor %}
 </div>
-
- <script>
-  function submitForms2(){
-    document.forms[0].submit();
-  }
+<script type="text/javascript">
+    function eliminarComentario(coment_id) {
+        var request = $.ajax({
+            type: "POST",
+            url: "{% url 'Comentarios' %}",
+            data: {
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+                "identificador_id": coment_id                   
+            },
+        });
+        request.done(function(response) {
+            alert("Comentario eliminado");
+            // Cierra el modal, oculta el identificador eliminado, etc.
+        });
+    }
 </script>
 {% endblock %}

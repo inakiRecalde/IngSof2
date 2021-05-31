@@ -5,6 +5,7 @@ from django.contrib.auth.views import LoginView
 urlpatterns = [
     path('', views.Inicio,name = "Inicio"),
     path('Comentarios/', views.Comentarios,name = "Comentarios"),
+    path('AgregarComentario/<int:compra_id>', views.AgregarComentario,name = "AgregarComentario"),
     path('Perfil/', views.Perfil,name = "Perfil"),
     path('Registro/', views.Registro,name = "Registro"),
     path('RegistroChofer/', views.RegistroChofer,name = "RegistroChofer"),

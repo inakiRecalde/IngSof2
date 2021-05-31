@@ -1,0 +1,15 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class = "comentInput">
+    <form class="coment-input" action="" method= "post" >
+        <h3>Dejanos tu opinion sobre nuestros viajes!</h>
+        {% csrf_token %}
+        <table>{{form.as_table}}</table>
+        <button class="btn" type="submit">Guardar</button>
+    </form>
+</div>
+{% endblock %}

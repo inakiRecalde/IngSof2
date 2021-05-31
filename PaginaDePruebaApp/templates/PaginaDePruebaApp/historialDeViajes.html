@@ -13,6 +13,9 @@
             </li>
             <a href="{% url 'CancelarPasaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">CANCELAR PASAJE</a>  
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+            {% if compra.comentario == null%}
+                <a href="{% url 'AgregarComentario' compra.id %}" style="margin-left: 20px;" class="btn btn-primary">COMENTAR VIAJE</a>
+            {% endif %}
         {% endif %}
     {% endfor %}
   </div>
@@ -24,7 +27,9 @@
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}} &nbsp; <b>Fecha de la Compra: </b>{{compra.fechaCompra}} &nbsp; <b>Precio total: $</b>{{compra.total}}
             </li>
-            <a href="{% url 'comentario' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMENTAR VIAJE</a> 
+            {% if compra.comentario == null%}
+                <a href="{% url 'AgregarComentario' compra.id %}" style="margin-left: 20px;" class="btn btn-primary">COMENTAR VIAJE</a> 
+            {% endif %}
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
