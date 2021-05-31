@@ -200,9 +200,6 @@ class CompraInsumosForm(forms.ModelForm):
             )
 
     def save(self):
-        print("Hago print")
-        print(self.cleaned_data['insumos'])
-        print("Termino")
         return self.cleaned_data['insumos']
 
 class InvitadoForm(forms.ModelForm):

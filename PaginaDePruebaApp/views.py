@@ -87,13 +87,13 @@ def Ahorro (request):
     else:
         return render(request,"PaginaDePruebaApp/ahorro.html")
 
-def HistorialDeViajes (request):
+def HistorialDeViajes(request):
     if request.user.is_authenticated:
-        persona=Cliente.objects.get(user_id=request.user.id)
-        compras=Compra.objects.filter(user__user__id__icontains=request.user.id)  
-        return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"persona":persona,"compras":compras})       
-    else:
-        return render(request,"PaginaDePruebaApp/historialDeViajes.html")
+        compras=Compra.objects.filter(user__user__id__icontains=request.user.id)
+        if compras:
+            return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"compras":compras})       
+        else:
+            return render(request,"PaginaDePruebaApp/historialDeViajes.html")
 
 def AltaMembresia (request):
     if request.method== "POST":
@@ -147,14 +147,16 @@ def infoViaje(request, id_viaje):
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
     insumos=list(Insumo.objects.get(pk=viajeInsumo.insumo_id) for viajeInsumo in viajeInsumosQuery)
     if request.user.is_authenticated:
-        compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
-        if compra:
-            if not compra.cancelado:
-                compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
-                insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)    
-                return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra, "insumosComprados":insumosComprados})
-            return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
-    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
+        compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+        if compras:
+            for compra in compras:
+                if not compra.cancelado:
+                    #compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
+                    #insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)
+                    #En el return de abajo faltaria mandar los insumos comprados por parametro    
+                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
+                return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
+        return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
 def ViajesChofer (request):
     return render(request,"PaginaDePruebaApp/viajesChofer.html")
@@ -353,11 +355,14 @@ def RegistroInvitado(request):
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
 
 def CancelarPasaje(request, id_viaje):
-    compra = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
-    dinero=compra.total
-    compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
-    #Falta sumarle los asientos disponibles de los invitados
-    compra.cancelado=True
-    #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
-    return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
+    compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
+    for compra in compras:
+        if compra.pendiente:
+            dinero=compra.total
+            compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
+            #Falta sumarle los asientos disponibles de los invitados
+            compra.cancelado=True
+            compra.save()
+            #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
+            return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 

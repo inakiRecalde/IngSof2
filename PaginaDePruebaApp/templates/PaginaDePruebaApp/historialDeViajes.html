@@ -42,7 +42,7 @@
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}}
             </li> 
-            <a href="{% url '' %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+            <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
   </div>
