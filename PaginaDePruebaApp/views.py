@@ -102,6 +102,10 @@ def AltaMembresia (request):
             diccionario=form.cleaned_data
             if chequearVencimiento(diccionario["fechaVto"]):
                 tarjeta=form.save()
+                cliente=Cliente.objects.get(user_id=request.user.id)
+                cliente.esGold=True
+                cliente.tarjeta=tarjeta
+                cliente.save()
                 return render(request,"PaginaDePruebaApp/mensajeExitoMembresia.html")
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
@@ -306,7 +310,6 @@ def Busqueda(request):
     elif origen=="" and destino=="" and fecha:
         viajes=Viaje.objects.filter(fechaSalida__icontains=fecha)
     if origen or destino or fecha:
-        print(viajes)
         return render(request,"PaginaDePruebaApp/busqueda.html", {"viajes":viajes})
     else:
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
@@ -315,44 +318,70 @@ def Busqueda(request):
 def CompraView(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)
     persona=Cliente.objects.get(user_id=request.user.id)
+    viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=viaje_id)
+    id_insumos=viajeInsumosQuery.values_list('insumo_id')
+    insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
+    insumosViaje=list(insumo for insumo in insumosQuery)
+    try:
+        compra=Compra.objects.get(user_id=request.user.id,viaje_id=viaje_id)
+    except :
+        compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=persona)
+
+    if compra.pendiente:
+        return render(request,"PaginaDePruebaApp/mensajeCompraFallida.html")
+    else:
+        compra=Compra.objects.get(user_id=request.user.id,viaje_id=viaje_id)
+
+    formInsumos=CompraInsumosForm(request.POST,instance=viaje)
+    if request.method== "POST":
+        formTarjeta= TarjetaForm(request.user, request.POST)
+        
+        if formTarjeta.is_valid():
+            diccionario=formTarjeta.cleaned_data
+            if chequearVencimiento(diccionario["fechaVto"]):
+                tarjeta=formTarjeta.save()
+                if formInsumos.is_valid():
+                    insumosCompra=formInsumos.save()
+                print(insumosCompra)
+                compra.pendiente=True
+                compra.save()
+                return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html")
+            else:
+                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
+                formTarjeta.add_error("fechaVto", msg)
+    else:
+        formTarjeta = TarjetaForm(request.user)
+    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumosViaje,"persona":persona})
+
+def RegistroInvitado(request,viaje_id):
+    
+    viaje=Viaje.objects.get(id=viaje_id)
+    persona=Cliente.objects.get(user_id=request.user.id)
+
+    compra=Compra.objects.get(viaje_id=viaje.id, user_id=request.user.id)
+    print(compra)
 
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=viaje_id)
     id_insumos=viajeInsumosQuery.values_list('insumo_id')
     insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
     insumos=list(insumo for insumo in insumosQuery)
+    formInsumos=CompraInsumosForm(request.POST,instance=viaje)
 
-    form2=CompraInsumosForm(request.POST,instance=viaje)
     if request.method== "POST":
-        form= TarjetaForm(request.user, request.POST)
-        
-        if form.is_valid():
-            diccionario=form.cleaned_data
-            if chequearVencimiento(diccionario["fechaVto"]):
-                tarjeta=form.save()
-                return render(request,"PaginaDePruebaApp/mensajeExitoMembresia.html")
-            else:
-                msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
-                form.add_error("fechaVto", msg)
-    else:
-        form = TarjetaForm(request.user)
-    return render(request,"PaginaDePruebaApp/compra.html", {"form": form ,"form2":form2, "viaje":viaje,"insumos":insumos,"persona":persona})
+        formTarjeta= TarjetaForm(request.user, request.POST)
+        formInvitado=InvitadoForm(request.POST)
+        if formInvitado.is_valid():
+            diccionario=formInvitado.cleaned_data
 
-def RegistroInvitado(request):
-    
-    if request.method== "POST":
-        form=InvitadoForm(request.POST)
-        if form.is_valid():
-            diccionario=form.cleaned_data
-            invitado=form.save()
-            print(invitado.nombre)
-            print(invitado.apellido)
-            print(invitado.dni)
-            return render(request,"PaginaDePruebaApp/compra.html")
+            invitado=formInvitado.save()
+            #print(invitado)
+            return render(request,"PaginaDePruebaApp/compra.html",{"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumos,"persona":persona})
         else:
-            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
+            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
     else:
-        form=InvitadoForm(request.POST)
-        return render(request,"PaginaDePruebaApp/registroInvitado.html", {"form": form})
+        formInvitado=InvitadoForm(request.POST)
+        return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
+
 
 def CancelarPasaje(request, id_viaje):
     compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
