@@ -14,17 +14,17 @@
         <li style="margin-left: 20px;"><b>Precio: $</b>{{viaje.precio}}</li>
     </li>
     </div>
-        
-    <br>
-    <div id="insumos-compra">
-        <h3>Insumos para su viaje</h3>
-        <form class="compra-insumos" action="" method= "post">
-            {% csrf_token %}
-            <table>{{formInsumos.as_table}}</table>
-            <br>
-        </form>
-    </div>
-    
+    {% if insumosViaje %}
+        <br>
+        <div id="insumos-compra">
+            <h3>Insumos para su viaje</h3>
+            <form class="compra-insumos" action="" method= "post">
+                {% csrf_token %}
+                <table>{{formInsumos.as_table}}</table>
+                <br>
+            </form>
+        </div>
+    {% endif %}
     <div id="invitados">
         {% if invitados %}
             <h3>Lista de invitados</h3>

@@ -43,6 +43,22 @@ def mail_disponible(mail):
         return False
     return True    
 
+def getListaInvitados(id_compra):
+    compraInvitadosQuery=Compra.invitados.through.objects.filter(compra_id=id_compra)
+    id_invitados=compraInvitadosQuery.values_list('invitado_id')
+    invitadosQuery=Invitado.objects.filter(pk__in=id_invitados)
+    return list(invitado for invitado in invitadosQuery)
+
+def getInsumosViaje(id_viaje):
+    viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
+    id_insumos=viajeInsumosQuery.values_list('insumo_id')
+    insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
+    return list(insumo for insumo in insumosQuery)
+
+def aplicarDescuento(precio):
+    descuento=(precio/100)*10
+    return precio-descuento
+
 #views 
 def Inicio (request):
     if request.user.is_authenticated and not request.user.is_staff:
@@ -157,8 +173,9 @@ def infoViaje(request, id_viaje):
                 if not compra.cancelado:
                     #compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
                     #insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)
-                    #En el return de abajo faltaria mandar los insumos comprados por parametro    
-                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
+                    #En el return de abajo faltaria mandar los insumos comprados por parametro   
+                    invitados=getListaInvitados(compra) 
+                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra,"invitados":invitados})
                 return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
@@ -315,23 +332,6 @@ def Busqueda(request):
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
         return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 
 
-
-def getListaInvitados(id_compra):
-    compraInvitadosQuery=Compra.invitados.through.objects.filter(compra_id=id_compra)
-    id_invitados=compraInvitadosQuery.values_list('invitado_id')
-    invitadosQuery=Invitado.objects.filter(pk__in=id_invitados)
-    return list(invitado for invitado in invitadosQuery)
-
-def getInsumosViaje(id_viaje):
-    viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
-    id_insumos=viajeInsumosQuery.values_list('insumo_id')
-    insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
-    return list(insumo for insumo in insumosQuery)
-
-def aplicarDescuento(precio):
-    descuento=(precio/100)*10
-    return precio-descuento
-
 def CompraView(request,viaje_id):
 
     #Traigo el viaje y el usuario
@@ -366,17 +366,25 @@ def CompraView(request,viaje_id):
                     insumosCompra=formInsumos.save()
                     #al total hay que agregar los insumos y en caso de ser gold hacer el descuento
                     print(insumosCompra)
-                compra.pendiente=True
-                #aplica descuento si es gold
-                if persona.esGold:
-                    pasajeConDescuento=aplicarDescuento(viaje.precio)
-                    compra.total=pasajeConDescuento+pasajeConDescuento*len(invitadosCompra)
+
+                cantPasajes=len(invitadosCompra)+1
+                if viaje.asientosDisponibles >=cantPasajes:
+                    compra.pendiente=True
+                    #aplica descuento si es gold
+                    if persona.esGold:
+                        pasajeConDescuento=aplicarDescuento(viaje.precio)
+                        compra.total=pasajeConDescuento*cantPasajes
+                    else:
+                        compra.total=viaje.precio*cantPasajes
+                    compra.save()
+                    viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
+                    viaje.save()
+                    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumos":insumosCompra})
                 else:
-                    compra.total=compra.total+viaje.precio*len(invitadosCompra)
-                compra.save()
-                viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
-                viaje.save()
-                return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumos":insumosCompra})
+                    msg ="No hay suficientes asientos disponibles"   ## Mensaje de error si esta vencida la tarjeta
+                    formTarjeta.add_error("nroTarjeta", msg)
+                    
+                    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumosViaje,"persona":persona,"invitados":invitadosCompra})
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)

@@ -3,6 +3,7 @@
 {% load static %}
 {% block content %}
 <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    <h3>Viaje</h3>
     <li style="margin-left: 20px;"><b>Origen: </b>{{viaje.ruta.origen}}</li>
     <li style="margin-left: 20px;"><b>Destino: </b>{{viaje.ruta.destino}}</li>
     <li style="margin-left: 20px;"><b>Salida: </b>{{viaje.fechaSalida}}</li>
@@ -39,31 +40,44 @@
         </div>
     </li>
     {% else %}
-    {% if not compra.cancelado %}
-    <li style="margin-left: 20px;"><b> Precio total: </b>{{compra.total}}</li>
-    <li style="margin-left: 20px;"><b>Lista de insumos comprados:</b>
-        <div>
-            <table id=tabla-insumos>
-            <thead>
-                <tr>
-                    <th>nombre</th>
-                    <th>descripcion</th>
-                    <th>precio</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for insumo in insumosComprados %}
-                <tr>
-                    <td>{{insumo.nombre}}</td>
-                    <td>{{insumo.descripcion}}</td>
-                    <td>${{insumo.precio}}</td>
-                </tr>                
-            {% endfor %}
-            </tbody>
-            </table>
-        </div>
-    </li>
-    {% endif %}
+        {% if not compra.cancelado %}
+            
+            <div id="invitados">
+                {% if invitados %}
+                    <h3>Lista de invitados</h3>
+                    {% for invitado in invitados %}
+                        <li style="margin-left: 20px;">
+                            <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
+                        </li>    
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% if insumosComprados %}
+            <h3 >Lista de insumos comprados:</h3>
+                <div>
+                    <table id=tabla-insumos>
+                    <thead>
+                        <tr>
+                            <th>nombre</th>
+                            <th>descripcion</th>
+                            <th>precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for insumo in insumosComprados %}
+                        <tr>
+                            <td>{{insumo.nombre}}</td>
+                            <td>{{insumo.descripcion}}</td>
+                            <td>${{insumo.precio}}</td>
+                        </tr>                
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            </li>
+            {% endif %}
+            <h3 ><b> Precio total: </b>${{compra.total}}</h3>
+        {% endif %}
     {% endif %}
 </div>     
 
