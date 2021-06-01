@@ -468,10 +468,11 @@ def CancelarPasaje(request, id_viaje):
     for compra in compras:
         if compra.pendiente:
             dinero=compra.total
-            compra.viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1
-            #Falta sumarle los asientos disponibles de los invitados
+            invitadosCompra=getListaInvitados(compra.id)
+            viaje=compra.viaje
+            viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
+            viaje.save()
             compra.cancelado=True
             compra.save()
-            #No se elimina la compra de la bd porq despues se tiene que listar las compras canceladas
             return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 
