@@ -25,22 +25,22 @@
                 <div id="insumo">
                     {% if insumo.stock > 0 %}
                         <li>{{insumo.nombre}} ${{insumo.precio}}</li>
-                        {% if insumo not in insumosCompra %}
+                        
                         &nbsp;&nbsp;<a href="{% url 'AgregarInsumo' nombreInsumo=insumo.nombre  viaje_id=viaje.id %}">Seleccionar insumo</a>
-                        {% endif %}
+                        
                     {% endif %}
                 </div>
                 {% endfor %}
                 
             </div>
         {% endif %}
-        {% if insumosCompra %}
+        {% if insumosCompraConCantidad %}
                 &nbsp;&nbsp;<h3>Insumos seleccionados</h3>
-                {% for insumo in insumosCompra %}
+                {% for insumo in insumosCompraConCantidad %}
                     <li style="margin-left: 20px;">
-                        </b>{{insumo.nombre}} &nbsp; <b>$</b>{{insumo.precio}} &nbsp; 
-                        <a href="{% url 'EliminarInsumo' nombreInsumo=insumo.nombre viaje_id=viaje.id %}">Eliminar insumo</a>
-                    </li>    
+                        </b>{{insumo.0.nombre}} &nbsp; <b>$</b>{{insumo.0.precio}} &nbsp;  x{{insumo.1}}
+                        <a href="{% url 'EliminarInsumo' nombreInsumo=insumo.0.nombre viaje_id=viaje.id %}">Eliminar insumo</a>
+                    </li> 
                 {% endfor %}
         {% endif %}
     </div>

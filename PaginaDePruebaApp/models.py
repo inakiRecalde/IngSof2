@@ -236,12 +236,14 @@ class Invitado(models.Model):
     apellido=models.CharField(max_length=30)
     dni=models.IntegerField()
 
+
+
 class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
     total=models.FloatField()
     viaje = models.ForeignKey(Viaje, on_delete= models.CASCADE) 
     user = models.ForeignKey(Cliente, on_delete= models.CASCADE)
-    insumos = models.ManyToManyField(Insumo,default=None,null=True)
+    insumos = models.ManyToManyField(Insumo,default=None,null=True,through='CantidadInsumo')
     comentario=models.OneToOneField(Comentario,on_delete=models.SET_NULL,default=None,null=True)
     invitados=models.ManyToManyField(Invitado,default=None,null=True)
     pendiente=models.BooleanField(default=False)
@@ -249,3 +251,8 @@ class Compra(models.Model):
     class Meta:
         verbose_name="Compra"
         verbose_name_plural="Compras" 
+
+class CantidadInsumo(models.Model):
+    compra=models.ForeignKey(Compra,on_delete=models.CASCADE)
+    insumo=models.ForeignKey(Insumo,on_delete=models.CASCADE)
+    cantidad=models.PositiveIntegerField()

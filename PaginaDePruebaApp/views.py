@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
+from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
 from datetime import date
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
@@ -65,10 +65,10 @@ def aplicarDescuento(precio):
     descuento=(precio/100)*10
     return precio-descuento
 
-def calcularPrecioInsumos(insumosCompra):
+def calcularPrecioInsumos(insumosCompraConCantidad):
     suma=0
-    for i in range(0,len(insumosCompra)):
-        suma=suma+insumosCompra[i].precio
+    for i in range(0,len(insumosCompraConCantidad)):
+        suma=suma+(insumosCompraConCantidad[i][0].precio*insumosCompraConCantidad[i][1])
 
     return suma
 
@@ -80,6 +80,11 @@ def getInvitadosViaje(viaje_id):
     invitadosViaje=Invitado.objects.filter(id__in=invitadosIds)
     invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
     return invitadosDnis
+
+def getInsumosConCantidad(listaInsumos,compra):
+    insumosCantidadQuery=CantidadInsumo.objects.filter(compra_id=compra.id,insumo__in=listaInsumos)
+    listaCantidades=list(cantInsumo.cantidad for cantInsumo in insumosCantidadQuery)
+    return list(zip(listaInsumos,listaCantidades))
 
 
 #views 
@@ -195,9 +200,10 @@ def infoViaje(request, id_viaje):
             for compra in compras:
                 if not compra.cancelado:
                     insumosComprados=getInsumosCompra(compra.id)
+                    insumosCompradosConCantidad=getInsumosConCantidad(insumosComprados,compra)
                     #En el return de abajo faltaria mandar los insumos comprados por parametro   
                     invitados=getInvitadosCompra(compra.id) 
-                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra,"invitados":invitados,"insumosComprados":insumosComprados})
+                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra,"invitados":invitados,"insumosCompradosConCantidad":insumosCompradosConCantidad})
                 return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
@@ -381,6 +387,8 @@ def CompraView(request,viaje_id):
     #Me quedo con la lista de insumos de la compra
     insumosCompra=getInsumosCompra(compra.id)
 
+    insumosCompraConCantidad=getInsumosConCantidad(insumosCompra,compra)
+
     if request.method == "POST":
         formTarjeta= TarjetaForm(request.user, request.POST,prefix="formTarjeta")
         if formTarjeta.is_valid():
@@ -398,23 +406,24 @@ def CompraView(request,viaje_id):
                         compra.total=pasajeConDescuento*cantPasajes
                     else:
                         compra.total=viaje.precio*cantPasajes
-                    compra.total=compra.total+calcularPrecioInsumos(insumosCompra)
-                    print(calcularPrecioInsumos(insumosCompra))
+                    compra.total=compra.total+calcularPrecioInsumos(insumosCompraConCantidad)
                     compra.save()
                     viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
                     viaje.save()
-                    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumosCompra":insumosCompra})
+                    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumosCompraConCantidad":insumosCompraConCantidad})
                 else:
                     msg ="No hay suficientes asientos disponibles"   ## Mensaje de error si esta vencida la tarjeta
                     formTarjeta.add_error("nroTarjeta", msg)
-                    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"persona":persona,"invitados":invitadosCompra})
+                    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"insumosCompraConCantidad":insumosCompraConCantidad,"persona":persona,"invitados":invitadosCompra})
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)
     else:
         if persona.esGold:
             formTarjeta = TarjetaForm(request.user, instance=persona.tarjeta, prefix="formTarjeta")
-    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"persona":persona,"invitados":invitadosCompra})
+        else:
+            formTarjeta = TarjetaForm(request.user,prefix="formTarjeta")
+    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"insumosCompraConCantidad":insumosCompraConCantidad,"persona":persona,"invitados":invitadosCompra})
             
 def RegistroInvitado(request,viaje_id):
 
@@ -479,9 +488,16 @@ def EliminarInsumo(request,nombreInsumo,viaje_id):
 
     insumo=Insumo.objects.get(pk=nombreInsumo)
     compraInsumo=Compra.insumos.through.objects.get(insumo_id=insumo.nombre,compra_id=compra.id)
-    insumo.stock=insumo.stock+1
+    insumoCompra=CantidadInsumo.objects.get(compra=compra,insumo=insumo)
+    if insumoCompra.cantidad>1:
+        insumo.stock=insumo.stock+1
+        insumoCompra.cantidad=insumoCompra.cantidad-1
+        insumoCompra.save()
+    else:
+        insumo.stock=insumo.stock+1
+        compraInsumo.delete()
     insumo.save()
-    compraInsumo.delete()
+    
     return redirect(CompraView,viaje_id=viaje_id)
     
 
@@ -493,8 +509,15 @@ def AgregarInsumo(request,nombreInsumo,viaje_id):
     insumo.stock=insumo.stock-1
     insumo.save()
 
-    Compra.insumos.through.objects.create(compra_id=compra.id,insumo_id=nombreInsumo)
+    try:
+        insumoCompra=CantidadInsumo.objects.get(compra=compra,insumo=insumo)
+    except:
+        compra.insumos.add(insumo,through_defaults={'cantidad':1})
+        return redirect(CompraView,viaje_id=viaje_id)
     
+    insumoCompra.cantidad=insumoCompra.cantidad+1
+    insumoCompra.save()
+
     return redirect(CompraView,viaje_id=viaje_id)
     
 

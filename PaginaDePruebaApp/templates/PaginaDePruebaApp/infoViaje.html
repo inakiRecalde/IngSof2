@@ -52,29 +52,31 @@
                     {% endfor %}
                 {% endif %}
             </div>
-            {% if insumosComprados %}
-            <h3 >Lista de insumos comprados:</h3>
-                <div>
-                    <table id=tabla-insumos>
-                    <thead>
-                        <tr>
-                            <th>nombre</th>
-                            <th>descripcion</th>
-                            <th>precio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for insumo in insumosComprados %}
-                        <tr>
-                            <td>{{insumo.nombre}}</td>
-                            <td>{{insumo.descripcion}}</td>
-                            <td>${{insumo.precio}}</td>
-                        </tr>                
-                    {% endfor %}
-                    </tbody>
-                    </table>
-                </div>
-            </li>
+            {% if insumosCompradosConCantidad %}
+                <h3 >Lista de insumos comprados:</h3>
+                    <div>
+                        <table id=tabla-insumos>
+                        <thead>
+                            <tr>
+                                <th>nombre</th>
+                                <th>descripcion</th>
+                                <th>precio</th>
+                                <th>cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for insumo in insumosCompradosConCantidad %}
+                            <tr>
+                                <td>{{insumo.0.nombre}}</td>
+                                <td>{{insumo.0.descripcion}}</td>
+                                <td>${{insumo.0.precio}}</td>
+                                <td>{{insumo.1}}</td>
+                            </tr>                
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </li>
             {% endif %}
             <h3 ><b> Precio total: </b>${{compra.total}}</h3>
         {% endif %}
