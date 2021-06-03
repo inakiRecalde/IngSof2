@@ -391,6 +391,7 @@ def CompraView(request,viaje_id):
                 #si hay asientos disponibles, calcula el precio total (en caso de ser gold aplica descuento) y realiza la compra
                 if viaje.asientosDisponibles >=cantPasajes:
                     compra.pendiente=True
+                    compra.cancelado=False
                     #aplica descuento si es gold
                     if persona.esGold:
                         pasajeConDescuento=aplicarDescuento(viaje.precio)
@@ -506,6 +507,7 @@ def CancelarPasaje(request, id_viaje):
             viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
             viaje.save()
             compra.cancelado=True
+            compra.pendiente=False
             compra.save()
             return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 
