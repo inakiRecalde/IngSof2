@@ -29,6 +29,14 @@
                 </li>    
             {% endfor %}
         {% endif %}
+        {% if insumosCompra %}
+            <h3>Lista de insumos</h3>
+            {% for insumo in insumosCompra %}
+                <li style="margin-left: 20px;">
+                    <b>{{insumo.nombre}} &nbsp; <b>Precio: $</b>{{insumo.precio}} &nbsp; 
+                </li>    
+            {% endfor %}
+        {% endif %}
         <h3>Precio total:  ${{compra.total}}</h3>
     </div>
 

@@ -149,58 +149,6 @@ class CambiarContraForm(forms.ModelForm):
         fields= ['passwordActual','password1','password2']
 
 
-#formularios para la compra
-
-class MyMultipleModelChoiceField(ModelMultipleChoiceField):
-
-    def label_from_instance(self, obj):
-        return "%s, precio: $%s" % (obj.nombre,obj.precio)
-
-"""class CompraInsumosForm(forms.ModelForm):
-    
-    class Meta:
-        model = Compra
-        fields = (
-            'insumos',
-            )
-
-    def __init__(self, *args, **kwargs):
-
-        # call the parent init
-        super(CompraInsumosForm, self).__init__(*args, **kwargs)
-        viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=self.instance.id)
-        id_insumos=viajeInsumosQuery.values_list('insumo_id')
-        
-        self.fields['insumos'] = MyMultipleModelChoiceField(
-            queryset=Insumo.objects.filter(pk__in=id_insumos), 
-            required=False, 
-            widget=forms.SelectMultiple()
-            
-            )"""
-
-class CompraInsumosForm(forms.ModelForm):
-    
-    class Meta:
-        model = Compra
-        fields = (
-            'insumos',
-            )
-
-    def __init__(self, *args, **kwargs):
-
-        # call the parent init
-        super(CompraInsumosForm, self).__init__(*args, **kwargs)
-        viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=self.instance.id)
-        id_insumos=viajeInsumosQuery.values_list('insumo_id')
-        
-        self.fields['insumos'] = MyMultipleModelChoiceField(
-            queryset=Insumo.objects.filter(pk__in=id_insumos), 
-            required=False, 
-            widget=forms.SelectMultiple()
-            )
-
-    def save(self):
-        return self.cleaned_data['insumos']
 
 class InvitadoForm(forms.ModelForm):
     nombre_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su nombre")', 'oninput': 'this.setCustomValidity("")'}

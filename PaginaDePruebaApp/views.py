@@ -43,11 +43,17 @@ def mail_disponible(mail):
         return False
     return True    
 
-def getListaInvitados(id_compra):
+def getInvitadosCompra(id_compra):
     compraInvitadosQuery=Compra.invitados.through.objects.filter(compra_id=id_compra)
     id_invitados=compraInvitadosQuery.values_list('invitado_id')
     invitadosQuery=Invitado.objects.filter(pk__in=id_invitados)
     return list(invitado for invitado in invitadosQuery)
+
+def getInsumosCompra(id_compra):
+    compraInsumosQuery=Compra.insumos.through.objects.filter(compra_id=id_compra)
+    id_insumos=compraInsumosQuery.values_list('insumo_id')
+    insumosQuery=Insumo.objects.filter(pk__in=id_insumos)
+    return list(insumo for insumo in insumosQuery)
 
 def getInsumosViaje(id_viaje):
     viajeInsumosQuery=Viaje.insumo.through.objects.filter(viaje_id=id_viaje)
@@ -58,6 +64,23 @@ def getInsumosViaje(id_viaje):
 def aplicarDescuento(precio):
     descuento=(precio/100)*10
     return precio-descuento
+
+def calcularPrecioInsumos(insumosCompra):
+    suma=0
+    for i in range(0,len(insumosCompra)):
+        suma=suma+insumosCompra[i].precio
+
+    return suma
+
+def getInvitadosViaje(viaje_id):
+    comprasViaje=Compra.objects.filter(viaje_id=viaje_id)
+    comprasIds=list(compra.id for compra in comprasViaje)
+    invitadosViajeQuery=Compra.invitados.through.objects.filter(compra_id__in=comprasIds)
+    invitadosIds=list(invitado.invitado_id for invitado in invitadosViajeQuery)
+    invitadosViaje=Invitado.objects.filter(id__in=invitadosIds)
+    invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
+    return invitadosDnis
+
 
 #views 
 def Inicio (request):
@@ -171,11 +194,10 @@ def infoViaje(request, id_viaje):
         if compras:
             for compra in compras:
                 if not compra.cancelado:
-                    #compraInsumosQuery=Compra.insumos.through.objects.filter(viaje_id=id_viaje)
-                    #insumosComprados=list(Insumo.objects.get(pk=compraInsumo.insumo_id) for compraInsumo in compraInsumosQuery)
+                    insumosComprados=getInsumosCompra(compra.id)
                     #En el return de abajo faltaria mandar los insumos comprados por parametro   
-                    invitados=getListaInvitados(compra) 
-                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra,"invitados":invitados})
+                    invitados=getInvitadosCompra(compra.id) 
+                    return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra,"invitados":invitados,"insumosComprados":insumosComprados})
                 return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
@@ -332,6 +354,9 @@ def Busqueda(request):
         msg ="INGRESE DATOS PARA SU BUSQUEDA."
         return render(request,"PaginaDePruebaApp/inicio.html", {"msg":msg}) 
 
+def ResumenCompra(request,context):
+    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",context)
+
 def CompraView(request,viaje_id):
 
     #Traigo el viaje y el usuario
@@ -339,7 +364,6 @@ def CompraView(request,viaje_id):
     persona=Cliente.objects.get(user_id=request.user.id)
 
     #Me quedo con la lista de insumos del viaje
-    
     insumosViaje=getInsumosViaje(viaje_id)
 
     #Si ya hay una compra la trae de la bd, sino la crea
@@ -352,22 +376,19 @@ def CompraView(request,viaje_id):
         return render(request,"PaginaDePruebaApp/mensajeCompraFallida.html")
     
     #Me quedo con la lista de invitados de la compra
-    
-    invitadosCompra=getListaInvitados(compra.id)
+    invitadosCompra=getInvitadosCompra(compra.id)
 
-    #formulario de insumos
-    formInsumos=CompraInsumosForm(request.POST,instance=viaje,prefix="formInsumos")
+    #Me quedo con la lista de insumos de la compra
+    insumosCompra=getInsumosCompra(compra.id)
+
     if request.method == "POST":
         formTarjeta= TarjetaForm(request.user, request.POST,prefix="formTarjeta")
         if formTarjeta.is_valid():
             diccionario=formTarjeta.cleaned_data
-            if chequearVencimiento(diccionario["fechaVto"]):                
-                if formInsumos.is_valid():
-                    insumosCompra=formInsumos.save()
-                    #al total hay que agregar los insumos y en caso de ser gold hacer el descuento
-                    print(insumosCompra)
-
+            if chequearVencimiento(diccionario["fechaVto"]): 
+                #calcula la cantidad de pasajes de la compra  
                 cantPasajes=len(invitadosCompra)+1
+                #si hay asientos disponibles, calcula el precio total (en caso de ser gold aplica descuento) y realiza la compra
                 if viaje.asientosDisponibles >=cantPasajes:
                     compra.pendiente=True
                     #aplica descuento si es gold
@@ -376,34 +397,27 @@ def CompraView(request,viaje_id):
                         compra.total=pasajeConDescuento*cantPasajes
                     else:
                         compra.total=viaje.precio*cantPasajes
+                    compra.total=compra.total+calcularPrecioInsumos(insumosCompra)
+                    print(calcularPrecioInsumos(insumosCompra))
                     compra.save()
                     viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
                     viaje.save()
-                    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumos":insumosCompra})
+                    return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumosCompra":insumosCompra})
                 else:
                     msg ="No hay suficientes asientos disponibles"   ## Mensaje de error si esta vencida la tarjeta
                     formTarjeta.add_error("nroTarjeta", msg)
-                    
-                    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumosViaje,"persona":persona,"invitados":invitadosCompra})
+                    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"persona":persona,"invitados":invitadosCompra})
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)
     else:
         formTarjeta = TarjetaForm(request.user,prefix="formTarjeta")
-    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumosViaje,"persona":persona,"invitados":invitadosCompra})
+    return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"persona":persona,"invitados":invitadosCompra})
 
 def RegistroInvitado(request,viaje_id):
-#info que necesito para devolverle al template en caso de apretar el boton para atrás
-    #Traigo el viaje y el usuario
+
+    #Traigo el viaje 
     viaje=Viaje.objects.get(id=viaje_id)
-    persona=Cliente.objects.get(user_id=request.user.id)
-
-    #Me quedo con la lista de insumos del viaje
-    
-    insumosViaje=insumosViaje=getInsumosViaje(viaje_id)
-
-    #formulario de insumos
-    formInsumos=CompraInsumosForm(request.POST,instance=viaje)
 
 #info que necesito para implementar los invitados
     #Me traigo la compra actual
@@ -411,25 +425,34 @@ def RegistroInvitado(request,viaje_id):
 
     #Me quedo con la lista de invitados de la compra
 
-    invitadosCompra=getListaInvitados(compra.id)
+    invitadosCompra=getInvitadosCompra(compra.id)
+
+    invitadosViajeDNI=getInvitadosViaje(viaje.id)
 
     #creo una lista de los dni de los invitados 
-    invitadosDNI=list(invitado.dni for invitado in invitadosCompra)
+    invitadosCompraDNI=list(invitado.dni for invitado in invitadosCompra)
 
     if request.method== "POST":
-        formTarjeta= TarjetaForm(request.user, request.POST)
         formInvitado=InvitadoForm(request.POST)
         if formInvitado.is_valid():
             invitadoInfo=formInvitado.cleaned_data
             #chequeo que el dni del invitado no esté ya registrado para la compra
-            if not invitadoInfo['dni'] in invitadosDNI:
-                #creo al invitado y a la relacion de la compra con el invitado
-                invitadoInfo=formInvitado.save()
-                Compra.invitados.through.objects.create(compra_id=compra.id,invitado_id=invitadoInfo.id)
-                invitadosCompra=getListaInvitados(compra.id)
-                return render(request,"PaginaDePruebaApp/mensajeExitoRegistroInvitado.html",{"viaje":viaje})
+            if not invitadoInfo['dni'] in invitadosCompraDNI:
+                if not invitadoInfo['dni'] in invitadosViajeDNI:
+                    #creo al invitado y a la relacion de la compra con el invitado
+                    invitadoExisteQuery=Invitado.objects.filter(dni=invitadoInfo['dni'])
+                    if not invitadoExisteQuery:
+                        invitadoInfo=formInvitado.save()
+                    else:
+                        invitadoInfo=Invitado.objects.get(dni=invitadoInfo['dni'])
+                    Compra.invitados.through.objects.create(compra_id=compra.id,invitado_id=invitadoInfo.id)
+                    return redirect(CompraView,viaje_id=viaje.id)
+                else:
+                    msg ="El dni ingresado ya se encuentra registrado en la lista de pasajeros de este viaje"   ## Mensaje de error si ya se registro a un invitado con ese dni
+                    formInvitado.add_error("dni", msg)
+                    return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})                
             else:
-                msg ="El dni ingresado ya se encuentra registrado en esta compra"   ## Mensaje de error si ya se registro a un invitado con ese dni
+                msg ="El dni ingresado ya se encuentra registrado en la lista de invitados de esta compra"   ## Mensaje de error si ya se registro a un invitado con ese dni
                 formInvitado.add_error("dni", msg)
                 return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})                
         else:
@@ -438,37 +461,47 @@ def RegistroInvitado(request,viaje_id):
         formInvitado=InvitadoForm(request.POST)
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
 
-def EliminarInvitado(request,dni,viaje_id):
-    #Traigo el viaje y el usuario
-    viaje=Viaje.objects.get(id=viaje_id)
-    persona=Cliente.objects.get(user_id=request.user.id)
-
-    #Me quedo con la lista de insumos del viaje
-    insumosViaje=insumosViaje=getInsumosViaje(viaje_id)
-
-    #formulario de insumos
-    formInsumos=CompraInsumosForm(request.POST,instance=viaje)
-    formTarjeta= TarjetaForm(request.user, request.POST)
-    
+def EliminarInvitado(request,invitado_id,viaje_id):
     #Me traigo la compra actual
-    compra=Compra.objects.get(viaje_id=viaje.id, user_id=request.user.id)
-
-    #Me quedo con la lista de invitados de la compra
-    invitado=Invitado.objects.get(dni=dni)
-    compraInvitado=Compra.invitados.through.objects.get(invitado_id=invitado.id)
+    compra=Compra.objects.get(viaje_id=viaje_id, user_id=request.user.id)
+    
+    invitado=Invitado.objects.get(id=invitado_id)
+    compraInvitado=Compra.invitados.through.objects.get(invitado_id=invitado.id,compra_id=compra.id)
     invitado.delete()
     compraInvitado.delete()
-    invitadosCompra=getListaInvitados(compra.id)
+    return redirect(CompraView,viaje_id=viaje_id)
+    
+def EliminarInsumo(request,nombreInsumo,viaje_id):    
+    #Me traigo la compra actual
+    compra=Compra.objects.get(viaje_id=viaje_id, user_id=request.user.id)
 
-    return render(request,"PaginaDePruebaApp/compra.html",{"formTarjeta": formTarjeta ,"formInsumos":formInsumos, "viaje":viaje,"insumos":insumosViaje,"persona":persona,"invitados":invitadosCompra})
+    insumo=Insumo.objects.get(pk=nombreInsumo)
+    compraInsumo=Compra.insumos.through.objects.get(insumo_id=insumo.nombre,compra_id=compra.id)
+    insumo.stock=insumo.stock+1
+    insumo.save()
+    compraInsumo.delete()
+    return redirect(CompraView,viaje_id=viaje_id)
+    
 
+def AgregarInsumo(request,nombreInsumo,viaje_id):
+    #Me traigo la compra actual
+    compra=Compra.objects.get(viaje_id=viaje_id, user_id=request.user.id)
+
+    insumo=Insumo.objects.get(pk=nombreInsumo)
+    insumo.stock=insumo.stock-1
+    insumo.save()
+
+    Compra.insumos.through.objects.create(compra_id=compra.id,insumo_id=nombreInsumo)
+    
+    return redirect(CompraView,viaje_id=viaje_id)
+    
 
 def CancelarPasaje(request, id_viaje):
     compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
     for compra in compras:
         if compra.pendiente:
             dinero=compra.total
-            invitadosCompra=getListaInvitados(compra.id)
+            invitadosCompra=getInvitadosCompra(compra.id)
             viaje=compra.viaje
             viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
             viaje.save()
