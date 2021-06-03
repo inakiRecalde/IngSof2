@@ -67,11 +67,8 @@
             <button class="btn btn-primary" type="submit">Comprar</button>
         </form>
         {% else %}
-            <a href="#">[ ] Utilizar tarjeta</a>
-            <br>
-            <h4>Numero = {{ persona.tarjeta.nro }}</h4>
-            <br>
-            <a href="#">[ ] Pagar con otra tarjeta</a>
+            <h6>Los datos a continuacion son de la tarjeta ya guardada en su cuenta.</h6>
+            <h6>Si desea ingresar otra tarjeta para la compra, solamente modifique sus datos.</h6>
             <form class="compra" action="" method= "post">
                 {% csrf_token %}
                 <table>{{formTarjeta.as_table}}</table>

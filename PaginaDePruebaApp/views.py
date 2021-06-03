@@ -412,9 +412,10 @@ def CompraView(request,viaje_id):
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
                 formTarjeta.add_error("fechaVto", msg)
     else:
-        formTarjeta = TarjetaForm(request.user,prefix="formTarjeta")
+        if persona.esGold:
+            formTarjeta = TarjetaForm(request.user, instance=persona.tarjeta, prefix="formTarjeta")
     return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"persona":persona,"invitados":invitadosCompra})
-
+            
 def RegistroInvitado(request,viaje_id):
 
     #Traigo el viaje 

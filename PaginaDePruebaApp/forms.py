@@ -96,7 +96,7 @@ class ChoferAdminForm(forms.ModelForm):
 
 
 class TarjetaForm(forms.ModelForm):
-    nroTarjeta= forms.IntegerField(label="Número de tarjeta")
+    nro= forms.IntegerField(label="Número de tarjeta")
     fechaVto=forms.DateField(label='Fecha de vencimiento', widget=forms.SelectDateWidget(years=range(1990, 2100)))
     codigo=forms.IntegerField(label="Código")
 
@@ -106,7 +106,7 @@ class TarjetaForm(forms.ModelForm):
 
     class Meta:
             model = Tarjeta
-            fields= ['nroTarjeta', 'codigo']
+            fields= ['nro', 'codigo', 'fechaVto']
             help_text = {k:"" for k in fields }
 
     def save(self):
