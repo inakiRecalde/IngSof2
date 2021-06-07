@@ -440,7 +440,7 @@ def CompraView(request,viaje_id):
                     return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumosCompraConCantidad":insumosCompraConCantidad})
                 else:
                     msg ="No hay suficientes asientos disponibles"   ## Mensaje de error si esta vencida la tarjeta
-                    formTarjeta.add_error("nroTarjeta", msg)
+                    formTarjeta.add_error("nro", msg)
                     return render(request,"PaginaDePruebaApp/compra.html", {"formTarjeta": formTarjeta , "viaje":viaje,"insumosViaje":insumosViaje,"insumosCompra":insumosCompra,"insumosCompraConCantidad":insumosCompraConCantidad,"persona":persona,"invitados":invitadosCompra})
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
