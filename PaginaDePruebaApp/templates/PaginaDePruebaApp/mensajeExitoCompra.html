@@ -34,7 +34,6 @@
                 {% for insumo in insumosCompraConCantidad %}
                     <li style="margin-left: 20px;">
                         </b>{{insumo.0.nombre}} &nbsp; <b>$</b>{{insumo.0.precio}} &nbsp;  x{{insumo.1}}
-                        <a href="{% url 'EliminarInsumo' nombreInsumo=insumo.0.nombre viaje_id=viaje.id %}">Eliminar insumo</a>
                     </li> 
                 {% endfor %}
         {% endif %}

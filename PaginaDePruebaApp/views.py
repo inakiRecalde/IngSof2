@@ -101,7 +101,6 @@ def Inicio (request):
 def ModificarComentario(request,coment_id):
 
     if request.method== "POST":
-        print('pasa por post')
         form= ComentInputForm(request.POST)
         if form.is_valid():
             compra = Compra.objects.get(comentario_id = coment_id)
@@ -145,6 +144,10 @@ def Comentarios (request):
     else:
         comentarios = Comentario.objects.all()
         compras = Compra.objects.all()
+        if not request.user.is_staff:
+            if request.user.esCliente:
+                persona=Cliente.objects.get(user_id=request.user.id) 
+                return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id,"persona":persona})        
         return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id})
 
 def Ahorro (request):
@@ -158,10 +161,11 @@ def Ahorro (request):
 def HistorialDeViajes(request):
     if request.user.is_authenticated:
         compras=Compra.objects.filter(user__user__id__icontains=request.user.id)
+        persona=Cliente.objects.get(user_id=request.user.id) 
         if compras:
-            return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"compras":compras})       
+            return render(request,"PaginaDePruebaApp/historialDeViajes.html", {"compras":compras,"persona":persona})       
         else:
-            return render(request,"PaginaDePruebaApp/historialDeViajes.html")
+            return render(request,"PaginaDePruebaApp/historialDeViajes.html",{"persona":persona})
 
 def AltaMembresia (request):
     if request.method== "POST":
@@ -306,7 +310,6 @@ def RegistroChofer(request):
                 return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
         else:
             diccionario=form.cleaned_data
-            print(form.error_messages)
             for msg in form.error_messages:
                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})

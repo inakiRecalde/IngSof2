@@ -129,7 +129,6 @@ class Ruta(models.Model):
         if self.origen_id == self.destino_id:
             raise ValidationError('Mismo lugar de origen y destino')
         viajesConRuta=Viaje.objects.filter(ruta_id=self.id)
-        print(viajesConRuta)
         if viajesConRuta:
             raise ValidationError('La informacion de la ruta seleccionada no se puede modificar debido a que esta asignado a un viaje.')
  
@@ -164,7 +163,7 @@ class Viaje(models.Model):
             viajeAntes = Viaje.objects.filter(id= self.id)
             if viajeAntes:
                 #chequeos en modificar
-                if self.enCurso:
+                """if self.enCurso:
                     raise ValidationError('Este viaje no puede modificarse debido a que se encuentra iniciado y/o finalizado')
                 else:
                     if( self.combi.patente != viajeAntes[0].combi.patente):
@@ -172,23 +171,21 @@ class Viaje(models.Model):
                             if(viajeAntes[0].combi.tipo == 'SuperComodo'):  
                                 raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una de tipo igual o superior') 
                         if(self.combi.cantAsientos < viajeAntes[0].combi.cantAsientos): 
-                            raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')
+                            raise ValidationError('No puede cambiar la combi, solo se puede cambiar por una con mayor o igual cantidad de asientos')"""
             
             else: # chequeos en agregar
                 
                 #chequea que las fechas sean a futuro y la de llegada no sea antes que la de salida
                 if self.fechaSalida == self.fechaLlegada:
                     raise ValidationError('Las fechas de salida y llegada no pueden ser la misma')
-                if self.fechaSalida < timezone.now():
+                """if self.fechaSalida < timezone.now():
                     raise ValidationError('Fecha de salida inválida')
                 if self.fechaLlegada < timezone.now():
-                    raise ValidationError('Fecha de llegada inválida')
+                    raise ValidationError('Fecha de llegada inválida')"""
                 if self.fechaLlegada < self.fechaSalida:
                     raise ValidationError('La fecha de llegada debe ser posterior a la de salida')
                 self.duracion=(self.fechaLlegada - self.fechaSalida)
                 self.asientosDisponibles=(self.combi.cantAsientos)
-                print(self.duracion)
-                print(self.asientosDisponibles)
             #chequea que no se superpongan las combis , lo hace tanto al modificar o al agregar
             viajesConMismaCombi=Viaje.objects.filter(combi_id=self.combi_id)
             if viajesConMismaCombi is not None:
