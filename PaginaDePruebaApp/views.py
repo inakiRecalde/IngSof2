@@ -144,7 +144,7 @@ def Comentarios (request):
     else:
         comentarios = Comentario.objects.all()
         compras = Compra.objects.all()
-        if not request.user.is_staff:
+        if not request.user.is_staff and not AnonymousUser:
             if request.user.esCliente:
                 persona=Cliente.objects.get(user_id=request.user.id) 
                 return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id,"persona":persona})        
