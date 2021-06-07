@@ -97,20 +97,42 @@ def Inicio (request):
         return render(request,"PaginaDePruebaApp/inicio.html", {"persona":persona})
     else:
         return render(request,"PaginaDePruebaApp/inicio.html")
-        
+
+def ModificarComentario(request,coment_id):
+
+    if request.method== "POST":
+        print('pasa por post')
+        form= ComentInputForm(request.POST)
+        if form.is_valid():
+            compra = Compra.objects.get(comentario_id = coment_id)
+            form.save(compra)
+
+            comentViejo = Comentario.objects.get(pk = coment_id)
+            comentViejo.delete()
+            
+            compras = Compra.objects.all()
+            comentarios = Comentario.objects.all()
+            return redirect(Comentarios)
+        else:        
+            return render(request,"PaginaDePruebaApp/modificarComentario.html", {"form": form})
+    else:
+        if request.method== "GET":
+            coment = Comentario.objects.get(pk=coment_id)
+            form= ComentInputForm(instance= coment)
+            return render(request,"PaginaDePruebaApp/modificarComentario.html", {"form": form})     
+          
 def AgregarComentario(request,compra_id):
-        if request.method== "POST":
-            form= ComentInputForm(request.POST)
-            if form.is_valid():
-                compra= Compra.objects.get(pk = compra_id)
-                form.save(compra)
-                comentarios = Comentario.objects.all()
-                return render(request,"PaginaDePruebaApp/comentarios.html",{"comentarios": comentarios})
-            else:        
-                return render(request,"PaginaDePruebaApp/agregarComentario.html", {"form": form, "compra":compra_id})
-        else:
-            form= ComentInputForm()
-            return render(request,"PaginaDePruebaApp/agregarComentario.html", {"form": form, "compra":compra_id})
+    if request.method== "POST":
+        form= ComentInputForm(request.POST)
+        if form.is_valid():
+            compra= Compra.objects.get(pk = compra_id)
+            form.save(compra)
+            return redirect(Comentarios)
+        else:        
+            return render(request,"PaginaDePruebaApp/agregarComentario.html", {"form": form})
+    else:
+        form= ComentInputForm()
+        return render(request,"PaginaDePruebaApp/agregarComentario.html", {"form": form})
 
 def Comentarios (request):
     if request.method== "POST":
@@ -118,10 +140,12 @@ def Comentarios (request):
         coment = Comentario.objects.get(pk=pk)
         coment.delete()
         comentarios = Comentario.objects.all()
-        return render(request,"PaginaDePruebaApp/comentarios.html",{"comentarios": comentarios})
+        compras = Compra.objects.all()
+        return redirect(Comentarios)
     else:
         comentarios = Comentario.objects.all()
-        return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios})
+        compras = Compra.objects.all()
+        return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id})
 
 def Ahorro (request):
     if request.user.is_authenticated:

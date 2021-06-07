@@ -113,7 +113,7 @@ class TarjetaForm(forms.ModelForm):
         tarjeta=Tarjeta.objects.create(
             nro=self.cleaned_data.get('nroTarjeta'), 
             fechaVto=self.cleaned_data.get('fechaVto'),
-            codigo=self.cleaned_data.get('codigo')
+            codigo=self.cleaned_data.get('codigo'),
         )
         return tarjeta
         

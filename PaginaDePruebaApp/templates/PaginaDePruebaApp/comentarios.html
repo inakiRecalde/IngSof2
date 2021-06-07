@@ -14,13 +14,25 @@
             {% if coment.puntuacion == 3 %} <b class = "Estrella">★★★</b> {% endif %}
             {% if coment.puntuacion == 4 %} <b class = "Estrella">★★★★</b> {% endif %}
             {% if coment.puntuacion == 5 %} <b class = "Estrella">★★★★★</b> {% endif %}
-            {% if user.esCliente %}
-                <br><button class="btn" onclick="eliminarComentario('{{ coment.id }}')">Eliminar</button>
-            {% endif %}
+             {% for compra in compras %}
+                {% if compra.comentario_id == coment.id %}
+                    {% if compra.user_id == user_id %}
+                        <a href={% url 'ModificarComentario' coment.id %}>Modificar</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% for compra in compras %}
+                {% if compra.comentario_id == coment.id %}
+                    {% if compra.user_id == user_id or user.is_superuser %}
+                        <br><button class="btn" onclick="eliminarComentario('{{ coment.id }}')">Eliminar</button>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         </li>
     </form>
     {% endfor %}
 </div>
+
 <script type="text/javascript">
     function eliminarComentario(coment_id) {
         var request = $.ajax({

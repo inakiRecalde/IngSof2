@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.Inicio,name = "Inicio"),
     path('Comentarios/', views.Comentarios,name = "Comentarios"),
     path('AgregarComentario/<int:compra_id>', views.AgregarComentario,name = "AgregarComentario"),
+    path('ModificarComentario/<int:coment_id>', views.ModificarComentario,name = "ModificarComentario"),
     path('Perfil/', views.Perfil,name = "Perfil"),
     path('Registro/', views.Registro,name = "Registro"),
     path('RegistroChofer/', views.RegistroChofer,name = "RegistroChofer"),
