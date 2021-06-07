@@ -13,9 +13,6 @@
             </li>
             <a href="{% url 'CancelarPasaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">CANCELAR PASAJE</a>  
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
-            {% if compra.comentario == null%}
-                <a href="{% url 'AgregarComentario' compra.id %}" style="margin-left: 20px;" class="btn btn-primary">COMENTAR VIAJE</a>
-            {% endif %}
         {% endif %}
     {% endfor %}
   </div>
