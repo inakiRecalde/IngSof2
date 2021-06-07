@@ -111,7 +111,7 @@ class TarjetaForm(forms.ModelForm):
 
     def save(self):
         tarjeta=Tarjeta.objects.create(
-            nro=self.cleaned_data.get('nroTarjeta'), 
+            nro=self.cleaned_data.get('nro'),
             fechaVto=self.cleaned_data.get('fechaVto'),
             codigo=self.cleaned_data.get('codigo'),
         )
