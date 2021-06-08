@@ -4,7 +4,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
-from datetime import date
+from datetime import date, datetime, timezone
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -86,6 +86,12 @@ def getInsumosConCantidad(listaInsumos,compra):
     listaCantidades=list(cantInsumo.cantidad for cantInsumo in insumosCantidadQuery)
     return list(zip(listaInsumos,listaCantidades))
 
+def calcularReintegro(total,viaje):
+    fecha=viaje.fechaSalida-datetime.now(timezone.utc)
+    if fecha.days < 2:
+        return total/2
+    else:
+        return total
 
 #views 
 def Inicio (request):
@@ -546,17 +552,16 @@ def AgregarInsumo(request,nombreInsumo,viaje_id):
     insumoCompra.save()
 
     return redirect(CompraView,viaje_id=viaje_id)
-    
 
 def CancelarPasaje(request, id_viaje):
     compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
     for compra in compras:
         if compra.pendiente:
-            dinero=compra.total
             invitadosCompra=getInvitadosCompra(compra.id)
             viaje=compra.viaje
             viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
             viaje.save()
+            dinero=calcularReintegro(compra.total,viaje)
             compra.cancelado=True
             compra.pendiente=False
             compra.save()
