@@ -4,7 +4,8 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
-from datetime import date
+from datetime import date, datetime, time
+from django.utils import timezone
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -552,9 +553,14 @@ def CancelarPasaje(request, id_viaje):
     compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
     for compra in compras:
         if compra.pendiente:
-            dinero=compra.total
             invitadosCompra=getInvitadosCompra(compra.id)
             viaje=compra.viaje
+            insumosCompra=getInsumosCompra(compra.id)
+            insumosCompraConCantidad=getInsumosConCantidad(insumosCompra,compra)
+            if (((compra.viaje.fechaSalida) - timezone.now()).days) < 2 :
+                dinero=(((len(invitadosCompra)+1)*viaje.precio) / 2) + calcularPrecioInsumos(insumosCompraConCantidad)
+            else:
+                dinero=compra.total
             viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
             viaje.save()
             compra.cancelado=True
