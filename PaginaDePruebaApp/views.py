@@ -88,7 +88,7 @@ def getInsumosConCantidad(listaInsumos,compra):
 
 def calcularReintegro(total,viaje):
     fecha=viaje.fechaSalida-datetime.now(timezone.utc)
-    if fecha.days < 2:
+    if fecha.days <= 2:
         return total/2
     else:
         return total
@@ -201,7 +201,17 @@ def CambioTarjeta (request):
         if form.is_valid():
             diccionario=form.cleaned_data
             if chequearVencimiento(diccionario["fechaVto"]):
-                tarjeta=form.save()
+                cliente=Cliente.objects.get(user_id=request.user.id)
+                tarjetaExisteQuery=Tarjeta.objects.filter(nro=diccionario['nro'])
+                if not tarjetaExisteQuery:
+                    tarjeta=form.save()
+                    tarjetavieja=Tarjeta.objects.get(nro=cliente.tarjeta.nro)
+                    tarjetavieja.delete()
+                else:
+                    #si ingresa un numero de tarjeta que ya existe lo toma de la bd así no se generan repetidos
+                    tarjeta=Tarjeta.objects.get(nro=diccionario['nro'])
+                cliente.tarjeta=tarjeta
+                cliente.save()
                 return render(request,"PaginaDePruebaApp/mensajeCambioTarjeta.html")
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
@@ -502,7 +512,7 @@ def RegistroInvitado(request,viaje_id):
         else:
             return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
     else:
-        formInvitado=InvitadoForm(request.POST)
+        formInvitado=InvitadoForm()
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
 
 def EliminarInvitado(request,invitado_id,viaje_id):
