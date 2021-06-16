@@ -125,7 +125,7 @@ def ModificarComentario(request,coment_id):
             coment = Comentario.objects.get(pk=coment_id)
             form= ComentInputForm(instance= coment)
             return render(request,"PaginaDePruebaApp/modificarComentario.html", {"form": form})     
-          
+
 def AgregarComentario(request,compra_id):
     if request.method== "POST":
         form= ComentInputForm(request.POST)
@@ -209,7 +209,9 @@ def CambioTarjeta (request):
                     tarjetavieja.delete()
                 else:
                     #si ingresa un numero de tarjeta que ya existe lo toma de la bd así no se generan repetidos
-                    tarjeta=Tarjeta.objects.get(nro=diccionario['nro'])
+                    msg ="La tarjeta con este número ya se encuentra registrada para otro usuario, por favor ingrese otra"   ## Mensaje de error si esta vencida la tarjeta
+                    form.add_error("nro", msg)
+                    return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
                 cliente.tarjeta=tarjeta
                 cliente.save()
                 return render(request,"PaginaDePruebaApp/mensajeCambioTarjeta.html")
