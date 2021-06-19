@@ -156,14 +156,6 @@ def Comentarios (request):
                 return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id,"persona":persona})        
         return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id})
 
-def Ahorro (request):
-    if request.user.is_authenticated:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        persona=Cliente.objects.get(user_id=request.user.id)
-        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona}) 
-    else:
-        return render(request,"PaginaDePruebaApp/ahorro.html")
-
 def HistorialDeViajes(request):
     if request.user.is_authenticated:
         compras=Compra.objects.filter(user__user__id__icontains=request.user.id)
@@ -449,6 +441,8 @@ def CompraView(request,viaje_id):
                     if persona.esGold:
                         pasajeConDescuento=aplicarDescuento(viaje.precio)
                         compra.total=pasajeConDescuento*cantPasajes
+                        persona.ahorro=persona.ahorro+(viaje.precio/100)*10
+                        persona.save()
                     else:
                         compra.total=viaje.precio*cantPasajes
                     compra.total=compra.total+calcularPrecioInsumos(insumosCompraConCantidad)
