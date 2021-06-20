@@ -14,7 +14,7 @@
             {% if coment.puntuacion == 3 %} <b class = "Estrella">★★★</b> {% endif %}
             {% if coment.puntuacion == 4 %} <b class = "Estrella">★★★★</b> {% endif %}
             {% if coment.puntuacion == 5 %} <b class = "Estrella">★★★★★</b> {% endif %}
-             {% for compra in compras %}
+            {% for compra in compras %}
                 {% if compra.comentario_id == coment.id %}
                     {% if compra.user_id == user_id %}
                         <a href={% url 'ModificarComentario' coment.id %}>Modificar</a>

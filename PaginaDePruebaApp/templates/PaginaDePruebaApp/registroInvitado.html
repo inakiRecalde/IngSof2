@@ -6,6 +6,7 @@
 
     <form class="registro" action="" method="post">
         <a class="btn btn-primary" href="{% url 'Compra' viaje.id %}" ">Volver a la compra</a>
+        <br><br><br><br>
         {% csrf_token %}        
         <table> {{formInvitado.as_table}} </table>
         <button class="btn btn-primary" type="submit">Guardar</button>

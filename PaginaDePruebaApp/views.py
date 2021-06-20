@@ -4,8 +4,12 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
+<<<<<<< HEAD
 from datetime import date, datetime, time
 from django.utils import timezone
+=======
+from datetime import date, datetime, timezone
+>>>>>>> 02c51b4f6b3bb0c6a58c578b5f6723aee3f1174d
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -87,6 +91,12 @@ def getInsumosConCantidad(listaInsumos,compra):
     listaCantidades=list(cantInsumo.cantidad for cantInsumo in insumosCantidadQuery)
     return list(zip(listaInsumos,listaCantidades))
 
+def calcularReintegro(total,viaje):
+    fecha=viaje.fechaSalida-datetime.now(timezone.utc)
+    if fecha.days <= 2:
+        return total/2
+    else:
+        return total
 
 #views 
 def Inicio (request):
@@ -120,7 +130,7 @@ def ModificarComentario(request,coment_id):
             coment = Comentario.objects.get(pk=coment_id)
             form= ComentInputForm(instance= coment)
             return render(request,"PaginaDePruebaApp/modificarComentario.html", {"form": form})     
-          
+
 def AgregarComentario(request,compra_id):
     if request.method== "POST":
         form= ComentInputForm(request.POST)
@@ -150,14 +160,6 @@ def Comentarios (request):
                 persona=Cliente.objects.get(user_id=request.user.id) 
                 return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id,"persona":persona})        
         return render(request,"PaginaDePruebaApp/comentarios.html", {"comentarios": comentarios, "compras": compras,"user_id":request.user.id})
-
-def Ahorro (request):
-    if request.user.is_authenticated:
-        persona=Cliente.objects.get(user_id=request.user.id) 
-        persona=Cliente.objects.get(user_id=request.user.id)
-        return render(request,"PaginaDePruebaApp/ahorro.html", {"persona":persona}) 
-    else:
-        return render(request,"PaginaDePruebaApp/ahorro.html")
 
 def HistorialDeViajes(request):
     if request.user.is_authenticated:
@@ -196,7 +198,19 @@ def CambioTarjeta (request):
         if form.is_valid():
             diccionario=form.cleaned_data
             if chequearVencimiento(diccionario["fechaVto"]):
-                tarjeta=form.save()
+                cliente=Cliente.objects.get(user_id=request.user.id)
+                tarjetaExisteQuery=Tarjeta.objects.filter(nro=diccionario['nro'])
+                if not tarjetaExisteQuery:
+                    tarjeta=form.save()
+                    tarjetavieja=Tarjeta.objects.get(nro=cliente.tarjeta.nro)
+                    tarjetavieja.delete()
+                else:
+                    #si ingresa un numero de tarjeta que ya existe lo toma de la bd así no se generan repetidos
+                    msg ="La tarjeta con este número ya se encuentra registrada para otro usuario, por favor ingrese otra"   ## Mensaje de error si esta vencida la tarjeta
+                    form.add_error("nro", msg)
+                    return render(request,"PaginaDePruebaApp/altaMembresia.html", {"form": form})
+                cliente.tarjeta=tarjeta
+                cliente.save()
                 return render(request,"PaginaDePruebaApp/mensajeCambioTarjeta.html")
             else:
                 msg ="La tarjeta se encuentra vencida"   ## Mensaje de error si esta vencida la tarjeta
@@ -432,6 +446,8 @@ def CompraView(request,viaje_id):
                     if persona.esGold:
                         pasajeConDescuento=aplicarDescuento(viaje.precio)
                         compra.total=pasajeConDescuento*cantPasajes
+                        persona.ahorro=persona.ahorro+(viaje.precio/100)*10
+                        persona.save()
                     else:
                         compra.total=viaje.precio*cantPasajes
                     compra.total=compra.total+calcularPrecioInsumos(insumosCompraConCantidad)
@@ -497,7 +513,7 @@ def RegistroInvitado(request,viaje_id):
         else:
             return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
     else:
-        formInvitado=InvitadoForm(request.POST)
+        formInvitado=InvitadoForm()
         return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
 
 def EliminarInvitado(request,invitado_id,viaje_id):
@@ -547,7 +563,6 @@ def AgregarInsumo(request,nombreInsumo,viaje_id):
     insumoCompra.save()
 
     return redirect(CompraView,viaje_id=viaje_id)
-    
 
 def CancelarPasaje(request, id_viaje):
     compras = Compra.objects.filter(viaje__id__icontains=id_viaje, user__user__id__icontains=request.user.id)
@@ -563,6 +578,7 @@ def CancelarPasaje(request, id_viaje):
                 dinero=compra.total
             viaje.asientosDisponibles=(compra.viaje.asientosDisponibles) + 1 + len(invitadosCompra)
             viaje.save()
+            dinero=calcularReintegro(compra.total,viaje)
             compra.cancelado=True
             compra.pendiente=False
             compra.save()

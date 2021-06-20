@@ -219,7 +219,7 @@ class Cliente(models.Model):
 
     #solo si es gold
     ahorro=models.FloatField(default=0) 
-    tarjeta=models.OneToOneField(Tarjeta, on_delete=models.CASCADE, null=True, default=None)
+    tarjeta=models.OneToOneField(Tarjeta, on_delete=models.SET_NULL, null=True, default=None)
 
     def __str__(self):
         return self.user.email
@@ -232,8 +232,6 @@ class Invitado(models.Model):
     nombre=models.CharField(max_length=30)
     apellido=models.CharField(max_length=30)
     dni=models.IntegerField()
-
-
 
 class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
