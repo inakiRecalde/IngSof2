@@ -4,12 +4,8 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
-<<<<<<< HEAD
-from datetime import date, datetime, time
-from django.utils import timezone
-=======
 from datetime import date, datetime, timezone
->>>>>>> 02c51b4f6b3bb0c6a58c578b5f6723aee3f1174d
+from django.utils import timezone
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
@@ -250,8 +246,30 @@ def infoViaje(request, id_viaje):
                 return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos,"compra":compra})
     return render(request,"PaginaDePruebaApp/infoViaje.html",{"viaje": viaje,"insumos":insumos})    
 
+def ViajeProximo(viajes):
+    if viajes:
+        for viaje in viajes:
+            if viaje.fechaSalida > timezone.now():
+                prox=viaje.fechaSalida
+                viajeProx=viaje
+                break 
+        for viaje in viajes:
+            if not viaje.finalizado and (viaje.fechaSalida > timezone.now()):
+                if prox > viaje.fechaSalida:
+                    prox=viaje.fechaSalida
+                    viajeProx=viaje
+        return viajeProx
+
 def ViajesChofer (request):
-    return render(request,"PaginaDePruebaApp/viajesChofer.html")
+    persona=Chofer.objects.get(user_id=request.user.id)
+    viajes=Viaje.objects.filter(combi__chofer__user__id__icontains=persona.user.id)
+    proximo=ViajeProximo(viajes)
+    print(proximo.id)
+    if proximo.id==viajes[0].id:
+        print("ENTRO")
+    else:
+        print("NO ENTRO")    
+    return render(request,"PaginaDePruebaApp/viajesChofer.html",{"viajes":viajes, "proximo":proximo})
 
 def Logout_request(request):
     logout(request)
