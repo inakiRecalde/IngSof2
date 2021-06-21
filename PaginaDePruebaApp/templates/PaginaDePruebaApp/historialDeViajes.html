@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 {% if compras %}
- 
+
 <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Futuros:</h2>
     {% for compra in compras %}
@@ -15,9 +15,8 @@
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
-  </div>
-  
-  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+</div>  
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Realizados:</h2>
     {% for compra in compras %}
         {% if compra.viaje.finalizado and not compra.cancelado%}
@@ -30,9 +29,9 @@
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
-  </div>
+</div>
 
-  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Cancelados:</h2>
     {% for compra in compras %}
         {% if compra.cancelado %}
@@ -42,8 +41,8 @@
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
         {% endif %}
     {% endfor %}
-  </div>
-  
+</div>
+
 {% else %}
     <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No hay viajes en su historial</h4>
 {% endif %}

@@ -30,4 +30,5 @@ urlpatterns = [
     path('EliminarInvitado/<str:nombreInsumo>/<int:viaje_id>', views.EliminarInsumo, name= "EliminarInsumo"),
     
     path('AgregarInsumo/<str:nombreInsumo>/<int:viaje_id>', views.AgregarInsumo, name= "AgregarInsumo"),
+    path('ListaPasajeros/<int:id_viaje>', views.ListaPasajeros, name= "ListaPasajeros"),
     ]

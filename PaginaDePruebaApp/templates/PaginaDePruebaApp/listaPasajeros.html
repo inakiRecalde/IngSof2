@@ -1,0 +1,37 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+{% block content %}
+    <div style="background-color: rgba(255, 255, 255,0.8); padding:50px">
+        <h3>Listado de pasajeros</h3>
+        {% if compradores or invitados %}
+        <div id="compradores">
+            {% if compradores %}
+                {% for comprador in compradores %}
+                    <li style="margin-left: 20px;">
+                        <b>Nombre: </b>{{comprador.user.first_name}} &nbsp; <b>Apellido: </b>{{comprador.user.last_name}} &nbsp; <b>DNI: </b>{{comprador.dni}} &nbsp; 
+                    </li>
+                    <a href="#" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
+                    <br>  
+                    <br>
+                    
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div id="invitados">
+            {% if invitados %}
+                {% for invitado in invitados %}
+                    <li style="margin-left: 20px;">
+                        <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
+                    </li>    
+                    <a href="#" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
+                    <br>  
+                    <br>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% else %}
+        <h4 style="margin-left:20px; color: rgb(247, 72, 3)">Este viaje no tiene pasajeros</h4>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -82,6 +82,15 @@ def getInvitadosViaje(viaje_id):
     invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
     return invitadosDnis
 
+def getPasajeros(viaje_id):
+    comprasViaje=Compra.objects.filter(viaje_id=viaje_id)
+    #filtro los compradores
+    compradoresIds=list(compra.user.user_id for compra in comprasViaje)
+    compradoresViaje=Cliente.objects.filter(user_id__in=compradoresIds)
+
+    return compradoresViaje
+    
+
 def getInsumosConCantidad(listaInsumos,compra):
     insumosCantidadQuery=CantidadInsumo.objects.filter(compra_id=compra.id,insumo__in=listaInsumos)
     listaCantidades=list(cantInsumo.cantidad for cantInsumo in insumosCantidadQuery)
@@ -601,4 +610,17 @@ def CancelarPasaje(request, id_viaje):
             compra.pendiente=False
             compra.save()
             return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
+
+def ListaPasajeros(request,id_viaje):
+    #Traigo el viaje 
+    viaje=Viaje.objects.get(id=id_viaje)
+
+    #filtro los usuarios que compraron pasajes
+    compradores=getPasajeros(viaje.id)
+
+    #filtro los invitados de ese viaje
+    invitadosDnis=getInvitadosViaje(viaje.id)
+    invitados=Invitado.objects.filter(dni__in=invitadosDnis)
+
+    return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados})
 

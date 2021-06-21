@@ -5,7 +5,7 @@
 {% block content %}
 
 {% if viajes %}
- <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Proximos viajes:</h2>
     {% for viaje in viajes %}
         {% if not viaje.finalizado %}
@@ -24,8 +24,8 @@
                 <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">INICIAR VIAJE</a>  
             {% endif %}    
             <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">FINALIZAR VIAJE</a>
-            <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
-            <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">PASAJEROS</a>
+            <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+            <a href="{% url 'ListaPasajeros' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">LISTA DE PASAJEROS</a>
             {% if viaje.enCurso %}
                 <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">NOTIFICAR IMPREVISTO</a>
                 <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">PASAJE EXPRESS</a>
@@ -38,7 +38,7 @@
             {% endif %}
         {% endif %}
     {% endfor %} 
-  </div>     
+</div>     
 {% else %}
     <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No tiene ningun viaje asignado</h4>
 {% endif %}
