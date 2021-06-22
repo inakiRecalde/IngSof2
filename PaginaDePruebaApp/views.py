@@ -630,3 +630,35 @@ def ListaPasajeros(request,id_viaje):
 
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados})
 
+def NotificarImprevisto(request,viaje_id):
+    if request.method== "POST":
+        form = ImprevistoInputForm(request.POST)
+        if form.is_valid():
+            viaje= Viaje.objects.get(id=viaje_id)
+            form.save(viaje)
+            return redirect(ViajesChofer)
+        else:        
+            return render(request,"PaginaDePruebaApp/notificarImprevisto.html", {"form": form})
+    else:
+        form = ImprevistoInputForm()
+        return render(request,"PaginaDePruebaApp/notificarImprevisto.html", {"form": form})
+
+def ModificarImprevisto(request,imprev_id):
+    
+    if request.method== "POST":
+        form= ImprevistoInputForm(request.POST)
+        if form.is_valid():
+            viaje = Viaje.objects.get(imprevisto_id = imprev_id)
+            form.save(viaje)
+
+            comentViejo = Imprevisto.objects.get(pk = imprev_id)
+            comentViejo.delete()
+            
+            return redirect(ViajesChofer)
+        else:        
+            return render(request,"PaginaDePruebaApp/modificarImprevisto.html", {"form": form})
+    else:
+        if request.method== "GET":
+            imprevisto = Imprevisto.objects.get(pk=imprev_id)
+            form=  ImprevistoInputForm(instance= imprevisto)
+            return render(request,"PaginaDePruebaApp/modificarImprevisto.html", {"form": form}) 

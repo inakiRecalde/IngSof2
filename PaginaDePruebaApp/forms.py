@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import widgets
 from django.forms import fields
-from .models import Cliente, Comentario, Compra, Invitado, Tarjeta, User,Chofer,Insumo,Viaje
+from .models import Cliente, Comentario, Compra, Imprevisto, Invitado, Tarjeta, User,Chofer,Insumo,Viaje
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
 from django.forms.models import ModelMultipleChoiceField
@@ -187,3 +187,22 @@ class ComentInputForm(forms.ModelForm):
         )
         compra.comentario = coment
         compra.save()  
+
+
+class ImprevistoInputForm(forms.ModelForm):
+    
+    texto_attr = {'oninvalid': 'this.setCustomValidity("Por favor un texto")', 'oninput': 'this.setCustomValidity("")'}   
+    texto=forms.CharField(label='Comente su imprevisto aqui', max_length=200,widget=forms.TextInput(attrs=texto_attr))
+
+    class Meta:
+        model = Imprevisto  
+        fields = (
+            'texto',
+        ) 
+    def save(self,viaje):
+        imprevisto= Imprevisto.objects.create(
+            texto=self.cleaned_data.get('texto')
+        )
+        
+        viaje.imprevisto = imprevisto
+        viaje.save()
