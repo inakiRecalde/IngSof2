@@ -439,7 +439,10 @@ def CompraView(request,viaje_id):
     persona=Cliente.objects.get(user_id=request.user.id)
 
     #Me quedo con la lista de insumos del viaje
-    insumosViaje=getInsumosViaje(viaje_id)
+    if not viaje.enCurso:
+        insumosViaje=getInsumosViaje(viaje_id)
+    else:
+        insumosViaje=[] 
 
     #Si ya hay una compra la trae de la bd, sino la crea
     try:
@@ -454,9 +457,12 @@ def CompraView(request,viaje_id):
     invitadosCompra=getInvitadosCompra(compra.id)
 
     #Me quedo con la lista de insumos de la compra
-    insumosCompra=getInsumosCompra(compra.id)
-
-    insumosCompraConCantidad=getInsumosConCantidad(insumosCompra,compra)
+    if not viaje.enCurso:
+        insumosCompra=getInsumosCompra(compra.id)
+        insumosCompraConCantidad=getInsumosConCantidad(insumosCompra,compra)
+    else:
+        insumosCompra=[]
+        insumosCompraConCantidad= []
 
     if request.method == "POST":
         formTarjeta= TarjetaForm(request.user, request.POST,prefix="formTarjeta")

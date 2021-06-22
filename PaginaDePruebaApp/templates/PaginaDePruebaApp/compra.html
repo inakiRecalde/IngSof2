@@ -5,7 +5,7 @@
 {% block content %}
 <div class="compra">
 
-    <div class="info-compra" id=info-viaje>
+    <div class="info-compra" id="info-viaje">
         <li style="margin-left: 20px;"><b>Origen: </b>{{viaje.ruta.origen}}</li>
         <li style="margin-left: 20px;"><b>Destino: </b>{{viaje.ruta.destino}}</li>
         <li style="margin-left: 20px;"><b>Fecha de partida: </b>{{viaje.fechaSalida}}</li>
@@ -15,8 +15,8 @@
         <li style="margin-left: 20px;"><b>Precio del pasaje: $</b>{{viaje.precio}}</li>
     </div>
 
-    <div id=info-insumos>
-        {% if insumosViaje %}
+    <div id="info-insumos">
+        {% if insumosViaje %} 
             <br>
             <div>
                 <h3>Insumos para su viaje</h3>
@@ -31,8 +31,10 @@
                 </div>
                 {% endfor %}
             </div>
+        {% else %}
+            <h4>No se pueden agragar insumos a un viaje en curso</h4>
         {% endif %}
-        {% if insumosCompraConCantidad %}
+        {% if insumosCompraConCantidad%}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <div>
                 <h3>Insumos seleccionados</h3>
@@ -59,7 +61,7 @@
         &nbsp; &nbsp; <a href="{% url 'RegistroInvitado' viaje.id %}" style="color:#4c85bb; font-size: medium; ">Para agregar un invitado haga click aquí</a>
     </div>
 
-    <div class="info-compra" id=form-compra>
+    <div class="info-compra" id="form-compra">
         {% if not persona.esGold %}
         <form class="compra" action="" method= "post">
             {% csrf_token %}

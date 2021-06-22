@@ -6,7 +6,7 @@
  <div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
     <h2 style="margin-left: 10px;">Viajes Encontrados:</h2>
     {% for viaje in viajes %}
-        {% if not viaje.enCurso %}
+        {% if not viaje.finalizado %}
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
             </li>
