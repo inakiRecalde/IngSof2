@@ -1,0 +1,43 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class= "comentarios">
+<h2>Imprevistos:</h2>
+
+    {% if user.esChofer %}
+
+            {% for imprev in imprevistos %}
+                
+                <li style="padding:5px;background-color: rgba(173, 175, 192,0.5);;margin: 20px 20px;">
+                    <b></b>{{imprev.texto}}&nbsp; 
+                    {%if imprev.resuelto %} 
+                        <b style= "color: green">Resuelto </b>
+                    {%else %}
+                        <b style= "color: red">No Resuelto </b>
+                        <br><a href={% url 'ModificarImprevisto' imprev.id %}>Modificar</a>
+                        <a href={% url 'MensajeExitoEliminarImprevisto' imprev.id %}>Eliminar</a>
+                    {%endif%}
+
+                </li>
+            {% endfor %}
+    {% else %}
+        {% for imprev in imprevistos %}
+                
+            <li style="padding:5px;background-color: rgba(173, 175, 192,0.5);;margin: 20px 20px;">
+                <b></b><a href= #> {{imprev.texto}}</a> &nbsp;
+                {%if imprev.resuelto %} 
+                    <b style= "color: green">(Resuelto) </b>
+                {%else %}
+                    <b style= "color: red">(No Resuelto) </b>
+                    <br><a style = 'color:black' href={% url 'ConfirmacionImprevistoResuelto' imprev.id %}>Marcar como Resuelto</a>
+                {%endif%}
+            
+            </li>
+            {% endfor %}
+
+    {% endif %}
+
+
+{% endblock %}

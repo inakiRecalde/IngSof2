@@ -54,6 +54,9 @@
                             <li class="nav-item {% if request.path == 'RegistroChofer' %}active{% endif %} px-lg-4">
                                 <a class="nav-link text-uppercase text-expanded" href="{% url 'RegistroChofer' %}">Registrar chofer</a>
                             </li>
+                            <li class="nav-item {% if request.path == 'Imprevistos' %}active{% endif %} px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="{% url 'Imprevistos' %}">Imprevistos</a>
+                            </li>
                             <li class="nav-item {% if request.path == 'PanelAdmin' %}active{% endif %} px-lg-4">
                                 <a class="nav-link text-uppercase text-expanded" href="http://127.0.0.1:8000/admin/">Panel administración</a>
                             </li>
@@ -61,6 +64,9 @@
                         {% if user.esChofer %}
                             <li class="nav-item {% if request.path == 'ViajesChofer' %}active{% endif %} px-lg-4">
                                 <a class="nav-link text-uppercase text-expanded" href="{% url 'ViajesChofer' %}">Mis viajes</a>
+                            </li>
+                            <li class="nav-item {% if request.path == 'ImprevistosChofer' %}active{% endif %} px-lg-4">
+                                <a class="nav-link text-uppercase text-expanded" href="{% url 'ImprevistosChofer' %}">Mis imprevistos</a>
                             </li>
                         {% endif %}
                         {% if user.esCliente %}

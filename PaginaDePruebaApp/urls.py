@@ -37,4 +37,11 @@ urlpatterns = [
 
     path('NotificarImprevisto/<int:viaje_id>', views.NotificarImprevisto,name = "NotificarImprevisto"),
     path('ModificarImprevisto/<int:imprev_id>', views.ModificarImprevisto,name = "ModificarImprevisto"),
+    path('Imprevistos/', views.Imprevistos,name = "Imprevistos"),
+    path('ConfirmacionImprevistoResuelto/<int:imprev>', views.ConfirmacionImprevistoResuelto,name = "ConfirmacionImprevistoResuelto" ),
+    path('MensajeExitoImprevistoResuelto/<int:imprev>', views.ImprevistoResuelto,name = "MensajeExitoImprevistoResuelto" ),
+    path('ImprevistosChofer/', views.Imprevistos,name = "ImprevistosChofer" ),
+    path('MensajeExitoEliminarImprevisto/<int:imprev>', views.ImprevistoEliminado,name = "MensajeExitoEliminarImprevisto" ),
+
+
     ]

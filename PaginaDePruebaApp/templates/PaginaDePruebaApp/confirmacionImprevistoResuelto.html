@@ -1,0 +1,13 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <div id="mensaje-membresia" style="background-color: white; padding:10em; text-align: center; font-size: 1.5em;">
+        Si marca el Imprevisto como resuelto, este no se podra eliminar ni modificar, ¿está segur@?
+        <br><a href= "{% url 'MensajeExitoImprevistoResuelto' imprev%}">Confirmar</button>
+        <a href="{% url 'Imprevistos' %}">Cancelar</a>
+    </div>
+
+
+{% endblock %}

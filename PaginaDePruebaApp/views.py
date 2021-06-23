@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
+from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar,User,Chofer,Viaje,Insumo,Compra
 from datetime import date, datetime, time, timezone
 from django.utils import timezone
 from .forms import *
@@ -102,6 +102,7 @@ def calcularReintegro(total,viaje):
         return total/2
     else:
         return total
+
 
 #views 
 def Inicio (request):
@@ -684,3 +685,42 @@ def ModificarImprevisto(request,imprev_id):
             imprevisto = Imprevisto.objects.get(pk=imprev_id)
             form=  ImprevistoInputForm(instance= imprevisto)
             return render(request,"PaginaDePruebaApp/modificarImprevisto.html", {"form": form}) 
+
+
+def Imprevistos (request):
+    if request.method== "POST":
+        if request.user.esChofer:
+            pk = request.POST.get('identificador_id')
+            imprev = Imprevisto.objects.get(pk=pk)
+            imprev.delete()  
+            print('pasa')
+            return redirect(Inicio)
+
+    else:
+        if request.user.esChofer:
+            combiChoferQuery= Combi.objects.filter(chofer_id = request.user.id)
+            viajes_id= combiChoferQuery.values_list('viaje')
+            viajesChoferQuery =Viaje.objects.filter(pk__in = viajes_id)
+            id_imprevistos= viajesChoferQuery.values_list('imprevisto_id')
+            imprevistosChofer = Imprevisto.objects.filter(pk__in = id_imprevistos)
+            return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistosChofer,"user":request.user})      
+        else:
+            imprevistos = Imprevisto.objects.all()  
+            print('sale2')
+            return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistos,"user":request.user})
+
+
+def ConfirmacionImprevistoResuelto(request, imprev):
+    return render(request, "PaginaDePruebaApp/confirmacionImprevistoResuelto.html",{"imprev":imprev})
+
+
+def ImprevistoResuelto(request, imprev):
+    imprevisto = Imprevisto.objects.get(pk=imprev)
+    imprevisto.resuelto = True
+    imprevisto.save()
+    return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoResuelto.html")
+
+def ImprevistoEliminado(request, imprev):
+    imprevisto = Imprevisto.objects.get(pk=imprev)
+    imprevisto.delete()
+    return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoEliminado.html")    
