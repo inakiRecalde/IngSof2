@@ -4,7 +4,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 from django.utils import timezone
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
@@ -629,6 +629,28 @@ def ListaPasajeros(request,id_viaje):
     invitados=Invitado.objects.filter(dni__in=invitadosDnis)
 
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados})
+
+def IniciarViaje(request, id_viaje):
+    viaje=Viaje.objects.get(id=id_viaje)
+    rechazado="El viaje aun no se puede iniciar"
+    aceptado="El viaje se ha iniciado correctamente"
+    if (viaje.fechaSalida > timezone.now()):
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": rechazado})
+    else:
+        viaje.enCurso=True
+        viaje.save()
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": aceptado})
+
+def FinalizarViaje(request, id_viaje):
+    viaje=Viaje.objects.get(id=id_viaje)
+    rechazado="El viaje no se puede finalizar sin antes iniciar el viaje"
+    aceptado="El viaje ha finalizado correctamente"
+    if viaje.enCurso:
+        viaje.finalizado=True
+        viaje.save()
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": aceptado})
+    else:
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": rechazado})
 
 def NotificarImprevisto(request,viaje_id):
     if request.method== "POST":
