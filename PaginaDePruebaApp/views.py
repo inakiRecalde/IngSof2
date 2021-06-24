@@ -534,6 +534,12 @@ def RegistroInvitado(request,viaje_id):
                         invitadoInfo=formInvitado.save()
                     else:
                         invitadoInfo=Invitado.objects.get(dni=invitadoInfo['dni'])
+                        invitadoInfo.suspendido=True
+                        invitadoInfo.save()
+                        if invitadoInfo.suspendido==True:
+                            msg ="No puede agregarse al invitado por ser sospechoso de covid"   ## Mensaje de error si ya se registro a un invitado con ese dni
+                            formInvitado.add_error("dni", msg)
+                            return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
                     Compra.invitados.through.objects.create(compra_id=compra.id,invitado_id=invitadoInfo.id)
                     return redirect(CompraView,viaje_id=viaje.id)
                 else:
@@ -693,11 +699,17 @@ def contarSintomas(sintomas):
             cant=cant+1
     return cant
 
+def suspenderUser(user):
+    user.suspendido=True
+    user.save()
+    comprasUser=Compra.objects.filter(user_id=user.user_id)
+    for compra in comprasUser:
+        compra.cancelado=True
+        compra.save()
+
 def CuestionarioCovid(request,dni,viaje_id):
 
     pasajero=Cliente.objects.filter(dni=dni)
-
-    print(pasajero)
 
     if request.method== "POST":
         form = CuestionarioCovidForm(request.POST)
@@ -705,8 +717,14 @@ def CuestionarioCovid(request,dni,viaje_id):
             data=form.cleaned_data
             if int(data['temperatura']) >= 38:
                 if pasajero:
-                    pasajero[0].suspendido=True
+                    suspenderUser(pasajero[0])
+                    pasajero[0].testRealizado=True
                     pasajero[0].save()
+                else:
+                    invitado=Invitado.objects.get(dni=dni)
+                    invitado.suspendido=True
+                    invitado.testRealizado=True
+                    invitado.save()
                 return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
             else:
                 claves=('perdidaGusto','perdidaOlfato','dolorGarganta','fiebre','infeccionesPulm')
@@ -714,10 +732,23 @@ def CuestionarioCovid(request,dni,viaje_id):
                 cantSintomas=contarSintomas(sintomas)
                 if cantSintomas >=2:
                     if pasajero:
-                        pasajero[0].suspendido=True
+                        suspenderUser(pasajero[0])
+                        pasajero[0].testRealizado=True
                         pasajero[0].save()
+                    else:
+                        invitado=Invitado.objects.get(dni=dni)
+                        invitado.suspendido=True
+                        invitado.testRealizado=True
+                        invitado.save()
                     return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
                 else:
+                    if pasajero:
+                        pasajero[0].testRealizado=True
+                        pasajero[0].save()
+                    else:
+                        invitado=Invitado.objects.get(dni=dni)
+                        invitado.testRealizado=True
+                        invitado.save()
                     return render(request,"PaginaDePruebaApp/mensajeCuestionarioExito.html",{"dni":dni,"viaje_id":viaje_id})
         else:        
             return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})

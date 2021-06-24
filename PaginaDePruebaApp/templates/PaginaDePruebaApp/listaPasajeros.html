@@ -11,10 +11,13 @@
                     <li style="margin-left: 20px;">
                         <b>Nombre: </b>{{comprador.user.first_name}} &nbsp; <b>Apellido: </b>{{comprador.user.last_name}} &nbsp; <b>DNI: </b>{{comprador.dni}} &nbsp; 
                     </li>
-                    <a href="{% url 'CuestionarioCovid' comprador.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
+                    {% if not comprador.testRealizado %}
+                        <a href="{% url 'CuestionarioCovid' comprador.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
+                    {% else %}
+                        <p style="color: rgb(26, 196, 11);">Test realizado</p>
+                    {% endif %}
                     <br>  
                     <br>
-                    
                 {% endfor %}
             {% endif %}
         </div>
@@ -24,7 +27,11 @@
                     <li style="margin-left: 20px;">
                         <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
                     </li>    
-                    <a href="{% url 'CuestionarioCovid' invitado.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
+                    {% if not invitado.testRealizado %}
+                        <a href="{% url 'CuestionarioCovid' invitado.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
+                    {% else %}
+                        <p style="color: rgb(26, 196, 11);">Test realizado</p>
+                    {% endif %}
                     <br>  
                     <br>
                 {% endfor %}

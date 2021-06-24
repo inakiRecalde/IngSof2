@@ -217,8 +217,10 @@ class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     dni= models.IntegerField(null= True, blank = False)
     suspendido=models.BooleanField(default=False)
+    testRealizado=models.BooleanField(default=False)
     esGold=models.BooleanField(default=False)
     historialViajes=models.ManyToManyField(Viaje,default=None,null=True)
+
 
     #solo si es gold
     ahorro=models.FloatField(default=0) 
@@ -235,6 +237,8 @@ class Invitado(models.Model):
     nombre=models.CharField(max_length=30)
     apellido=models.CharField(max_length=30)
     dni=models.IntegerField()
+    suspendido=models.BooleanField(default=False)
+    testRealizado=models.BooleanField(default=False)
 
 class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
