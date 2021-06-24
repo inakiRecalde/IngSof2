@@ -154,7 +154,7 @@ class Viaje(models.Model):
     duracion=models.CharField(max_length=20, default='')
     asientosDisponibles=models.PositiveIntegerField()
     precio=models.PositiveIntegerField()   
-    imprevisto=models.ForeignKey(Imprevisto,null= True,blank=True,on_delete=models.PROTECT)
+    imprevisto=models.ForeignKey(Imprevisto,null= True,blank=True,on_delete=models.SET_NULL)
 
     def clean(self):
         #primero valida que las fechas no sean un string cualquiera así no rompe todo

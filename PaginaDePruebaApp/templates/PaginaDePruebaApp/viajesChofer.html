@@ -21,9 +21,9 @@
             </li>
             {% endif %}
             {% if not viaje.enCurso %}
-                <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">INICIAR VIAJE</a>  
+                <a href="{% url 'IniciarViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">INICIAR VIAJE</a>  
             {% endif %}    
-            <a href="{% url 'ViajesChofer' %}" style="margin-left: 20px;" class="btn btn-primary">FINALIZAR VIAJE</a>
+            <a href="{% url 'FinalizarViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">FINALIZAR VIAJE</a>
             <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
             <a href="{% url 'ListaPasajeros' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">LISTA DE PASAJEROS</a>
 

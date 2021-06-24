@@ -3,8 +3,8 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Lugar,User,Chofer,Viaje,Insumo,Compra
-from datetime import date, datetime, timezone
+from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar,User,Chofer,Viaje,Insumo,Compra
+from datetime import date, datetime, time, timezone
 from django.utils import timezone
 from .forms import *
 from django.core.mail import EmailMultiAlternatives
@@ -102,6 +102,7 @@ def calcularReintegro(total,viaje):
         return total/2
     else:
         return total
+
 
 #views 
 def Inicio (request):
@@ -630,6 +631,28 @@ def ListaPasajeros(request,id_viaje):
 
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados,"viaje_id":viaje.id})
 
+def IniciarViaje(request, id_viaje):
+    viaje=Viaje.objects.get(id=id_viaje)
+    rechazado="El viaje aun no se puede iniciar"
+    aceptado="El viaje se ha iniciado correctamente"
+    if (viaje.fechaSalida > timezone.now()):
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": rechazado})
+    else:
+        viaje.enCurso=True
+        viaje.save()
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": aceptado})
+
+def FinalizarViaje(request, id_viaje):
+    viaje=Viaje.objects.get(id=id_viaje)
+    rechazado="El viaje no se puede finalizar sin antes iniciar el viaje"
+    aceptado="El viaje ha finalizado correctamente"
+    if viaje.enCurso:
+        viaje.finalizado=True
+        viaje.save()
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": aceptado})
+    else:
+        return render(request,"PaginaDePruebaApp/mensajeIniciadoFinalizado.html", {"mensaje": rechazado})
+
 def NotificarImprevisto(request,viaje_id):
     if request.method== "POST":
         form = ImprevistoInputForm(request.POST)
@@ -701,3 +724,41 @@ def CuestionarioCovid(request,dni,viaje_id):
     else:
         form = CuestionarioCovidForm()
         return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})
+
+def Imprevistos (request):
+    if request.method== "POST":
+        if request.user.esChofer:
+            pk = request.POST.get('identificador_id')
+            imprev = Imprevisto.objects.get(pk=pk)
+            imprev.delete()  
+            print('pasa')
+            return redirect(Inicio)
+
+    else:
+        if request.user.esChofer:
+            combiChoferQuery= Combi.objects.filter(chofer_id = request.user.id)
+            viajes_id= combiChoferQuery.values_list('viaje')
+            viajesChoferQuery =Viaje.objects.filter(pk__in = viajes_id)
+            id_imprevistos= viajesChoferQuery.values_list('imprevisto_id')
+            imprevistosChofer = Imprevisto.objects.filter(pk__in = id_imprevistos)
+            return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistosChofer,"user":request.user})      
+        else:
+            imprevistos = Imprevisto.objects.all()  
+            print('sale2')
+            return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistos,"user":request.user})
+
+
+def ConfirmacionImprevistoResuelto(request, imprev):
+    return render(request, "PaginaDePruebaApp/confirmacionImprevistoResuelto.html",{"imprev":imprev})
+
+
+def ImprevistoResuelto(request, imprev):
+    imprevisto = Imprevisto.objects.get(pk=imprev)
+    imprevisto.resuelto = True
+    imprevisto.save()
+    return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoResuelto.html")
+
+def ImprevistoEliminado(request, imprev):
+    imprevisto = Imprevisto.objects.get(pk=imprev)
+    imprevisto.delete()
+    return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoEliminado.html")    
