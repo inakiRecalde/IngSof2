@@ -34,4 +34,6 @@ urlpatterns = [
 
     path('NotificarImprevisto/<int:viaje_id>', views.NotificarImprevisto,name = "NotificarImprevisto"),
     path('ModificarImprevisto/<int:imprev_id>', views.ModificarImprevisto,name = "ModificarImprevisto"),
+    
+    path('CuestionarioCovid/<int:dni>/<int:viaje_id>', views.CuestionarioCovid, name= "CuestionarioCovid"),
     ]

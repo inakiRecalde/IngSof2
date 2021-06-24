@@ -11,7 +11,7 @@
                     <li style="margin-left: 20px;">
                         <b>Nombre: </b>{{comprador.user.first_name}} &nbsp; <b>Apellido: </b>{{comprador.user.last_name}} &nbsp; <b>DNI: </b>{{comprador.dni}} &nbsp; 
                     </li>
-                    <a href="#" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
+                    <a href="{% url 'CuestionarioCovid' comprador.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
                     <br>  
                     <br>
                     
@@ -24,7 +24,7 @@
                     <li style="margin-left: 20px;">
                         <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
                     </li>    
-                    <a href="#" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
+                    <a href="{% url 'CuestionarioCovid' invitado.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
                     <br>  
                     <br>
                 {% endfor %}

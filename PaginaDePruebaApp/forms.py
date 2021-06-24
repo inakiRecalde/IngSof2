@@ -206,3 +206,19 @@ class ImprevistoInputForm(forms.ModelForm):
         
         viaje.imprevisto = imprevisto
         viaje.save()
+
+class CuestionarioCovidForm(forms.ModelForm):
+    temperatura_attr = {'placeholder':'°C','oninvalid': 'this.setCustomValidity("Por favor ingrese una temperatura")', 'oninput': 'this.setCustomValidity("")'}
+
+    temperatura=forms.FloatField(label="Temperatura actual",widget=widgets.NumberInput(attrs=temperatura_attr))
+    perdidaGusto=forms.BooleanField(label="Pérdida de gusto en la última semana",required=False)
+    perdidaOlfato=forms.BooleanField(label="Pérdida de olfato en la última semana",required=False)
+    dolorGarganta=forms.BooleanField(label="Dolor de garganta en la última semana",required=False)
+    fiebre=forms.BooleanField(label="Fiebre en la última semana",required=False)
+    infeccionesPulm=forms.BooleanField(label="Infección pulmonar en la última semana",required=False)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'temperatura','perdidaGusto','perdidaOlfato','dolorGarganta','fiebre','infeccionesPulm'
+        )  

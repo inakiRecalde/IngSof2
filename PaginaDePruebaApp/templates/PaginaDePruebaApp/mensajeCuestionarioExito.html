@@ -1,0 +1,13 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+    
+    <div id="mensaje-membresia" style="background-color: white; padding:5em; text-align: center; font-size: 1.5em;">
+        <a class="btn btn-primary" href="{% url 'ListaPasajeros' viaje_id %}" ">Volver a la lista</a>
+        <br><br>
+        El pasajero con dni: {{dni}} se encuentra en condiciones de viajar.
+    </div>
+
+{% endblock %}

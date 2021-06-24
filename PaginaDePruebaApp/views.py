@@ -628,7 +628,7 @@ def ListaPasajeros(request,id_viaje):
     invitadosDnis=getInvitadosViaje(viaje.id)
     invitados=Invitado.objects.filter(dni__in=invitadosDnis)
 
-    return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados})
+    return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados,"viaje_id":viaje.id})
 
 def NotificarImprevisto(request,viaje_id):
     if request.method== "POST":
@@ -662,3 +662,42 @@ def ModificarImprevisto(request,imprev_id):
             imprevisto = Imprevisto.objects.get(pk=imprev_id)
             form=  ImprevistoInputForm(instance= imprevisto)
             return render(request,"PaginaDePruebaApp/modificarImprevisto.html", {"form": form}) 
+
+def contarSintomas(sintomas):
+    cant=0
+    for sintoma in sintomas:
+        if sintomas[sintoma] == True:
+            cant=cant+1
+    return cant
+
+def CuestionarioCovid(request,dni,viaje_id):
+
+    pasajero=Cliente.objects.filter(dni=dni)
+
+    print(pasajero)
+
+    if request.method== "POST":
+        form = CuestionarioCovidForm(request.POST)
+        if form.is_valid():
+            data=form.cleaned_data
+            if int(data['temperatura']) >= 38:
+                if pasajero:
+                    pasajero[0].suspendido=True
+                    pasajero[0].save()
+                return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
+            else:
+                claves=('perdidaGusto','perdidaOlfato','dolorGarganta','fiebre','infeccionesPulm')
+                sintomas={k:data[k] for k in claves}
+                cantSintomas=contarSintomas(sintomas)
+                if cantSintomas >=2:
+                    if pasajero:
+                        pasajero[0].suspendido=True
+                        pasajero[0].save()
+                    return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
+                else:
+                    return render(request,"PaginaDePruebaApp/mensajeCuestionarioExito.html",{"dni":dni,"viaje_id":viaje_id})
+        else:        
+            return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})
+    else:
+        form = CuestionarioCovidForm()
+        return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})
