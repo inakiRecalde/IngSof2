@@ -274,11 +274,7 @@ def ViajesChofer (request):
     persona=Chofer.objects.get(user_id=request.user.id)
     viajes=Viaje.objects.filter(combi__chofer__user__id__icontains=persona.user.id)
     proximo=ViajeProximo(viajes)
-    print(proximo.id)
-    if proximo.id==viajes[0].id:
-        print("ENTRO")
-    else:
-        print("NO ENTRO")    
+    viajes=viajes.order_by('fechaSalida')
     return render(request,"PaginaDePruebaApp/viajesChofer.html",{"viajes":viajes, "proximo":proximo})
 
 def Logout_request(request):
