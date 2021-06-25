@@ -44,6 +44,6 @@ urlpatterns = [
     path('MensajeExitoImprevistoResuelto/<int:imprev>', views.ImprevistoResuelto,name = "MensajeExitoImprevistoResuelto" ),
     path('ImprevistosChofer/', views.Imprevistos,name = "ImprevistosChofer" ),
     path('MensajeExitoEliminarImprevisto/<int:imprev>', views.ImprevistoEliminado,name = "MensajeExitoEliminarImprevisto" ),
-
+    path('CompraExpress/<int:viaje_id>', views.CompraExpress,name = "CompraExpress" ),  
 
     ]

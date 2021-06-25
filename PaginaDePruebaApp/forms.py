@@ -8,6 +8,7 @@ from .models import Cliente, Comentario, Compra, Imprevisto, Invitado, Tarjeta, 
 from django.forms.fields import Field
 from django.contrib.auth import authenticate
 from django.forms.models import ModelMultipleChoiceField
+from django.contrib.auth.hashers import make_password
 
 class UserRegisterForm(UserCreationForm):
     #mensajes de error
@@ -31,14 +32,14 @@ class UserRegisterForm(UserCreationForm):
         help_text = {k:"" for k in fields }
 
     def save(self):
-      user=super().save(commit=False)
-      user.esCliente=True
-      user.username=self.cleaned_data.get('email')
-      user.save()
-      cliente=Cliente.objects.create(user=user)
-      cliente.dni=self.cleaned_data.get('dni')
-      cliente.save()
-      return user
+        user=super().save(commit=False)
+        user.esCliente=True
+        user.username=self.cleaned_data.get('email')
+        user.save()
+        cliente=Cliente.objects.create(user=user)
+        cliente.dni=self.cleaned_data.get('dni')
+        cliente.save()
+        return user
 
 class ChoferRegisterForm(UserCreationForm):
     #mensajes de error
@@ -61,14 +62,14 @@ class ChoferRegisterForm(UserCreationForm):
         help_text = {k:"" for k in fields }
 
     def save(self):
-      user=super().save(commit=False)
-      user.esChofer=True
-      user.username=self.cleaned_data.get('email')
-      user.save()
-      chofer=Chofer.objects.create(user=user)
-      chofer.telefono=self.cleaned_data.get('tel')
-      chofer.save()
-      return user
+        user=super().save(commit=False)
+        user.esChofer=True
+        user.username=self.cleaned_data.get('email')
+        user.save()
+        chofer=Chofer.objects.create(user=user)
+        chofer.telefono=self.cleaned_data.get('tel')
+        chofer.save()
+        return user
 
 class LoginForm(forms.ModelForm):
     email=forms.EmailField(label="Email")
@@ -78,8 +79,8 @@ class LoginForm(forms.ModelForm):
         model  =  User
         fields =  ('email', 'password')
         widgets = {
-                   'email':forms.TextInput(attrs={'class':'form-control'}),
-                   'password':forms.TextInput(attrs={'class':'form-control'}),
+                'email':forms.TextInput(attrs={'class':'form-control'}),
+                'password':forms.TextInput(attrs={'class':'form-control'}),
         }
         help_text = {k:"" for k in fields }
 
@@ -222,3 +223,32 @@ class CuestionarioCovidForm(forms.ModelForm):
         fields = (
             'temperatura','perdidaGusto','perdidaOlfato','dolorGarganta','fiebre','infeccionesPulm'
         )  
+
+class CompraExpressNuevoUserForm(forms.ModelForm):
+    nombre_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su nombre")', 'oninput': 'this.setCustomValidity("")'}
+    apellido_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su apellido")', 'oninput': 'this.setCustomValidity("")'}
+    dni_attr = {'oninvalid': 'this.setCustomValidity("Por favor ingrese su DNI")', 'oninput': 'this.setCustomValidity("")'}
+
+    
+    first_name= forms.CharField(label='Nombre', max_length=30,widget=forms.TextInput(attrs=nombre_attr))
+    last_name= forms.CharField(label='Apellido',max_length=30,widget=forms.TextInput(attrs=apellido_attr))
+    dni = forms.IntegerField(label='DNI', max_value=99999999,widget=forms.TextInput(attrs=dni_attr))
+    email = forms.EmailField()
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'first_name','last_name','dni','email'
+        )
+
+    def save(self):
+        user=super().save(commit=False)
+        user.esCliente=True
+        user.username=self.cleaned_data.get('email')
+        user.password=make_password("viajarencombi", salt=None, hasher='default')
+        user.save()
+        cliente=Cliente.objects.create(user=user)
+        cliente.dni=self.cleaned_data.get('dni')
+        cliente.save()
+        return user
+

@@ -333,7 +333,7 @@ def Registro(request):
         else:
             diccionario=form.cleaned_data
             for msg in form.error_messages:
-                 messages.error(request, f" {msg}: {form.error_messages[msg]}")
+                messages.error(request, f" {msg}: {form.error_messages[msg]}")
             return render(request,"PaginaDePruebaApp/registro.html", {"form": form})
     else:
         form = UserRegisterForm()
@@ -793,3 +793,31 @@ def ImprevistoEliminado(request, imprev):
     imprevisto = Imprevisto.objects.get(pk=imprev)
     imprevisto.delete()
     return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoEliminado.html")    
+
+
+def CompraExpress(request,viaje_id):
+    viaje=Viaje.objects.get(id=viaje_id)
+    clientesDni=list(cliente.dni for cliente in Cliente.objects.all())
+    if request.method=="POST":
+        form=CompraExpressNuevoUserForm(request.POST)
+        if form.is_valid():
+            data=form.cleaned_data
+            if data.get('dni') in clientesDni:
+                msg ="El dni ingresado ya se encuentra registrado en el sistema con otro mail"   ## Mensaje de error si ya se registro a un invitado con ese dni
+                form.add_error("dni", msg)
+                return render(request,"PaginaDePruebaApp/compraExpress.html", {"form": form})
+            else:
+                nuevoUser=form.save()
+                cliente=Cliente.objects.get(user_id=nuevoUser.id)
+                compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=cliente)
+                viaje.asientosDisponibles=viaje.asientosDisponibles-1
+                viaje.save()
+                return render(request,"PaginaDePruebaApp/mensajeCompraExpressExitosa.html",{"viaje":viaje})
+        else:
+            return render(request,"PaginaDePruebaApp/compraExpress.html", {"form": form})
+    else:
+        form = CompraExpressNuevoUserForm()
+        return render(request,"PaginaDePruebaApp/compraExpress.html", {"form": form})
+
+
+
