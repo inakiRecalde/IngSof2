@@ -10,9 +10,8 @@
     {% for viaje in viajes %}
         {% if not viaje.finalizado %}
             {% if viaje.id == proximo.id %}
-            <br>
             <h4 style="margin-left: 10px;">Su proximo viaje es el siguiente:</h4>
-            <li style="margin-left: 20px; color:green">
+            <li style="margin-left: 20px; color:goldenrod">
                 <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
             </li>
             {% else %}
@@ -22,6 +21,8 @@
             {% endif %}
             {% if not viaje.enCurso %}
                 <a href="{% url 'IniciarViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">INICIAR VIAJE</a>  
+            {% else %}
+                <b style="color: green; padding:20px">VIAJE EN CURSO</b>
             {% endif %}    
             <a href="{% url 'FinalizarViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">FINALIZAR VIAJE</a>
             <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
@@ -43,6 +44,20 @@
                 <br>
             {% endif %}
         {% endif %}
+    {% endfor %}
+    <h2 style="margin-left: 10px;">Viajes realizados:</h2>
+    {% for viaje in viajes %}
+    {% if viaje.finalizado %}
+        <li style="margin-left: 20px;">
+            <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
+        </li>
+        <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+        {% if viaje.imprevisto == NULL %}
+            <a href="{% url 'NotificarImprevisto' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">NOTIFICAR IMPREVISTO</a>
+        {% else %}
+            <a href="{% url 'ModificarImprevisto' viaje.imprevisto.id %}" style="margin-left: 20px;" class="btn btn-primary">MODIFICAR IMPREVISTO</a>
+        {% endif %}
+    {% endif %}
     {% endfor %} 
 </div>     
 {% else %}
