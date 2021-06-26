@@ -201,12 +201,11 @@ class ImprevistoInputForm(forms.ModelForm):
             'texto',
         ) 
     def save(self,viaje):
-        imprevisto= Imprevisto.objects.create(
-            texto=self.cleaned_data.get('texto')
+        Imprevisto.objects.create(
+            texto=self.cleaned_data.get('texto'),
+            viaje = viaje
         )
-        
-        viaje.imprevisto = imprevisto
-        viaje.save()
+
 
 class CuestionarioCovidForm(forms.ModelForm):
     temperatura_attr = {'placeholder':'°C','oninvalid': 'this.setCustomValidity("Por favor ingrese una temperatura")', 'oninput': 'this.setCustomValidity("")'}

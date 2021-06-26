@@ -140,9 +140,7 @@ class Ruta(models.Model):
         verbose_name="Ruta"
         verbose_name_plural="Rutas"
 
-class Imprevisto(models.Model):
-    texto=models.CharField(max_length=200)
-    resuelto=models.BooleanField(default=False)  
+ 
 class Viaje(models.Model):
     enCurso=models.BooleanField(default=False, verbose_name="Viaje iniciado")
     finalizado=models.BooleanField(default=False, verbose_name="Viaje finalizado")
@@ -154,7 +152,6 @@ class Viaje(models.Model):
     duracion=models.CharField(max_length=20, default='')
     asientosDisponibles=models.PositiveIntegerField()
     precio=models.PositiveIntegerField()   
-    imprevisto=models.ForeignKey(Imprevisto,null= True,blank=True,on_delete=models.SET_NULL)
 
     def clean(self):
         #primero valida que las fechas no sean un string cualquiera así no rompe todo
@@ -204,6 +201,10 @@ class Viaje(models.Model):
     def __str__(self):
         return "origen: {0}, destino: {1}, combi: {2}, fecha salida: {3}, fecha llegada: {4} y precio: ${5}".format(self.ruta.origen,self.ruta.destino, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
 
+class Imprevisto(models.Model):
+    texto=models.CharField(max_length=200)
+    resuelto=models.BooleanField(default=False) 
+    viaje=models.ForeignKey(Viaje,on_delete=models.CASCADE)
 class Tarjeta(models.Model):
     nro=models.IntegerField()
     fechaVto=models.DateTimeField()

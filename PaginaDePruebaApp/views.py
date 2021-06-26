@@ -673,7 +673,8 @@ def ModificarImprevisto(request,imprev_id):
     if request.method== "POST":
         form= ImprevistoInputForm(request.POST)
         if form.is_valid():
-            viaje = Viaje.objects.get(imprevisto_id = imprev_id)
+            imprev = Imprevisto.objects.get(id = imprev_id)
+            viaje = Viaje.objects.get(id=imprev.viaje_id)
             form.save(viaje)
 
             comentViejo = Imprevisto.objects.get(pk = imprev_id)
@@ -765,13 +766,10 @@ def Imprevistos (request):
         if request.user.esChofer:
             combiChoferQuery= Combi.objects.filter(chofer_id = request.user.id)
             viajes_id= combiChoferQuery.values_list('viaje')
-            viajesChoferQuery =Viaje.objects.filter(pk__in = viajes_id)
-            id_imprevistos= viajesChoferQuery.values_list('imprevisto_id')
-            imprevistosChofer = Imprevisto.objects.filter(pk__in = id_imprevistos)
+            imprevistosChofer =Imprevisto.objects.filter(viaje_id__in = viajes_id)
             return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistosChofer,"user":request.user})      
         else:
-            imprevistos = Imprevisto.objects.all()  
-            print('sale2')
+            imprevistos = Imprevisto.objects.all()
             return render(request,"PaginaDePruebaApp/imprevistos.html", {"imprevistos": imprevistos,"user":request.user})
 
 

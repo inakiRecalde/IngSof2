@@ -28,13 +28,9 @@
             <a href="{% url 'infoViaje' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
             <a href="{% url 'ListaPasajeros' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">LISTA DE PASAJEROS</a>
 
-            {% if viaje.enCurso %}
+            {% if not viaje.enCurso %}
                 <a href="{% url 'CompraExpress' viaje.id%}" style="margin-left: 20px;" class="btn btn-primary">PASAJE EXPRESS</a>
-                {% if viaje.imprevisto == NULL %}
                     <a href="{% url 'NotificarImprevisto' viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">NOTIFICAR IMPREVISTO</a>
-                {% else %}
-                    <a href="{% url 'ModificarImprevisto' viaje.imprevisto.id %}" style="margin-left: 20px;" class="btn btn-primary">MODIFICAR IMPREVISTO</a>
-                {% endif %}
             {% endif %}
 
             {% if viaje.id == proximo.id %}
