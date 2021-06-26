@@ -788,6 +788,10 @@ def ImprevistoEliminado(request, imprev):
     imprevisto.delete()
     return render(request, "PaginaDePruebaApp/mensajeExitoImprevistoEliminado.html")    
 
+def verDetalleImprevisto(request, id_imprev):
+    imprevisto = Imprevisto.objects.get(pk=id_imprev)
+    return render(request,"PaginaDePruebaApp/verDetalleImprevisto.html",{"imprevisto":imprevisto})
+                
 
 def CompraExpress(request,viaje_id):
     viaje=Viaje.objects.get(id=viaje_id)

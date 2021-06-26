@@ -1,4 +1,5 @@
 
+from datetime import datetime, time
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
@@ -203,7 +204,9 @@ class ImprevistoInputForm(forms.ModelForm):
     def save(self,viaje):
         Imprevisto.objects.create(
             texto=self.cleaned_data.get('texto'),
-            viaje = viaje
+            viaje = viaje,
+            chofer = viaje.combi.chofer,
+            fecha= datetime.now()
         )
 
 

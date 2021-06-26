@@ -11,13 +11,16 @@
             {% for imprev in imprevistos %}
                 
                 <li style="padding:5px;background-color: rgba(173, 175, 192,0.5);;margin: 20px 20px;">
-                    <b></b>{{imprev.texto}}&nbsp; 
+                    <b></b><a style= "color: black" href= "{% url 'VerDetalleImprevisto' imprev.id %}"> {{imprev.texto}}</a> &nbsp;
                     {%if imprev.resuelto %} 
                         <b style= "color: green">Resuelto </b>
+                        <br><a>Fecha de imprevisto: {{imprev.fecha}}</a>
                     {%else %}
                         <b style= "color: red">No Resuelto </b>
+                        <br><a>Fecha de imprevisto: {{imprev.fecha}}</a>
                         <br><a href={% url 'ModificarImprevisto' imprev.id %}>Modificar</a>
                         <a href={% url 'MensajeExitoEliminarImprevisto' imprev.id %}>Eliminar</a>
+
                     {%endif%}
 
                 </li>
@@ -26,12 +29,14 @@
         {% for imprev in imprevistos %}
                 
             <li style="padding:5px;background-color: rgba(173, 175, 192,0.5);;margin: 20px 20px;">
-                <b></b><a href= #> {{imprev.texto}}</a> &nbsp;
+                <b></b><a style= "color: black" href= "{% url 'VerDetalleImprevisto' imprev.id %}"> {{imprev.texto}}</a> &nbsp;
                 {%if imprev.resuelto %} 
                     <b style= "color: green">(Resuelto) </b>
+                    <br><a>Fecha de imprevisto: {{imprev.fecha}}</a>
                 {%else %}
                     <b style= "color: red">(No Resuelto) </b>
-                    <br><a style = 'color:black' href={% url 'ConfirmacionImprevistoResuelto' imprev.id %}>Marcar como Resuelto</a>
+                    <br><a>Fecha de imprevisto: {{imprev.fecha}}</a>
+                    <br><a href={% url 'ConfirmacionImprevistoResuelto' imprev.id %}>Marcar como Resuelto</a>
                 {%endif%}
             
             </li>

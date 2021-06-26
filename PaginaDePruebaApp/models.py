@@ -202,9 +202,12 @@ class Viaje(models.Model):
         return "origen: {0}, destino: {1}, combi: {2}, fecha salida: {3}, fecha llegada: {4} y precio: ${5}".format(self.ruta.origen,self.ruta.destino, self.combi.modelo,self.fechaSalida.strftime("%b %d %Y %H:%M"),self.fechaLlegada.strftime("%b %d %Y %H:%M"),self.precio)
 
 class Imprevisto(models.Model):
+    fecha=models.DateTimeField()
     texto=models.CharField(max_length=200)
     resuelto=models.BooleanField(default=False) 
     viaje=models.ForeignKey(Viaje,on_delete=models.CASCADE)
+    # para guardar el chofer que reealizo el imprevisto y si la combi cambia de chofer, no se le asigne a otro.
+    chofer=models.ForeignKey(Chofer,on_delete=models.PROTECT)
 class Tarjeta(models.Model):
     nro=models.IntegerField()
     fechaVto=models.DateTimeField()

@@ -1,0 +1,23 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+{% block content %}
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    <h3>Datos de Imprevisto</h3>
+    {%if imprevisto.resuelto %} 
+        <b style= "color: green">(Resuelto) </b>
+    {%else %}
+        <b style= "color: red">(No Resuelto) </b>
+        <br><a href={% url 'ConfirmacionImprevistoResuelto' imprevisto.id %}>Marcar como Resuelto</a>
+    {%endif%}
+    <li style="margin-left: 20px;"><b>Descripcion: </b>{{imprevisto.texto}}</li>
+    <li style="margin-left: 20px;"><b>Fecha de imprevisto: </b>{{imprevisto.fecha}}</li>
+    <li style="margin-left: 20px;"><b>Chofer: </b>{{ imprevisto.chofer.user.last_name}}  {{ imprevisto.chofer.user.first_name}} - {{imprevisto.chofer}}</li>
+    <li style="margin-left: 20px;"><b>Origen: </b>{{imprevisto.viaje.ruta.origen}}</li>
+    <li style="margin-left: 20px;"><b>Destino: </b>{{imprevisto.viaje.ruta.destino}}</li>
+    <li style="margin-left: 20px;"><b>Fecha salida: </b>{{imprevisto.viaje.fechaSalida}}</li>
+    <li style="margin-left: 20px;"><b>Fecha llegada: </b>{{imprevisto.viaje.fechaLlegada}}</li>
+    <li style="margin-left: 20px;"><b>Patente Combi: </b>{{imprevisto.viaje.combi.patente}}</li>
+  
+
+{% endblock %}
