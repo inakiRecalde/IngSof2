@@ -40,6 +40,8 @@ urlpatterns = [
     
     path('CuestionarioCovid/<int:dni>/<int:viaje_id>', views.CuestionarioCovid, name= "CuestionarioCovid"),
     path('Imprevistos/', views.Imprevistos,name = "Imprevistos"),
+    path('Reembolsos/', views.Reembolsos,name = "Reembolsos"),
+    path('RealizarReembolso/<int:reembolso_id>', views.RealizarReembolso,name = "RealizarReembolso"),
     path('ConfirmacionImprevistoResuelto/<int:imprev>', views.ConfirmacionImprevistoResuelto,name = "ConfirmacionImprevistoResuelto" ),
     path('MensajeExitoImprevistoResuelto/<int:imprev>', views.ImprevistoResuelto,name = "MensajeExitoImprevistoResuelto" ),
     path('ImprevistosChofer/', views.Imprevistos,name = "ImprevistosChofer" ),

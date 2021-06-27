@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar,User,Chofer,Viaje,Insumo,Compra
+from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar, Reembolso,User,Chofer,Viaje,Insumo,Compra
 from datetime import date, datetime, time, timezone
 from django.utils import timezone
 from .forms import *
@@ -617,6 +617,8 @@ def CancelarPasaje(request, id_viaje):
             dinero=calcularReintegro(compra.total,viaje)
             compra.cancelado=True
             compra.pendiente=False
+            reembolso=Reembolso.objects.create(user=request.user, dinero=dinero, fecha=timezone.now(), realizado=False)
+            compra.reembolso=reembolso
             compra.save()
             return render (request, "PaginaDePruebaApp/cancelarPasaje.html", {"dinero": dinero})
 
@@ -753,13 +755,24 @@ def CuestionarioCovid(request,dni,viaje_id):
         form = CuestionarioCovidForm()
         return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})
 
+def Reembolsos(request):
+    reembolsos=Reembolso.objects.all()
+    reembolsos=reembolsos.order_by('fecha')
+    return render(request,"PaginaDePruebaApp/reembolsos.html", {"reembolsos" : reembolsos})
+
+def RealizarReembolso(request, reembolso_id):
+    reembolso=Reembolso.objects.get(id=reembolso_id)
+    reembolso.realizado=True
+    reembolso.save()
+    return render(request,"PaginaDePruebaApp/inicio.html")
+
+
 def Imprevistos (request):
     if request.method== "POST":
         if request.user.esChofer:
             pk = request.POST.get('identificador_id')
             imprev = Imprevisto.objects.get(pk=pk)
             imprev.delete()  
-            print('pasa')
             return redirect(Inicio)
 
     else:
