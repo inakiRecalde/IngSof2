@@ -1,0 +1,22 @@
+{% extends "PaginaDePruebaApp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+{% if reembolsos %}
+<div style="background-color: rgba(255, 255, 255,0.8); padding:50px"> 
+    {% for reembolso in reembolsos %}
+        {% if not reembolso.realizado %}
+        <li style="margin-left: 20px;">
+            <b>Usuario: </b>{{reembolso.user}} &nbsp; <b>Fecha: </b>{{reembolso.fecha}} &nbsp; <b>Dinero: $</b>{{reembolso.dinero}}
+        </li>
+        <a href="{% url 'RealizarReembolso' reembolso.id %}" style="margin-left: 20px;" class="btn btn-primary"> Realizar Reembolso</a>
+        {% endif %}
+    {% endfor %} 
+</div>     
+{% else %}
+    <h4 style="background-color: rgba(255, 255, 255,0.8); color:black; padding:50px">No tiene ningun reebolso para realizar</h4>
+{% endif %}
+
+{% endblock %}

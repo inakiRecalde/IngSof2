@@ -39,6 +39,11 @@
                 <b>Origen: </b>{{compra.viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{compra.viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{compra.viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{compra.viaje.fechaLlegada}}
             </li> 
             <a href="{% url 'infoViaje' compra.viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">MAS INFO</a>
+            {% if not compra.reembolso.realizado %}
+                <b style="color: red;">Compra aun no reembolsada</b>
+            {% else %}
+                <b style="color: green;">Compra ya reembolsada: </b>${{compra.reembolso.dinero}}
+            {% endif %}
         {% endif %}
     {% endfor %}
 </div>

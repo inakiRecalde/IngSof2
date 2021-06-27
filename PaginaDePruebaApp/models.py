@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import datetime
+from django.db.models.deletion import CASCADE
 from django.db.models.fields import IntegerField
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
@@ -244,6 +245,12 @@ class Invitado(models.Model):
     suspendido=models.BooleanField(default=False)
     testRealizado=models.BooleanField(default=False)
 
+class Reembolso(models.Model):
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    dinero=models.IntegerField()
+    fecha=models.DateTimeField()
+    realizado=models.BooleanField(default=False)
+
 class Compra(models.Model):
     fechaCompra=models.DateTimeField(auto_now_add=True)
     total=models.FloatField()
@@ -254,6 +261,7 @@ class Compra(models.Model):
     invitados=models.ManyToManyField(Invitado,default=None,null=True)
     pendiente=models.BooleanField(default=False)
     cancelado=models.BooleanField(default=False)
+    reembolso=models.OneToOneField(Reembolso, on_delete=CASCADE, default=None, null=True)
     class Meta:
         verbose_name="Compra"
         verbose_name_plural="Compras" 
