@@ -8,7 +8,9 @@
         <b style= "color: green">(Resuelto) </b>
     {%else %}
         <b style= "color: red">(No Resuelto) </b>
-        <br><a href={% url 'ConfirmacionImprevistoResuelto' imprevisto.id %}>Marcar como Resuelto</a>
+        {% if user.is_superuser %}
+            <br><a href={% url 'ConfirmacionImprevistoResuelto' imprevisto.id %}>Marcar como Resuelto</a>
+        {%endif%}
     {%endif%}
     <li style="margin-left: 20px;"><b>Descripcion: </b>{{imprevisto.texto}}</li>
     <li style="margin-left: 20px;"><b>Fecha de imprevisto: </b>{{imprevisto.fecha}}</li>

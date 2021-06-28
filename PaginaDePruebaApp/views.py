@@ -704,7 +704,11 @@ def suspenderUser(user):
     comprasUser=Compra.objects.filter(user_id=user.user_id)
     for compra in comprasUser:
         compra.cancelado=True
+        usuario= User.objects.get(id=user.user_id)
+        reembolso=Reembolso.objects.create(user=usuario, dinero=compra.total, fecha=timezone.now(), realizado=False)
+        compra.reembolso=reembolso
         compra.save()
+        
 
 def CuestionarioCovid(request,dni,viaje_id):
 
@@ -756,7 +760,7 @@ def CuestionarioCovid(request,dni,viaje_id):
         return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})
 
 def Reembolsos(request):
-    reembolsos=Reembolso.objects.all()
+    reembolsos=Reembolso.objects.filter(realizado=False)
     reembolsos=reembolsos.order_by('fecha')
     return render(request,"PaginaDePruebaApp/reembolsos.html", {"reembolsos" : reembolsos})
 
@@ -764,7 +768,9 @@ def RealizarReembolso(request, reembolso_id):
     reembolso=Reembolso.objects.get(id=reembolso_id)
     reembolso.realizado=True
     reembolso.save()
-    return render(request,"PaginaDePruebaApp/inicio.html")
+    return redirect(Reembolsos)
+
+
 
 
 def Imprevistos (request):
