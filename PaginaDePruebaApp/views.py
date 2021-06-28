@@ -87,7 +87,6 @@ def getPasajeros(viaje_id):
     #filtro los compradores
     compradoresIds=list(compra.user.user_id for compra in comprasViaje)
     compradoresViaje=Cliente.objects.filter(user_id__in=compradoresIds)
-
     return compradoresViaje
     
 
@@ -99,8 +98,6 @@ def getInsumosConCantidad(listaInsumos,compra):
 def getClientesConTest(listaClientes,viaje):
     clientesTestQuery=TestRealizadoCliente.objects.filter(viaje_id=viaje.id,cliente__in=listaClientes).order_by('cliente')
     listaRealizado=list(test.testRealizado for test in clientesTestQuery)
-    print(listaClientes)
-    print(listaRealizado)
     return list(zip(listaClientes,listaRealizado))
 
 def getInvitadosConTest(listaInvitados,viaje):
@@ -548,8 +545,6 @@ def RegistroInvitado(request,viaje_id):
                     else:
                         #si existe, lo trae y se fija si está suspendido
                         invitadoInfo=Invitado.objects.get(dni=invitadoInfo['dni'])
-                        #invitadoInfo.suspendido=True
-                        #invitadoInfo.save()
                         if invitadoInfo.suspendido==True:
                             msg ="No puede agregarse al invitado por ser sospechoso de covid"   ## Mensaje de error si ya se registro a un invitado con ese dni
                             formInvitado.add_error("dni", msg)
@@ -645,19 +640,24 @@ def ListaPasajeros(request,id_viaje):
     #Traigo el viaje 
     viaje=Viaje.objects.get(id=id_viaje)
 
-    #filtro los usuarios que compraron pasajes
-    compradores=getPasajeros(viaje.id)
+    #filtro los usuarios que compraron pasajes y no estan cancelados
+    comprasViaje=Compra.objects.filter(viaje_id=id_viaje,cancelado=False)
+    #filtro los compradores
+    compradoresIds=list(compra.user.user_id for compra in comprasViaje)
+    compradores=Cliente.objects.filter(user_id__in=compradoresIds)
 
     compradoresConTest=getClientesConTest(compradores,viaje)
 
     #filtro los invitados de ese viaje
-    invitadosDnis=getInvitadosViaje(viaje.id)
+    comprasIds=list(compra.id for compra in comprasViaje)
+    invitadosViajeQuery=Compra.invitados.through.objects.filter(compra_id__in=comprasIds)
+    invitadosIds=list(invitado.invitado_id for invitado in invitadosViajeQuery)
+    invitadosViaje=Invitado.objects.filter(id__in=invitadosIds)
+    invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
     invitados=Invitado.objects.filter(dni__in=invitadosDnis)
 
     invitadosConTest=getInvitadosConTest(invitados,viaje)
 
-    print(invitadosConTest)
-    print(compradoresConTest)
 
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradoresConTest":compradoresConTest,"invitadosConTest":invitadosConTest,"viaje_id":viaje.id})
 
@@ -729,7 +729,10 @@ def suspenderUser(user):
     user.save()
     comprasUser=Compra.objects.filter(user_id=user.user_id)
     for compra in comprasUser:
+        viajeCompra=Viaje.objects.get(id=compra.viaje_id)
+        #if viajeCompra.fechaSalida < 
         compra.cancelado=True
+        compra.pendiente=False
         usuario= User.objects.get(id=user.user_id)
         reembolso=Reembolso.objects.create(user=usuario, dinero=compra.total, fecha=timezone.now(), realizado=False)
         compra.reembolso=reembolso
@@ -751,11 +754,10 @@ def CuestionarioCovid(request,dni,viaje_id):
                     testPasajero=TestRealizadoCliente.objects.get(cliente=pasajero[0],viaje=viaje)
                     testPasajero.testRealizado=True
                     testPasajero.save()
-                    #pasajero[0].testRealizado.add(viaje,through_defaults={'testRealizado':True})
-                    #pasajero[0].save()
                 else:
                     invitado=Invitado.objects.get(dni=dni)
                     invitado.suspendido=True
+                    invitado.save()
                     testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
                     testInvitado.testRealizado=True
                     testInvitado.save()
@@ -773,6 +775,7 @@ def CuestionarioCovid(request,dni,viaje_id):
                     else:
                         invitado=Invitado.objects.get(dni=dni)
                         invitado.suspendido=True
+                        invitado.save()
                         testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
                         testInvitado.testRealizado=True
                         testInvitado.save()
