@@ -730,13 +730,13 @@ def suspenderUser(user):
     comprasUser=Compra.objects.filter(user_id=user.user_id)
     for compra in comprasUser:
         viajeCompra=Viaje.objects.get(id=compra.viaje_id)
-        #if viajeCompra.fechaSalida < 
-        compra.cancelado=True
-        compra.pendiente=False
-        usuario= User.objects.get(id=user.user_id)
-        reembolso=Reembolso.objects.create(user=usuario, dinero=compra.total, fecha=timezone.now(), realizado=False)
-        compra.reembolso=reembolso
-        compra.save()
+        if viajeCompra.fechaSalida < timezone.now() + timezone.timedelta(days=15):
+            compra.cancelado=True
+            compra.pendiente=False
+            usuario= User.objects.get(id=user.user_id)
+            reembolso=Reembolso.objects.create(user=usuario, dinero=compra.total, fecha=timezone.now(), realizado=False)
+            compra.reembolso=reembolso
+            compra.save()
         
 
 def CuestionarioCovid(request,dni,viaje_id):
