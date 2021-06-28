@@ -222,9 +222,8 @@ class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     dni= models.IntegerField(null= True, blank = False)
     suspendido=models.BooleanField(default=False)
-    testRealizado=models.BooleanField(default=False)
+    testRealizado=models.ManyToManyField(Viaje,default=None,null=True,through='TestRealizadoCliente')
     esGold=models.BooleanField(default=False)
-    historialViajes=models.ManyToManyField(Viaje,default=None,null=True)
 
 
     #solo si es gold
@@ -243,7 +242,7 @@ class Invitado(models.Model):
     apellido=models.CharField(max_length=30)
     dni=models.IntegerField()
     suspendido=models.BooleanField(default=False)
-    testRealizado=models.BooleanField(default=False)
+    testRealizado=models.ManyToManyField(Viaje,default=None,null=True,through='TestRealizadoInvitado')
 
 class Reembolso(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE)
@@ -270,3 +269,13 @@ class CantidadInsumo(models.Model):
     compra=models.ForeignKey(Compra,on_delete=models.CASCADE)
     insumo=models.ForeignKey(Insumo,on_delete=models.CASCADE)
     cantidad=models.PositiveIntegerField()
+
+class TestRealizadoCliente(models.Model):
+    cliente=models.ForeignKey(Cliente,on_delete=models.CASCADE)
+    viaje=models.ForeignKey(Viaje,on_delete=models.CASCADE)
+    testRealizado=models.BooleanField(default=False)
+
+class TestRealizadoInvitado(models.Model):
+    invitado=models.ForeignKey(Invitado,on_delete=models.CASCADE)
+    viaje=models.ForeignKey(Viaje,on_delete=models.CASCADE)
+    testRealizado=models.BooleanField(default=False)

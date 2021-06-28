@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar, Reembolso,User,Chofer,Viaje,Insumo,Compra
+from PaginaDePruebaApp.models import CantidadInsumo, Cliente, Combi, Lugar, Reembolso, TestRealizadoCliente, TestRealizadoInvitado,User,Chofer,Viaje,Insumo,Compra
 from datetime import date, datetime, time, timezone
 from django.utils import timezone
 from .forms import *
@@ -95,6 +95,19 @@ def getInsumosConCantidad(listaInsumos,compra):
     insumosCantidadQuery=CantidadInsumo.objects.filter(compra_id=compra.id,insumo__in=listaInsumos)
     listaCantidades=list(cantInsumo.cantidad for cantInsumo in insumosCantidadQuery)
     return list(zip(listaInsumos,listaCantidades))
+
+def getClientesConTest(listaClientes,viaje):
+    clientesTestQuery=TestRealizadoCliente.objects.filter(viaje_id=viaje.id,cliente__in=listaClientes).order_by('cliente')
+    listaRealizado=list(test.testRealizado for test in clientesTestQuery)
+    print(listaClientes)
+    print(listaRealizado)
+    return list(zip(listaClientes,listaRealizado))
+
+def getInvitadosConTest(listaInvitados,viaje):
+    invitadosTestQuery=TestRealizadoInvitado.objects.filter(viaje_id=viaje.id,invitado__in=listaInvitados).order_by('invitado')
+    listaRealizado=list(test.testRealizado for test in invitadosTestQuery)
+    return list(zip(listaInvitados,listaRealizado))
+
 
 def calcularReintegro(total,viaje):
     fecha=viaje.fechaSalida-datetime.now(timezone.utc)
@@ -449,6 +462,9 @@ def CompraView(request,viaje_id):
 
     if compra.pendiente:
         return render(request,"PaginaDePruebaApp/mensajeCompraFallida.html")
+
+    if persona.suspendido:
+        return render(request,"PaginaDePruebaApp/mensajeCompraFallidaUserSusp.html")
     
     #Me quedo con la lista de invitados de la compra
     invitadosCompra=getInvitadosCompra(compra.id)
@@ -484,6 +500,7 @@ def CompraView(request,viaje_id):
                     compra.save()
                     viaje.asientosDisponibles=viaje.asientosDisponibles-(len(invitadosCompra)+1)
                     viaje.save()
+                    persona.testRealizado.add(viaje,through_defaults={'testRealizado':False})
                     return render(request,"PaginaDePruebaApp/mensajeExitoCompra.html",{"compra":compra,"viaje":viaje,"invitados":invitadosCompra,"insumosCompraConCantidad":insumosCompraConCantidad})
                 else:
                     msg ="No hay suficientes asientos disponibles"   ## Mensaje de error si esta vencida la tarjeta
@@ -529,14 +546,16 @@ def RegistroInvitado(request,viaje_id):
                     if not invitadoExisteQuery:
                         invitadoInfo=formInvitado.save()
                     else:
+                        #si existe, lo trae y se fija si está suspendido
                         invitadoInfo=Invitado.objects.get(dni=invitadoInfo['dni'])
-                        invitadoInfo.suspendido=True
-                        invitadoInfo.save()
+                        #invitadoInfo.suspendido=True
+                        #invitadoInfo.save()
                         if invitadoInfo.suspendido==True:
                             msg ="No puede agregarse al invitado por ser sospechoso de covid"   ## Mensaje de error si ya se registro a un invitado con ese dni
                             formInvitado.add_error("dni", msg)
                             return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
                     Compra.invitados.through.objects.create(compra_id=compra.id,invitado_id=invitadoInfo.id)
+                    invitadoInfo.testRealizado.add(viaje,through_defaults={'testRealizado':False})
                     return redirect(CompraView,viaje_id=viaje.id)
                 else:
                     msg ="El dni ingresado ya se encuentra registrado en la lista de pasajeros de este viaje"   ## Mensaje de error si ya se registro a un invitado con ese dni
@@ -629,11 +648,18 @@ def ListaPasajeros(request,id_viaje):
     #filtro los usuarios que compraron pasajes
     compradores=getPasajeros(viaje.id)
 
+    compradoresConTest=getClientesConTest(compradores,viaje)
+
     #filtro los invitados de ese viaje
     invitadosDnis=getInvitadosViaje(viaje.id)
     invitados=Invitado.objects.filter(dni__in=invitadosDnis)
 
-    return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradores":compradores,"invitados":invitados,"viaje_id":viaje.id})
+    invitadosConTest=getInvitadosConTest(invitados,viaje)
+
+    print(invitadosConTest)
+    print(compradoresConTest)
+
+    return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradoresConTest":compradoresConTest,"invitadosConTest":invitadosConTest,"viaje_id":viaje.id})
 
 def IniciarViaje(request, id_viaje):
     viaje=Viaje.objects.get(id=id_viaje)
@@ -712,6 +738,7 @@ def suspenderUser(user):
 
 def CuestionarioCovid(request,dni,viaje_id):
 
+    viaje=Viaje.objects.get(id=viaje_id)
     pasajero=Cliente.objects.filter(dni=dni)
 
     if request.method== "POST":
@@ -721,13 +748,17 @@ def CuestionarioCovid(request,dni,viaje_id):
             if int(data['temperatura']) >= 38:
                 if pasajero:
                     suspenderUser(pasajero[0])
-                    pasajero[0].testRealizado=True
-                    pasajero[0].save()
+                    testPasajero=TestRealizadoCliente.objects.get(cliente=pasajero[0],viaje=viaje)
+                    testPasajero.testRealizado=True
+                    testPasajero.save()
+                    #pasajero[0].testRealizado.add(viaje,through_defaults={'testRealizado':True})
+                    #pasajero[0].save()
                 else:
                     invitado=Invitado.objects.get(dni=dni)
                     invitado.suspendido=True
-                    invitado.testRealizado=True
-                    invitado.save()
+                    testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
+                    testInvitado.testRealizado=True
+                    testInvitado.save()
                 return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
             else:
                 claves=('perdidaGusto','perdidaOlfato','dolorGarganta','fiebre','infeccionesPulm')
@@ -736,22 +767,26 @@ def CuestionarioCovid(request,dni,viaje_id):
                 if cantSintomas >=2:
                     if pasajero:
                         suspenderUser(pasajero[0])
-                        pasajero[0].testRealizado=True
-                        pasajero[0].save()
+                        testPasajero=TestRealizadoCliente.objects.get(cliente=pasajero[0],viaje=viaje)
+                        testPasajero.testRealizado=True
+                        testPasajero.save()
                     else:
                         invitado=Invitado.objects.get(dni=dni)
                         invitado.suspendido=True
-                        invitado.testRealizado=True
-                        invitado.save()
+                        testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
+                        testInvitado.testRealizado=True
+                        testInvitado.save()
                     return render (request,"PaginaDePruebaApp/mensajeCuestionarioFallido.html",{"dni":dni,"viaje_id":viaje_id})
                 else:
                     if pasajero:
-                        pasajero[0].testRealizado=True
-                        pasajero[0].save()
+                        testPasajero=TestRealizadoCliente.objects.get(cliente=pasajero[0],viaje=viaje)
+                        testPasajero.testRealizado=True
+                        testPasajero.save()
                     else:
                         invitado=Invitado.objects.get(dni=dni)
-                        invitado.testRealizado=True
-                        invitado.save()
+                        testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
+                        testInvitado.testRealizado=True
+                        testInvitado.save()
                     return render(request,"PaginaDePruebaApp/mensajeCuestionarioExito.html",{"dni":dni,"viaje_id":viaje_id})
         else:        
             return render(request,"PaginaDePruebaApp/cuestionarioCovid.html", {"form": form})

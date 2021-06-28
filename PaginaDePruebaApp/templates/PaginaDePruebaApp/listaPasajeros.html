@@ -4,15 +4,15 @@
 {% block content %}
     <div style="background-color: rgba(255, 255, 255,0.8); padding:50px">
         <h3>Listado de pasajeros</h3>
-        {% if compradores or invitados %}
+        {% if compradoresConTest or invitadosConTest %}
         <div id="compradores">
-            {% if compradores %}
-                {% for comprador in compradores %}
+            {% if compradoresConTest %}
+                {% for comprador in compradoresConTest %}
                     <li style="margin-left: 20px;">
-                        <b>Nombre: </b>{{comprador.user.first_name}} &nbsp; <b>Apellido: </b>{{comprador.user.last_name}} &nbsp; <b>DNI: </b>{{comprador.dni}} &nbsp; 
+                        <b>Nombre: </b>{{comprador.0.user.first_name}} &nbsp; <b>Apellido: </b>{{comprador.0.user.last_name}} &nbsp; <b>DNI: </b>{{comprador.0.dni}} &nbsp; 
                     </li>
-                    {% if not comprador.testRealizado %}
-                        <a href="{% url 'CuestionarioCovid' comprador.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
+                    {% if not comprador.1 %}
+                        <a href="{% url 'CuestionarioCovid' comprador.0.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>  
                     {% else %}
                         <p style="color: rgb(26, 196, 11);">Test realizado</p>
                     {% endif %}
@@ -22,13 +22,13 @@
             {% endif %}
         </div>
         <div id="invitados">
-            {% if invitados %}
-                {% for invitado in invitados %}
+            {% if invitadosConTest %}
+                {% for invitado in invitadosConTest %}
                     <li style="margin-left: 20px;">
-                        <b>Nombre: </b>{{invitado.nombre}} &nbsp; <b>Apellido: </b>{{invitado.apellido}} &nbsp; <b>DNI: </b>{{invitado.dni}} &nbsp; 
-                    </li>    
-                    {% if not invitado.testRealizado %}
-                        <a href="{% url 'CuestionarioCovid' invitado.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
+                        <b>Nombre: </b>{{invitado.0.nombre}} &nbsp; <b>Apellido: </b>{{invitado.0.apellido}} &nbsp; <b>DNI: </b>{{invitado.0.dni}} &nbsp; 
+                    </li>
+                    {% if not invitado.1 %}
+                        <a href="{% url 'CuestionarioCovid' invitado.0.dni viaje_id %}" style="margin-left: 20px;" class="btn btn-primary">Realizar cuestionario COVID-19</a>    
                     {% else %}
                         <p style="color: rgb(26, 196, 11);">Test realizado</p>
                     {% endif %}

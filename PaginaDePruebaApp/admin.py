@@ -47,14 +47,14 @@ class UserAdmin(admin.ModelAdmin):
                         obj.delete()
                 else:
                     obj.delete() 
-                           
+
 
 admin.site.register(User, UserAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("dni","user", "suspendido", "esGold")  #Campos que va a mostrar cuando presione Usuarios
     search_fields = ("dni",)  ## campos por los que se puede buscar
-    readonly_fields=("user","dni","tarjeta","ahorro","historialViajes")
+    readonly_fields=("user","dni","tarjeta","ahorro")
 
     #para que no pueda aniadir desde el panel
     def has_add_permission(self, request, obj=None):
