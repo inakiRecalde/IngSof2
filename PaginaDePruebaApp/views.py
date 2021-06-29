@@ -10,6 +10,7 @@ from .forms import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
+import pytz
 
 # metodos.
 def envio_Mail(destinatario):
@@ -268,17 +269,15 @@ def infoViaje(request, id_viaje):
 
 def ViajeProximo(viajes):
     if viajes:
+        minFecha= datetime.max
+        minFecha= minFecha.replace(tzinfo=pytz.timezone('UTC'))
         for viaje in viajes:
-            if viaje.fechaSalida > timezone.now():
-                prox=viaje.fechaSalida
+            if (not viaje.finalizado) and (viaje.fechaSalida <= minFecha):
+                minFecha= viaje.fechaSalida
                 viajeProx=viaje
-                break 
-        for viaje in viajes:
-            if not viaje.finalizado and (viaje.fechaSalida > timezone.now()):
-                if prox > viaje.fechaSalida:
-                    prox=viaje.fechaSalida
-                    viajeProx=viaje
         return viajeProx
+    else:
+        return -1
 
 def ViajesChofer (request):
     persona=Chofer.objects.get(user_id=request.user.id)
