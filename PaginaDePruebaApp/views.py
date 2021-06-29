@@ -657,7 +657,6 @@ def ListaPasajeros(request,id_viaje):
 
     invitadosConTest=getInvitadosConTest(invitados,viaje)
 
-
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradoresConTest":compradoresConTest,"invitadosConTest":invitadosConTest,"viaje_id":viaje.id})
 
 def IniciarViaje(request, id_viaje):
@@ -863,7 +862,8 @@ def CompraExpress(request,viaje_id):
             else:
                 nuevoUser=form.save()
                 cliente=Cliente.objects.get(user_id=nuevoUser.id)
-                compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=cliente)
+                compra=Compra.objects.create(total=viaje.precio,viaje=viaje,user=cliente,pendiente=1)
+                TestRealizadoCliente.objects.create(testRealizado=0,cliente=cliente,viaje=viaje)
                 viaje.asientosDisponibles=viaje.asientosDisponibles-1
                 viaje.save()
                 return render(request,"PaginaDePruebaApp/mensajeCompraExpressExitosa.html",{"viaje":viaje})
