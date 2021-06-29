@@ -221,7 +221,7 @@ class Tarjeta(models.Model):
 class Cliente(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     dni= models.IntegerField(null= True, blank = False)
-    suspendido=models.BooleanField(default=False)
+    suspendido=models.DateTimeField(null=True,blank=True)
     testRealizado=models.ManyToManyField(Viaje,default=None,null=True,through='TestRealizadoCliente')
     esGold=models.BooleanField(default=False)
 
@@ -241,7 +241,7 @@ class Invitado(models.Model):
     nombre=models.CharField(max_length=30)
     apellido=models.CharField(max_length=30)
     dni=models.IntegerField()
-    suspendido=models.BooleanField(default=False)
+    suspendido=models.DateTimeField(null=True,blank=True)
     testRealizado=models.ManyToManyField(Viaje,default=None,null=True,through='TestRealizadoInvitado')
 
 class Reembolso(models.Model):

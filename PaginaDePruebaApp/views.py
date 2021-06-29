@@ -459,7 +459,7 @@ def CompraView(request,viaje_id):
     if compra.pendiente:
         return render(request,"PaginaDePruebaApp/mensajeCompraFallida.html")
 
-    if persona.suspendido:
+    if persona.suspendido != None and viaje.fechaSalida < persona.suspendido + timezone.timedelta(days=15):
         return render(request,"PaginaDePruebaApp/mensajeCompraFallidaUserSusp.html")
     
     #Me quedo con la lista de invitados de la compra
@@ -544,7 +544,7 @@ def RegistroInvitado(request,viaje_id):
                     else:
                         #si existe, lo trae y se fija si está suspendido
                         invitadoInfo=Invitado.objects.get(dni=invitadoInfo['dni'])
-                        if invitadoInfo.suspendido==True:
+                        if invitadoInfo.suspendido != None and invitadoInfo.suspendido < timezone.now() + timezone.timedelta(days=15):
                             msg ="No puede agregarse al invitado por ser sospechoso de covid"   ## Mensaje de error si ya se registro a un invitado con ese dni
                             formInvitado.add_error("dni", msg)
                             return render(request,"PaginaDePruebaApp/registroInvitado.html", {"formInvitado": formInvitado,"viaje":viaje})
@@ -723,7 +723,7 @@ def contarSintomas(sintomas):
     return cant
 
 def suspenderUser(user):
-    user.suspendido=True
+    user.suspendido=timezone.now()
     user.save()
     comprasUser=Compra.objects.filter(user_id=user.user_id)
     for compra in comprasUser:
@@ -754,7 +754,7 @@ def CuestionarioCovid(request,dni,viaje_id):
                     testPasajero.save()
                 else:
                     invitado=Invitado.objects.get(dni=dni)
-                    invitado.suspendido=True
+                    invitado.suspendido=timezone.now()
                     invitado.save()
                     testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
                     testInvitado.testRealizado=True
@@ -772,7 +772,7 @@ def CuestionarioCovid(request,dni,viaje_id):
                         testPasajero.save()
                     else:
                         invitado=Invitado.objects.get(dni=dni)
-                        invitado.suspendido=True
+                        invitado.suspendido=timezone.now()
                         invitado.save()
                         testInvitado=TestRealizadoInvitado.objects.get(invitado=invitado,viaje=viaje)
                         testInvitado.testRealizado=True
