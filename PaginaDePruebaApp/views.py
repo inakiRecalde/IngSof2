@@ -528,11 +528,9 @@ def RegistroInvitado(request,viaje_id):
 
     invitadosCompra=getInvitadosCompra(compra.id)
 
-    invitadosViajeDNI=getInvitadosViaje(viaje.id)
-
+    invitadosViajeDNI=list(invitado.dni for invitado in getInvitadosViaje(viaje.id))
     #creo una lista de los dni de los invitados 
     invitadosCompraDNI=list(invitado.dni for invitado in invitadosCompra)
-
     if request.method== "POST":
         formInvitado=InvitadoForm(request.POST)
         if formInvitado.is_valid():
