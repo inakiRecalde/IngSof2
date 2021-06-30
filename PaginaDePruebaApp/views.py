@@ -81,13 +81,15 @@ def getInvitadosViaje(viaje_id):
     invitadosIds=list(invitado.invitado_id for invitado in invitadosViajeQuery)
     invitadosViaje=Invitado.objects.filter(id__in=invitadosIds)
     invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
-    return invitadosDnis
+    invitadosQuery= Invitado.objects.filter(dni__in = invitadosDnis)
+    return invitadosQuery
 
 def getPasajeros(viaje_id):
     comprasViaje=Compra.objects.filter(viaje_id=viaje_id)
     #filtro los compradores
     compradoresIds=list(compra.user.user_id for compra in comprasViaje)
     compradoresViaje=Cliente.objects.filter(user_id__in=compradoresIds)
+    print(compradoresViaje)
     return compradoresViaje
     
 
@@ -102,7 +104,8 @@ def getClientesConTest(listaClientes,viaje):
     return list(zip(listaClientes,listaRealizado))
 
 def getInvitadosConTest(listaInvitados,viaje):
-    invitadosTestQuery=TestRealizadoInvitado.objects.filter(viaje_id=viaje.id,invitado__in=listaInvitados).order_by('invitado')
+    print(listaInvitados)
+    invitadosTestQuery=TestRealizadoInvitado.objects.filter(viaje_id=viaje.id,invitado_id__in=listaInvitados).order_by('invitado')
     listaRealizado=list(test.testRealizado for test in invitadosTestQuery)
     return list(zip(listaInvitados,listaRealizado))
 
@@ -646,6 +649,7 @@ def ListaPasajeros(request,id_viaje):
     compradores=Cliente.objects.filter(user_id__in=compradoresIds)
     """
     compradores=getPasajeros(id_viaje)
+    print(compradores)
     compradoresConTest=getClientesConTest(compradores,viaje)
     """
     #filtro los invitados de ese viaje
