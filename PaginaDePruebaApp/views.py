@@ -638,23 +638,24 @@ def CancelarPasaje(request, id_viaje):
 def ListaPasajeros(request,id_viaje):
     #Traigo el viaje 
     viaje=Viaje.objects.get(id=id_viaje)
-
+    """
     #filtro los usuarios que compraron pasajes y no estan cancelados
     comprasViaje=Compra.objects.filter(viaje_id=id_viaje,cancelado=False)
     #filtro los compradores
     compradoresIds=list(compra.user.user_id for compra in comprasViaje)
     compradores=Cliente.objects.filter(user_id__in=compradoresIds)
-
+    """
+    compradores=getPasajeros(id_viaje)
     compradoresConTest=getClientesConTest(compradores,viaje)
-
+    """
     #filtro los invitados de ese viaje
     comprasIds=list(compra.id for compra in comprasViaje)
     invitadosViajeQuery=Compra.invitados.through.objects.filter(compra_id__in=comprasIds)
     invitadosIds=list(invitado.invitado_id for invitado in invitadosViajeQuery)
     invitadosViaje=Invitado.objects.filter(id__in=invitadosIds)
     invitadosDnis=list(invitado.dni for invitado in invitadosViaje)
-    invitados=Invitado.objects.filter(dni__in=invitadosDnis)
-
+    invitados=Invitado.objects.filter(dni__in=invitadosDnis)"""
+    invitados=getInvitadosViaje(id_viaje)
     invitadosConTest=getInvitadosConTest(invitados,viaje)
 
     return render(request,"PaginaDePruebaApp/listaPasajeros.html",{"compradoresConTest":compradoresConTest,"invitadosConTest":invitadosConTest,"viaje_id":viaje.id})
