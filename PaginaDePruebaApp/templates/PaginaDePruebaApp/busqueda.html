@@ -10,6 +10,9 @@
             <li style="margin-left: 20px;">
                 <b>Origen: </b>{{viaje.ruta.origen}} &nbsp; <b>Destino: </b>{{viaje.ruta.destino}} &nbsp; <b>Salida: </b>{{viaje.fechaSalida}} &nbsp; <b>Llegada: </b>{{viaje.fechaLlegada}} &nbsp; <b>Asientos disponibles: </b>{{viaje.asientosDisponibles}} &nbsp; <b>Precio: $</b>{{viaje.precio}}
             </li>
+            {% if viaje.enCurso %}
+                <b style="color: green; padding:20px">VIAJE EN CURSO</b>
+            {% endif %}
             {% if viaje.asientosDisponibles > 0 %}
                 {% if user.is_authenticated and not user.esChofer and not user.is_staff %}
                     <a href="{% url 'Compra' viaje_id=viaje.id %}" style="margin-left: 20px;" class="btn btn-primary">COMPRAR PASAJE</a>  
